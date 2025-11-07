@@ -90,22 +90,30 @@ class EmergentGravityNode(BaseNode):
         # 3. Calculate Curvature (Approx. $\nabla^2\Phi$)
         # The Laplacian of the potential field shows where the potential
         # is "bending" the most, i.e., the curvature.
-        self.curvature_field = cv2.Laplacian(self.potential_field, cv2.CV_32F, ksize=3)
         
+        # --- FIX ---
+        # Destination depth (cv2.CV_64F) must match the source depth (np.float64)
+        self.curvature_field = cv2.Laplacian(self.potential_field, cv2.CV_64F, ksize=3)
+        # --- END FIX ---
+
         # Apply coupling constant
         self.potential_field *= self.g_coupling
         self.curvature_field *= self.g_coupling
         
     def get_output(self, port_name):
         if port_name == 'gravity_potential':
-            return self._normalize_for_vis(self.potential_field)
+            # Normalize to float32 for other nodes
+            norm_field = self._normalize_for_vis(self.potential_field)
+            return norm_field.astype(np.float32) if norm_field is not None else None
             
         elif port_name == 'curvature_field':
             # Curvature can be positive or negative, so we take abs()
             # Check for None before np.abs()
             if self.curvature_field is None:
                 return None
-            return self._normalize_for_vis(np.abs(self.curvature_field))
+            norm_field = self._normalize_for_vis(np.abs(self.curvature_field))
+            # Normalize to float32 for other nodes
+            return norm_field.astype(np.float32) if norm_field is not None else None
             
         elif port_name == 'total_mass':
             return self.total_mass
@@ -113,7 +121,6 @@ class EmergentGravityNode(BaseNode):
         return None
         
     def get_display_image(self):
-        # --- START FIX ---
         # We visualize the curvature field, as it's more dynamic
         
         # Check if self.curvature_field is None before calling np.abs
@@ -126,7 +133,6 @@ class EmergentGravityNode(BaseNode):
         
         if vis_field_normalized is None:
              vis_field_normalized = np.zeros((64, 64), dtype=np.float32)
-        # --- END FIX ---
 
         img_u8 = (vis_field_normalized * 255).astype(np.uint8)
         
