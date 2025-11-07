@@ -1,0 +1,145 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "TopologicalXORNode",
+      "pos_x": 400,
+      "pos_y": 250,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "size": 96
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 50,
+      "pos_y": 100,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "value": 1.0
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 50,
+      "pos_y": 250,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "value": 0.0
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "InteractiveSignalNode",
+      "pos_x": 50,
+      "pos_y": 400,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "zoom_factor": 0.0
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "SinglePulseNode",
+      "pos_x": 250,
+      "pos_y": 400,
+      "width": 150,
+      "height": 100,
+      "config": {}
+    },
+    {
+      "id": 5,
+      "class_name": "DocumentationNode",
+      "pos_x": 50,
+      "pos_y": 550,
+      "width": 350,
+      "height": 150,
+      "config": {
+        "doc_text": "EXPERIMENT: TOPOLOGICAL XOR GATE (1 ⊕ 0 = 1)\n\n1. INITIAL SETUP:\n   - Input A (Top): 1.0 (Soliton)\n   - Input B (Middle): 0.0 (No Soliton)\n\n2. EXECUTION STEPS:\n   a) Click the GREEN 'Start' button.\n   b) Click the '+' button on the 'Interactive Signal' node once.\n   (This sends the single-frame launch pulse.)\n\n3. OBSERVATION:\n   - Image Display: Watch the wave travel through the potential.\n   - Output C: Should transition from 0.000 to 1.000 (Result is True).\n   - To run 1 ⊕ 1 = 0, set Input A & B to 1.0 and repeat step b."
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 700,
+      "pos_y": 100,
+      "width": 200,
+      "height": 100,
+      "config": {}
+    },
+    {
+      "id": 7,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 700,
+      "pos_y": 250,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "width": 160,
+        "height": 120
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 700,
+      "pos_y": 480,
+      "width": 200,
+      "height": 100,
+      "config": {}
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "input_A"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "input_B"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal",
+      "to_node_id": 4,
+      "to_port": "trigger_in"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "pulse_out",
+      "to_node_id": 0,
+      "to_port": "compute_trigger"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "output_C",
+      "to_node_id": 6,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "computation_image",
+      "to_node_id": 7,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "xor_state",
+      "to_node_id": 8,
+      "to_port": "signal"
+    }
+  ]
+}
