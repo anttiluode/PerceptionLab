@@ -1,7 +1,6 @@
 """
 Antti's CrystalMaker Node - A 3D polyrhythmic field generator
 Based on the PolyrhythmicSea class from crystal_kingdom.py
-Requires: pip install scipy
 Place this file in the 'nodes' folder
 """
 
@@ -17,7 +16,8 @@ BaseNode = __main__.BaseNode
 PA_INSTANCE = getattr(__main__, "PA_INSTANCE", None)
 # ------------------------------------
 try:
-    from scipy.signal import convolve
+    # --- FIX: Change import to ndimage.convolve for periodic boundaries ---
+    from scipy.ndimage import convolve 
     SCIPY_AVAILABLE = True
 except ImportError:
     SCIPY_AVAILABLE = False
@@ -97,8 +97,13 @@ class CrystalMakerNode(BaseNode):
         return -self.nonlinearity_A * field_k + self.nonlinearity_B * (field_k**3)
         
     def _laplacian(self, f):
-        """3D Laplacian using convolution"""
+        """3D Laplacian using convolution with periodic boundary ('wrap')"""
+        if not SCIPY_AVAILABLE:
+            return np.zeros_like(f)
+            
+        # --- FIX: Use mode='wrap' with scipy.ndimage.convolve ---
         return convolve(f, self.kern, mode='wrap')
+        # --- END FIX ---
 
     def step(self):
         if not SCIPY_AVAILABLE:
@@ -139,6 +144,10 @@ class CrystalMakerNode(BaseNode):
             new_phi_k = phi_k + (1 - self.damping_factor * self.dt) * vel_k + self.dt**2 * acc
             new_phi_list.append(new_phi_k)
 
+        # Update fields
+        # Note: phi_o_fields update logic (phi_o_k = phi_k) seems missing from the original source step,
+        # but the physics uses phi_o_k to compute vel_k, so we need to update it here.
+        self.phi_o_fields = self.phi_fields # Save current as previous for the next step
         self.phi_fields = new_phi_list
         self._update_summed_fields()
         
@@ -182,11 +191,3 @@ class CrystalMakerNode(BaseNode):
             ("Grid Size (3D)", "N", self.N, None),
             ("Num Fields", "num_fields", self.num_fields, None),
         ]
-
-    def close(self):
-        # Clear large arrays on close
-        self.phi_fields = []
-        self.phi_o_fields = []
-        self.phi = None
-        self.phi_o = None
-        super().close()
