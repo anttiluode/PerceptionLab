@@ -68,7 +68,6 @@ class ReactiveSpaceNode(BaseNode):
         self.time += 0.01
         
         # --- Get audio-reactive signals ---
-        # Get 0-1 signals from (e.g.) SpectrumAnalyzer
         bass_energy = self.get_blended_input('bass_in', 'sum') or 0.0
         highs_energy = self.get_blended_input('highs_in', 'sum') or 0.0
 
@@ -82,44 +81,41 @@ class ReactiveSpaceNode(BaseNode):
         to_attractor = attractor_pos - self.positions
         dist_sq = np.sum(to_attractor**2, axis=1, keepdims=True) + 1e-3
         
-        # --- MODIFIED: Bass controls gravity strength ---
         base_gravity = 5.0
-        sun_pulse_strength = 1.0 + (bass_energy * 5.0) # Bass makes the "Sun" pulse
+        sun_pulse_strength = 1.0 + (bass_energy * 5.0)
         force = to_attractor / dist_sq * (base_gravity * sun_pulse_strength)
         
         # Update velocities
-        self.velocities += force * 0.1 # dt
+        self.velocities += force * 0.1
         
-        # --- MODIFIED: Highs add "energy" (jiggle) to stars ---
         star_jiggle = (np.random.rand(self.particle_count, 2) - 0.5) * (highs_energy * 0.5)
         self.velocities += star_jiggle
         
-        self.velocities *= 0.98 # Damping
+        self.velocities *= 0.98
         
         # Update positions
         self.positions += self.velocities
         
-        # Bounce off walls
-        mask_x_low = self.positions[:, 0] < 0
-        mask_x_high = self.positions[:, 0] >= self.w
-        mask_y_low = self.positions[:, 1] < 0
-        mask_y_high = self.positions[:, 1] >= self.h
+        # FIX: Clamp positions to current grid size (handle resizing)
+        self.positions[:, 0] = np.clip(self.positions[:, 0], 0, self.w - 1)
+        self.positions[:, 1] = np.clip(self.positions[:, 1], 0, self.h - 1)
         
-        self.positions[mask_x_low, 0] = 0
-        self.positions[mask_x_high, 0] = self.w - 1
-        self.positions[mask_y_low, 1] = 0
-        self.positions[mask_y_high, 1] = self.h - 1
+        # Bounce velocities when hitting walls
+        mask_x_low = self.positions[:, 0] <= 0
+        mask_x_high = self.positions[:, 0] >= self.w - 1
+        mask_y_low = self.positions[:, 1] <= 0
+        mask_y_high = self.positions[:, 1] >= self.h - 1
         
         self.velocities[mask_x_low | mask_x_high, 0] *= -0.5
         self.velocities[mask_y_low | mask_y_high, 1] *= -0.5
 
         # Update the density image
-        self.space *= 0.9 # Fade old trails
+        self.space *= 0.9
         
         # Get integer positions
         int_pos = self.positions.astype(int)
         
-        # Valid coordinates
+        # FIX: More robust validation that accounts for current dimensions
         valid = (int_pos[:, 0] >= 0) & (int_pos[:, 0] < self.w) & \
                 (int_pos[:, 1] >= 0) & (int_pos[:, 1] < self.h)
         
@@ -127,7 +123,10 @@ class ReactiveSpaceNode(BaseNode):
         
         # "Splat" particles onto the image
         if valid_pos.shape[0] > 0:
-            self.space[valid_pos[:, 1], valid_pos[:, 0]] = 1.0 # Bright points
+            # FIX: Use clip as final safety net
+            y_coords = np.clip(valid_pos[:, 1], 0, self.h - 1)
+            x_coords = np.clip(valid_pos[:, 0], 0, self.w - 1)
+            self.space[y_coords, x_coords] = 1.0
         
         # Blur to make it look like a density field
         display_img = cv2.GaussianBlur(self.space, (5, 5), 0)
