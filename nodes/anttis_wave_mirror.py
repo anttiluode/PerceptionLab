@@ -20,6 +20,7 @@ PA_INSTANCE = getattr(__main__, "PA_INSTANCE", None)
 class WaveNeuron:
     """Simplified WaveNeuron class from mirror.py"""
     def __init__(self, w, h):
+        # WaveNeuron is designed for grayscale/single-channel data (w, h)
         self.frequency = np.random.uniform(0.1, 1.0, (h, w)).astype(np.float32)
         self.amplitude = np.random.uniform(0.5, 1.0, (h, w)).astype(np.float32)
         self.phase = np.random.uniform(0, 2 * np.pi, (h, w)).astype(np.float32)
@@ -29,7 +30,7 @@ class WaveNeuron:
         return self.amplitude * np.sin(2 * np.pi * self.frequency * t + self.phase) + input_signal
         
     def train(self, target, t, learning_rate):
-        # Vectorized training
+        # Target must be (h, w) shape to match output
         output = self.activate(0, t) # Get internal activation
         error = target - output
         
@@ -73,8 +74,14 @@ class WaveMirrorNode(BaseNode):
         if input_image is None:
             input_image = np.zeros((self.h, self.w), dtype=np.float32)
         else:
+            # 1. Resize the input
             input_image = cv2.resize(input_image, (self.w, self.h), interpolation=cv2.INTER_AREA)
 
+            # 2. FIX: Convert to Grayscale if the input is color (ndim == 3)
+            if input_image.ndim == 3:
+                # Convert BGR/RGB to Grayscale (assuming input is float 0-1)
+                input_image = cv2.cvtColor(input_image.astype(np.float32), cv2.COLOR_BGR2GRAY)
+            
         if self.training_counter < self.training_duration:
             # --- Training Phase ---
             self.wnn.train(input_image, t, self.learning_rate)
