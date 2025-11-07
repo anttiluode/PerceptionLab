@@ -429,7 +429,8 @@ class NodeItem(QtWidgets.QGraphicsItem):
             painter.setFont(QtGui.QFont("Arial", 8, QtGui.QFont.Weight.Bold))
             painter.drawText(self.random_btn_rect, QtCore.Qt.AlignmentFlag.AlignCenter, "R")
             
-        if self.zoom_in_rect and self.zoom_in_rect.contains(ev.pos()):
+        if self.zoom_in_rect and self.zoom_out_rect:
+            # Draw '-' button (zoom in)
             painter.setBrush(QtGui.QColor(60, 180, 255))
             painter.setPen(QtGui.QColor(40, 40, 40))
             painter.drawEllipse(self.zoom_in_rect)
@@ -437,6 +438,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
             painter.setFont(QtGui.QFont("Arial", 8, QtGui.QFont.Weight.Bold))
             painter.drawText(self.zoom_in_rect, QtCore.Qt.AlignmentFlag.AlignCenter, "-")
 
+            # Draw '+' button (zoom out)
             painter.setBrush(QtGui.QColor(60, 180, 255))
             painter.setPen(QtGui.QColor(40, 40, 40))
             painter.drawEllipse(self.zoom_out_rect)
