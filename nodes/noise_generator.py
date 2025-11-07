@@ -22,13 +22,16 @@ class NoiseGeneratorNode(BaseNode):
         super().__init__()
         self.node_title = "Noise Gen"
         self.outputs = {'image': 'image', 'signal': 'signal'} 
-        self.w, self.h = width, height
+        self.w, self.h = int(width), int(height)
         self.noise_type = noise_type 
         self.speed = float(speed)
         
+        self._init_arrays()
+        
+    def _init_arrays(self):
+        """Initialize or reinitialize arrays based on current w, h"""
         self.img = np.random.rand(self.h, self.w).astype(np.float32)
         self.signal_value = 0.0 
-        
         self.brown_state = np.zeros((self.h, self.w), dtype=np.float32)
         self.perlin_phase = np.random.rand(2) * 100
 
@@ -38,6 +41,10 @@ class NoiseGeneratorNode(BaseNode):
             return np.random.rand(*shape)
         
         elif self.noise_type == 'brown':
+            # Ensure brown_state matches current shape
+            if self.brown_state.shape != shape:
+                self.brown_state = np.zeros(shape, dtype=np.float32)
+            
             rand_step = np.random.randn(*shape) * 0.05 * self.speed
             self.brown_state = self.brown_state + rand_step
             self.brown_state = np.clip(self.brown_state, -1.0, 1.0)
@@ -64,17 +71,27 @@ class NoiseGeneratorNode(BaseNode):
         return np.random.rand(*shape)
 
     def step(self):
+        # Check if dimensions changed (from config update)
+        if self.img.shape != (self.h, self.w):
+            self._init_arrays()
+        
         new_noise = self._generate_noise_step((self.h, self.w))
         
         self.img = self.img * (1.0 - self.speed) + new_noise * self.speed
         
         center_y, center_x = self.h // 2, self.w // 2
         window_size = 10
-        center_patch = self.img[
-            center_y - window_size//2 : center_y + window_size//2,
-            center_x - window_size//2 : center_x + window_size//2
-        ]
-        self.signal_value = np.mean(center_patch) * 2.0 - 1.0
+        y_start = max(0, center_y - window_size//2)
+        y_end = min(self.h, center_y + window_size//2)
+        x_start = max(0, center_x - window_size//2)
+        x_end = min(self.w, center_x + window_size//2)
+        
+        center_patch = self.img[y_start:y_end, x_start:x_end]
+        
+        if center_patch.size > 0:
+            self.signal_value = np.mean(center_patch) * 2.0 - 1.0
+        else:
+            self.signal_value = 0.0
         
     def get_output(self, port_name):
         if port_name == 'image':
@@ -96,5 +113,5 @@ class NoiseGeneratorNode(BaseNode):
                 ("Perlin (Pattern)", "perlin"), 
                 ("Quantum (Spikes)", "quantum")
             ]),
-            ("Speed (Blend Factor)", "speed", self.speed, None)
+            ("Speed (Blend Factor)", "speed", self.speed, None),
         ]
