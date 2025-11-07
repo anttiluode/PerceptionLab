@@ -108,12 +108,15 @@ class QuantumWaveNode(BaseNode):
         # Update parameters from inputs
         mom_in = self.get_blended_input('momentum_x', 'sum')
         if mom_in is not None:
-            # Map input signal [-1, 1] to a wide momentum range [-10, 10]
-            new_k0x = mom_in * 10.0
-            # If momentum changes significantly, reinitialize the wave
+            # FIX: Handle both scalar and array inputs
+            if hasattr(mom_in, '__len__'):  # Is array-like
+                new_k0x = float(np.mean(mom_in)) * 10.0
+            else:  # Is scalar
+                new_k0x = float(mom_in) * 10.0
+            
             if abs(new_k0x - self.k0x) > 1.0:
-                 self.k0x = new_k0x
-                 self.initialize_wavefunction()
+                self.k0x = new_k0x
+                self.initialize_wavefunction()
             
         # Check for reset signal
         reset_sig = self.get_blended_input('reset', 'sum')
