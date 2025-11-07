@@ -36,7 +36,8 @@ class SpectrumAnalyzerNode(BaseNode):
         self.vis_img = np.zeros((64, 64, 3), dtype=np.uint8)
 
     def step(self):
-        spectrum = self.get_blended_input('spectrum_in', 'mean')
+        # get_blended_input will use 'mean' for array types like 'spectrum'
+        spectrum = self.get_blended_input('spectrum_in', 'mean') 
         
         if spectrum is None or len(spectrum) == 0:
             self.bass *= 0.9
@@ -74,7 +75,9 @@ class SpectrumAnalyzerNode(BaseNode):
             return self.high
         return None
 
+    # --- THIS IS THE FIX ---
     def get_display_image(self):
+    # --- END FIX ---
         img = np.ascontiguousarray(self.vis_img)
         return QtGui.QImage(img.data, 64, 64, 64*3, QtGui.QImage.Format.Format_BGR888)
 
