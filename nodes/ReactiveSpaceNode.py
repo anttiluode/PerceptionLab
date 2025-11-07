@@ -38,7 +38,7 @@ class ReactiveSpaceNode(BaseNode):
         super().__init__()
         self.node_title = "Reactive Space"
         
-        # --- MODIFIED: Inputs for audio-reactivity ---
+        # --- Inputs for audio-reactivity ---
         self.inputs = {
             'bass_in': 'signal',  # Controls Sun/Attractor
             'highs_in': 'signal'  # Controls Stars/Particles
@@ -48,7 +48,7 @@ class ReactiveSpaceNode(BaseNode):
         self.w, self.h = width, height
         self.particle_count = int(particle_count)
         
-        # --- ADDED: Color scheme ---
+        # --- Color scheme ---
         self.color_scheme = str(color_scheme)
         
         # Particle state
@@ -57,14 +57,45 @@ class ReactiveSpaceNode(BaseNode):
         
         # The "density" image
         self.space = np.zeros((self.h, self.w), dtype=np.float32)
-        
-        # --- FIX: Initialize the display_img array ---
         self.display_img = np.zeros((self.h, self.w), dtype=np.float32)
-        # --- END FIX ---
+        
+        # Track last dimensions to detect resizing (NEW)
+        self._last_w = self.w
+        self._last_h = self.h
         
         self.time = 0.0
 
+    def _check_and_resize_arrays(self):
+        """Reinitialize arrays if dimensions changed (NEW HELPER)"""
+        if self.w != self._last_w or self.h != self._last_h:
+            # Dimensions changed - reinitialize arrays
+            old_space = self.space
+            
+            # Create new arrays
+            self.space = np.zeros((self.h, self.w), dtype=np.float32)
+            self.display_img = np.zeros((self.h, self.w), dtype=np.float32)
+            
+            # Try to preserve old content (resize it)
+            try:
+                # Resize old_space content to fit the new dimensions
+                self.space = cv2.resize(old_space, (self.w, self.h), interpolation=cv2.INTER_LINEAR)
+            except Exception:
+                # If resize fails (e.g., old_space was empty or invalid), just use zeros
+                pass 
+            
+            # Clamp all particle positions to new bounds
+            self.positions[:, 0] = np.clip(self.positions[:, 0], 0, self.w - 1)
+            self.positions[:, 1] = np.clip(self.positions[:, 1], 0, self.h - 1)
+            
+            # Update tracking
+            self._last_w = self.w
+            self._last_h = self.h
+            
+
     def step(self):
+        # FIX: Check if node was resized and update arrays
+        self._check_and_resize_arrays()
+        
         self.time += 0.01
         
         # --- Get audio-reactive signals ---
@@ -96,7 +127,7 @@ class ReactiveSpaceNode(BaseNode):
         # Update positions
         self.positions += self.velocities
         
-        # FIX: Clamp positions to current grid size (handle resizing)
+        # Clamp positions to valid range
         self.positions[:, 0] = np.clip(self.positions[:, 0], 0, self.w - 1)
         self.positions[:, 1] = np.clip(self.positions[:, 1], 0, self.h - 1)
         
@@ -115,7 +146,7 @@ class ReactiveSpaceNode(BaseNode):
         # Get integer positions
         int_pos = self.positions.astype(int)
         
-        # FIX: More robust validation that accounts for current dimensions
+        # Validate positions
         valid = (int_pos[:, 0] >= 0) & (int_pos[:, 0] < self.w) & \
                 (int_pos[:, 1] >= 0) & (int_pos[:, 1] < self.h)
         
@@ -123,14 +154,13 @@ class ReactiveSpaceNode(BaseNode):
         
         # "Splat" particles onto the image
         if valid_pos.shape[0] > 0:
-            # FIX: Use clip as final safety net
             y_coords = np.clip(valid_pos[:, 1], 0, self.h - 1)
             x_coords = np.clip(valid_pos[:, 0], 0, self.w - 1)
+            # Use assignment to set the density at particle locations
             self.space[y_coords, x_coords] = 1.0
         
         # Blur to make it look like a density field
-        display_img = cv2.GaussianBlur(self.space, (5, 5), 0)
-        self.display_img = display_img
+        self.display_img = cv2.GaussianBlur(self.space, (5, 5), 0)
 
     def get_output(self, port_name):
         if port_name == 'image':
@@ -141,7 +171,7 @@ class ReactiveSpaceNode(BaseNode):
         return None
         
     def get_display_image(self):
-        # --- MODIFIED: Apply color map ---
+        # FIX: Use the actual current dimensions of the arrays for QImage creation.
         img_u8 = (np.clip(self.display_img, 0, 1) * 255).astype(np.uint8)
         
         cmap_cv2 = CMAP_DICT.get(self.color_scheme)
@@ -153,7 +183,7 @@ class ReactiveSpaceNode(BaseNode):
             h, w = img_color.shape[:2]
             return QtGui.QImage(img_color.data, w, h, 3*w, QtGui.QImage.Format.Format_BGR888)
         else:
-            # Just return grayscale
+            # Just return grayscale at ACTUAL size
             img_u8 = np.ascontiguousarray(img_u8)
             h, w = img_u8.shape
             return QtGui.QImage(img_u8.data, w, h, w, QtGui.QImage.Format.Format_Grayscale8)
