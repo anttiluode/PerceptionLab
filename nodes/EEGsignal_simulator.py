@@ -5,7 +5,7 @@ Place this file in the 'nodes' folder
 
 import numpy as np
 from PyQt6 import QtGui
-
+import cv2
 import sys
 import os
 # --- This is the new, correct block ---
