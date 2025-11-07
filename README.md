@@ -12,18 +12,6 @@ resize it for better visibility.Save/Load Graphs: Save your complex node layouts
 file and load them later.Configurable: Right-click nodes to configure their internal parameters
 (e.g., sample rates, device IDs, physics constants).
 
-Project Structure
-
-perception_lab/
-├── perception_lab_host.py    # Main application (run this)
-├── nodes/                     # Folder for all external node modules
-│   ├── media_source.py
-│   ├── signal_math.py
-│   ├── anttis_phiworld.py
-│   ├── fractal_explorer.py
-│   └── ... (and all your other 20+ nodes)
-└── README.md                  # This file
-
 # Installation
 
 # Core Application Requirements
