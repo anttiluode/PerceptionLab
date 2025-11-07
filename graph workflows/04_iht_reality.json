@@ -1,0 +1,114 @@
+{
+  "global_settings": {
+    "coupling": 85
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "IHTPhaseFieldNode",
+      "pos_x": 50,
+      "pos_y": 100,
+      "width": 250,
+      "height": 220,
+      "config": {}
+    },
+    {
+      "id": 1,
+      "class_name": "IHTAttractorWNode",
+      "pos_x": 350,
+      "pos_y": 50,
+      "width": 200,
+      "height": 200,
+      "config": {}
+    },
+    {
+      "id": 2,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 600,
+      "pos_y": 50,
+      "width": 250,
+      "height": 200,
+      "config": {}
+    },
+    {
+      "id": 3,
+      "class_name": "EmergentGravityNode",
+      "pos_x": 350,
+      "pos_y": 300,
+      "width": 200,
+      "height": 200,
+      "config": {}
+    },
+    {
+      "id": 4,
+      "class_name": "PhiWorldNode",
+      "pos_x": 600,
+      "pos_y": 300,
+      "width": 250,
+      "height": 220,
+      "config": {}
+    },
+    {
+      "id": 5,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 900,
+      "pos_y": 300,
+      "width": 300,
+      "height": 250,
+      "config": {}
+    },
+    {
+      "id": 6,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 350,
+      "pos_y": 550,
+      "width": 200,
+      "height": 100,
+      "config": {}
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "phase_field",
+      "to_node_id": 1,
+      "to_port": "phase_field"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "projected_field",
+      "to_node_id": 2,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "constraint_density",
+      "to_node_id": 3,
+      "to_port": "constraint_density"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "gravity_potential",
+      "to_node_id": 4,
+      "to_port": "perturb_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "total_mass",
+      "to_node_id": 4,
+      "to_port": "energy_in"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "particles",
+      "to_node_id": 5,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "coherence",
+      "to_node_id": 6,
+      "to_port": "signal"
+    }
+  ]
+}

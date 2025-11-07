@@ -1,0 +1,150 @@
+{
+  "global_settings": {
+    "coupling": 75
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": 50,
+      "pos_y": 100,
+      "width": 200,
+      "height": 220,
+      "config": {
+        "edf_file_path": "",
+        "selected_region": "Occipital"
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "SignalMathNode",
+      "pos_x": 300,
+      "pos_y": 100,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "operation": "avg"
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "SignalMathNode",
+      "pos_x": 300,
+      "pos_y": 320,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "operation": "avg"
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SignalMathNode",
+      "pos_x": 550,
+      "pos_y": 210,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "operation": "avg"
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "RevolvingBitNode",
+      "pos_x": 800,
+      "pos_y": 100,
+      "width": 250,
+      "height": 220,
+      "config": {}
+    },
+    {
+      "id": 5,
+      "class_name": "FractalRopeNode",
+      "pos_x": 1100,
+      "pos_y": 100,
+      "width": 250,
+      "height": 220,
+      "config": {}
+    },
+    {
+      "id": 6,
+      "class_name": "CrystalMakerNode",
+      "pos_x": 800,
+      "pos_y": 370,
+      "width": 300,
+      "height": 250,
+      "config": {}
+    },
+    {
+      "id": 7,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 1150,
+      "pos_y": 370,
+      "width": 300,
+      "height": 250,
+      "config": {}
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "delta",
+      "to_node_id": 1,
+      "to_port": "A"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta",
+      "to_node_id": 1,
+      "to_port": "B"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha",
+      "to_node_id": 2,
+      "to_port": "A"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta",
+      "to_node_id": 2,
+      "to_port": "B"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "result",
+      "to_node_id": 3,
+      "to_port": "A"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "result",
+      "to_node_id": 3,
+      "to_port": "B"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "result",
+      "to_node_id": 4,
+      "to_port": "coupling"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "field_amp",
+      "to_node_id": 5,
+      "to_port": "measurement_trigger"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "measured_image",
+      "to_node_id": 6,
+      "to_port": "tension"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "field_slice",
+      "to_node_id": 7,
+      "to_port": "image"
+    }
+  ]
+}

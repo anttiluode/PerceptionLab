@@ -1,0 +1,138 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EEGSimulatorNode",
+      "pos_x": 50,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 1,
+      "class_name": "NeuralFieldNode",
+      "pos_x": 300,
+      "pos_y": 50,
+      "width": 250,
+      "height": 200,
+      "config": {}
+    },
+    {
+      "id": 2,
+      "class_name": "FractalAnalyzerNode",
+      "pos_x": 600,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 3,
+      "class_name": "QuantumWaveNode",
+      "pos_x": 300,
+      "pos_y": 300,
+      "width": 250,
+      "height": 220,
+      "config": {}
+    },
+    {
+      "id": 4,
+      "class_name": "BlochQubitNode",
+      "pos_x": 600,
+      "pos_y": 300,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 5,
+      "class_name": "TopologicalXORNode",
+      "pos_x": 850,
+      "pos_y": 300,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 6,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 300,
+      "pos_y": 570,
+      "width": 250,
+      "height": 200,
+      "config": {}
+    },
+    {
+      "id": 7,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 600,
+      "pos_y": 570,
+      "width": 200,
+      "height": 100,
+      "config": {}
+    },
+    {
+      "id": 8,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 850,
+      "pos_y": 570,
+      "width": 200,
+      "height": 100,
+      "config": {}
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "theta"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 4,
+      "to_port": "rx_angle"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 2,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 3,
+      "to_port": "momentum_x"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "fractal_beta",
+      "to_node_id": 5,
+      "to_port": "input_A"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "image",
+      "to_node_id": 6,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "bloch_z",
+      "to_node_id": 7,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "output_C",
+      "to_node_id": 8,
+      "to_port": "signal"
+    }
+  ]
+}

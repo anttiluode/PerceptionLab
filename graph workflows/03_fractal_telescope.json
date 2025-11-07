@@ -1,0 +1,101 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MandelbrotNode",
+      "pos_x": 400,
+      "pos_y": 250,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "resolution": 128,
+        "max_iterations": 50
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "FractalSteeringPilotNode",
+      "pos_x": 100,
+      "pos_y": 250,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "nudge_factor": 0.005,
+        "complexity_smoothing": 0.95
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 400,
+      "pos_y": 50,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "value": 0.05
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 700,
+      "pos_y": 250,
+      "width": 300,
+      "height": 250,
+      "config": {
+        "width": 160,
+        "height": 120
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 100,
+      "pos_y": 50,
+      "width": 250,
+      "height": 100,
+      "config": {}
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "x_nudge",
+      "to_node_id": 0,
+      "to_port": "x_pos"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "y_nudge",
+      "to_node_id": 0,
+      "to_port": "y_pos"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "zoom"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 3,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "complexity",
+      "to_node_id": 4,
+      "to_port": "signal"
+    }
+  ]
+}

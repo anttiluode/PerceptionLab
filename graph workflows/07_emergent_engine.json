@@ -1,0 +1,132 @@
+{
+  "global_settings": {
+    "coupling": 75
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "InteractiveSignalNode",
+      "pos_x": 50.0,
+      "pos_y": 100.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Interactive Signal",
+        "zoom_factor": 1.0
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "EmergentRealityNode",
+      "pos_x": 300.0,
+      "pos_y": 100.0,
+      "width": 250.0,
+      "height": 220.0,
+      "config": {
+        "inputs": {
+          "alpha_control": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "intensity": "image",
+          "speed_of_light": "image",
+          "total_energy": "signal",
+          "curvature": "signal"
+        },
+        "input_data": {
+          "alpha_control": [],
+          "reset": []
+        },
+        "node_title": "Emergent Reality",
+        "resolution": 64,
+        "current_alpha": 2.0,
+        "steps_per_frame": 5,
+        "energy_value": 48916.96089620371,
+        "curvature_value": 0.0019075969879388667
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ReactiveSpaceNode",
+      "pos_x": 600.0,
+      "pos_y": 100.0,
+      "width": 350.0,
+      "height": 280.0,
+      "config": {
+        "inputs": {
+          "bass_in": "signal",
+          "highs_in": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {
+          "bass_in": [],
+          "highs_in": []
+        },
+        "node_title": "Reactive Space",
+        "w": 160,
+        "h": 120,
+        "particle_count": 200,
+        "color_scheme": "viridis",
+        "_last_w": 160,
+        "_last_h": 120,
+        "time": 6.7699999999999
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SpaceSimulatorNode",
+      "pos_x": 300.0,
+      "pos_y": 370.0,
+      "width": 250.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Space Simulator",
+        "w": 160,
+        "h": 120,
+        "particle_count": 200,
+        "time": 6.7699999999999
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "SpaceScreensaverNode",
+      "pos_x": 631.0,
+      "pos_y": 426.0,
+      "width": 408.0,
+      "height": 309.0,
+      "config": {
+        "inputs": {
+          "reset": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "total_mass": "signal"
+        },
+        "input_data": {
+          "reset": []
+        },
+        "node_title": "Space Screensaver",
+        "universe_size": 48,
+        "num_singularities": 100,
+        "color_scheme": "plasma",
+        "device": "cuda",
+        "total_mass": -1239.1170654296875
+      }
+    }
+  ],
+  "edges": []
+}

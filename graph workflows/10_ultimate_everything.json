@@ -1,0 +1,310 @@
+{
+  "global_settings": {
+    "coupling": 95
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": 50,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "source_type": "Microphone"
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "FFTCochleaNode",
+      "pos_x": 300,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 2,
+      "class_name": "SpectrumAnalyzerNode",
+      "pos_x": 550,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 3,
+      "class_name": "ReactiveSpaceNode",
+      "pos_x": 800,
+      "pos_y": 50,
+      "width": 300,
+      "height": 250,
+      "config": {
+        "color_scheme": "plasma"
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 1150,
+      "pos_y": 50,
+      "width": 250,
+      "height": 200,
+      "config": {}
+    },
+    {
+      "id": 5,
+      "class_name": "FractalAnalyzerNode",
+      "pos_x": 1150,
+      "pos_y": 300,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 6,
+      "class_name": "EEGSimulatorNode",
+      "pos_x": 50,
+      "pos_y": 300,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 7,
+      "class_name": "NeuralFieldNode",
+      "pos_x": 300,
+      "pos_y": 300,
+      "width": 250,
+      "height": 200,
+      "config": {}
+    },
+    {
+      "id": 8,
+      "class_name": "QuantumWaveNode",
+      "pos_x": 550,
+      "pos_y": 300,
+      "width": 250,
+      "height": 220,
+      "config": {}
+    },
+    {
+      "id": 9,
+      "class_name": "PhiWorldNode",
+      "pos_x": 800,
+      "pos_y": 350,
+      "width": 300,
+      "height": 250,
+      "config": {}
+    },
+    {
+      "id": 10,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 300,
+      "pos_y": 550,
+      "width": 250,
+      "height": 200,
+      "config": {}
+    },
+    {
+      "id": 11,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 550,
+      "pos_y": 570,
+      "width": 250,
+      "height": 200,
+      "config": {}
+    },
+    {
+      "id": 12,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 800,
+      "pos_y": 650,
+      "width": 300,
+      "height": 250,
+      "config": {}
+    },
+    {
+      "id": 13,
+      "class_name": "CrystalMakerNode",
+      "pos_x": 50,
+      "pos_y": 550,
+      "width": 200,
+      "height": 200,
+      "config": {}
+    },
+    {
+      "id": 14,
+      "class_name": "TopologicalXORNode",
+      "pos_x": 50,
+      "pos_y": 800,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 15,
+      "class_name": "SinglePulseNode",
+      "pos_x": 50,
+      "pos_y": 1030,
+      "width": 200,
+      "height": 100,
+      "config": {}
+    },
+    {
+      "id": 16,
+      "class_name": "SignalMonitorNode",
+      "pos_x": 300,
+      "pos_y": 800,
+      "width": 200,
+      "height": 150,
+      "config": {}
+    },
+    {
+      "id": 17,
+      "class_name": "SignalMonitorNode",
+      "pos_x": 550,
+      "pos_y": 820,
+      "width": 200,
+      "height": 150,
+      "config": {}
+    },
+    {
+      "id": 18,
+      "class_name": "SpeakerOutputNode",
+      "pos_x": 800,
+      "pos_y": 950,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "spectrum",
+      "to_node_id": 2,
+      "to_port": "spectrum_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "bass",
+      "to_node_id": 3,
+      "to_port": "bass_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "high",
+      "to_node_id": 3,
+      "to_port": "highs_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "image",
+      "to_node_id": 4,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "image",
+      "to_node_id": 5,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 7,
+      "to_port": "theta"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 7,
+      "to_port": "alpha"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "image",
+      "to_node_id": 8,
+      "to_port": "momentum_x"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "signal",
+      "to_node_id": 9,
+      "to_port": "energy_in"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "image",
+      "to_node_id": 10,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "image",
+      "to_node_id": 11,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "field",
+      "to_node_id": 12,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "fractal_beta",
+      "to_node_id": 13,
+      "to_port": "tension"
+    },
+    {
+      "from_node_id": 13,
+      "from_port": "total_energy",
+      "to_node_id": 14,
+      "to_port": "input_A"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "mids",
+      "to_node_id": 14,
+      "to_port": "input_B"
+    },
+    {
+      "from_node_id": 15,
+      "from_port": "pulse_out",
+      "to_node_id": 14,
+      "to_port": "compute_trigger"
+    },
+    {
+      "from_node_id": 14,
+      "from_port": "output_C",
+      "to_node_id": 16,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "count",
+      "to_node_id": 17,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "mids",
+      "to_node_id": 18,
+      "to_port": "frequency"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "bass",
+      "to_node_id": 18,
+      "to_port": "amplitude"
+    }
+  ]
+}

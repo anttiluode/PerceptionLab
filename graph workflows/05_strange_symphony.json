@@ -1,0 +1,254 @@
+{
+  "global_settings": {
+    "coupling": 75
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "ChaoticControlNode",
+      "pos_x": 50.0,
+      "pos_y": 100.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "control_nudge": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "chaos_x": "signal",
+          "chaos_y": "signal",
+          "phase_image": "image"
+        },
+        "input_data": {
+          "control_nudge": [],
+          "reset": []
+        },
+        "node_title": "Chaotic Control (Lorenz)",
+        "sigma": 10.0,
+        "rho": 28.0,
+        "beta": 2.6666666666666665,
+        "dt": 0.01,
+        "history_len": 1000,
+        "output_x": -4.979905161362859,
+        "output_y": -4.709349588695708
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "SignalAttractorNode",
+      "pos_x": 300.0,
+      "pos_y": 100.0,
+      "width": 300.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "signal_a": "signal",
+          "signal_b": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "x_out": "signal",
+          "y_out": "signal"
+        },
+        "input_data": {
+          "signal_a": [
+            -3.763215004882534
+          ],
+          "signal_b": [
+            -3.3997828506932883
+          ]
+        },
+        "node_title": "Signal Attractor",
+        "w": 128,
+        "h": 128,
+        "x": 0.36080326307907173,
+        "y": 0.49027112527145034,
+        "param_c": 1.0,
+        "param_d": 0.7
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "FFTCochleaNode",
+      "pos_x": 653.0,
+      "pos_y": 108.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "outputs": {
+          "spectrum": "spectrum",
+          "signal": "signal",
+          "image": "image",
+          "complex_spectrum": "complex_spectrum"
+        },
+        "node_title": "FFT Cochlea",
+        "freq_bins": 64,
+        "x": 0.0,
+        "internal_freq": 12.37003288930617
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SpectralMemoryNode",
+      "pos_x": 900.0,
+      "pos_y": 100.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum",
+          "decay": "signal",
+          "boost": "signal"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "image": "image"
+        },
+        "node_title": "Spectral Memory",
+        "decay": 0.9,
+        "boost": 0.1
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "iFFTCochleaNode",
+      "pos_x": 650.0,
+      "pos_y": 350.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "iFFT Cochlea",
+        "h": 120,
+        "w": 160
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "ImageMoireNode",
+      "pos_x": 900.0,
+      "pos_y": 350.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "peak_freq": "signal",
+          "bandwidth": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "Image to Moir\u00e9",
+        "resolution": 128,
+        "peak_freq": 0.1,
+        "bandwidth": 0.1
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 650.0,
+      "pos_y": 580.0,
+      "width": 300.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {},
+        "node_title": "Image Display",
+        "w": 160,
+        "h": 120
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "SpeakerOutputNode",
+      "pos_x": 362.0,
+      "pos_y": 380.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "frequency": "signal",
+          "amplitude": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "frequency": [
+            -0.18248507703278816
+          ],
+          "amplitude": []
+        },
+        "node_title": "Speaker (Speakers (Focus...)",
+        "sample_rate": 44100,
+        "device_index": 6,
+        "current_freq": 100.0,
+        "current_amp": 0.5,
+        "_last_amp": 0.5,
+        "_last_freq": 100.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "chaos_x",
+      "to_node_id": 1,
+      "to_port": "signal_a"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "chaos_y",
+      "to_node_id": 1,
+      "to_port": "signal_b"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 2,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "complex_spectrum",
+      "to_node_id": 3,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "complex_spectrum",
+      "to_node_id": 4,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "image",
+      "to_node_id": 5,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "image",
+      "to_node_id": 6,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "x_out",
+      "to_node_id": 7,
+      "to_port": "frequency"
+    }
+  ]
+}
