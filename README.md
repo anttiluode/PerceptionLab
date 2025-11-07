@@ -1,4 +1,4 @@
-# Antti's Perception Laboratory 
+# Antti's Perception Laboratory (modular with node folder sepearate)
 
 ![GUI](./anttis.png)
 
