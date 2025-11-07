@@ -1,0 +1,146 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "FractalQuantumGateNode",
+      "pos_x": -440.0,
+      "pos_y": -208.0,
+      "width": 200.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {
+          "potential_strength": "signal",
+          "damping": "signal",
+          "operation_trigger": "signal"
+        },
+        "outputs": {
+          "prob_density": "image",
+          "phase_field": "image",
+          "current_operation": "signal"
+        },
+        "input_data": {
+          "potential_strength": [
+            0.0027250389485854675
+          ],
+          "damping": [],
+          "operation_trigger": [
+            0.7
+          ]
+        },
+        "node_title": "Fractal Quantum Gate",
+        "size": 64,
+        "dt": 0.05,
+        "time": 292.7000000000323,
+        "hbar_eff": 1.0,
+        "mass_eff": 1.0,
+        "potential_strength": 0.0027250389485854675,
+        "damping": 0.005,
+        "operation_step": 0,
+        "total_steps": 30,
+        "last_trigger_val": 0.7
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -754.0,
+      "pos_y": -66.0,
+      "width": 200.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ImageDisplayNode",
+      "pos_x": -147.0,
+      "pos_y": -152.0,
+      "width": 200.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {},
+        "node_title": "Image Display",
+        "w": 160,
+        "h": 120
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "ImageDisplayNode",
+      "pos_x": -168.0,
+      "pos_y": -359.0,
+      "width": 200.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {},
+        "node_title": "Image Display",
+        "w": 160,
+        "h": 120
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -747.0,
+      "pos_y": -350.0,
+      "width": 200.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Noise Gen",
+        "w": 160,
+        "h": 120,
+        "noise_type": "white",
+        "speed": 0.1,
+        "signal_value": 0.00707451305497564
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "operation_trigger"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "phase_field",
+      "to_node_id": 2,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "prob_density",
+      "to_node_id": 3,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "potential_strength"
+    }
+  ]
+}
