@@ -1,0 +1,135 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "ReactiveSpaceNode",
+      "pos_x": -676.0,
+      "pos_y": -484.0,
+      "width": 379.0,
+      "height": 283.0,
+      "config": {
+        "inputs": {
+          "bass_in": "signal",
+          "highs_in": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {
+          "bass_in": [
+            0.4820255998148315
+          ],
+          "highs_in": [
+            0.06671534675389294
+          ]
+        },
+        "node_title": "Reactive Space",
+        "w": 160,
+        "h": 120,
+        "particle_count": 200,
+        "color_scheme": "plasma",
+        "time": 1.6900000000000013
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "FFTCochleaNode",
+      "pos_x": -588.0,
+      "pos_y": -115.0,
+      "width": 200.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "outputs": {
+          "spectrum": "spectrum",
+          "signal": "signal",
+          "image": "image",
+          "complex_spectrum": "complex_spectrum"
+        },
+        "node_title": "FFT Cochlea",
+        "freq_bins": 64,
+        "x": 0.0,
+        "internal_freq": 5.52968973268833
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "SpectrumAnalyzerNode",
+      "pos_x": -349.0,
+      "pos_y": -95.0,
+      "width": 200.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {
+          "spectrum_in": "spectrum"
+        },
+        "outputs": {
+          "bass": "signal",
+          "mids": "signal",
+          "high": "signal"
+        },
+        "node_title": "Spectrum Analyzer",
+        "low_split": 0.1,
+        "high_split": 0.5,
+        "bass": 0.696377262538906,
+        "mids": 0.21074433611276888,
+        "high": 0.09287840127166994
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "MediaSourceNode",
+      "pos_x": -907.0,
+      "pos_y": -112.0,
+      "width": 200.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Microphone)",
+        "device_id": 0,
+        "source_type": "Microphone",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 3,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "spectrum",
+      "to_node_id": 2,
+      "to_port": "spectrum_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "bass",
+      "to_node_id": 0,
+      "to_port": "bass_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "high",
+      "to_node_id": 0,
+      "to_port": "highs_in"
+    }
+  ]
+}
