@@ -42,17 +42,32 @@ class WaveletDecomposeNode(BaseNode):
         self.wavelet_name = str(wavelet_name)
         self.size = int(size)
         
-        # Internal storage for output components
-        h, w = self.size // 2, self.size // 2
+        self._init_arrays()
+        
+        if not PYWT_AVAILABLE:
+            self.node_title = "DWT (No PyWT!)"
+
+    def _init_arrays(self):
+        """Initializes or re-initializes all internal arrays based on self.size"""
+        self.size = int(self.size // 2 * 2) 
+        
+        try:
+            # --- FIX: Get the filter_len (int) from the wavelet_name (str) ---
+            wavelet = pywt.Wavelet(self.wavelet_name)
+            filter_len = wavelet.dec_len 
+            h = pywt.dwt_coeff_len(self.size, filter_len, mode='symmetric')
+            # --- END FIX ---
+            w = h
+        except (ValueError, TypeError): # Catch errors from bad wavelet name or the pywt call
+            h = self.size // 2
+            w = self.size // 2
+
         self.ll_out = np.zeros((h, w), dtype=np.float32)
         self.lh_out = np.zeros((h, w), dtype=np.float32)
         self.hl_out = np.zeros((h, w), dtype=np.float32)
         self.hh_out = np.zeros((h, w), dtype=np.float32)
         
-        self.display_tiled = np.zeros((self.size, self.size), dtype=np.float32)
-        
-        if not PYWT_AVAILABLE:
-            self.node_title = "DWT (No PyWT!)"
+        self.display_tiled = np.zeros((h*2, w*2), dtype=np.float32)
 
     def _normalize(self, arr):
         """Normalize an array to [0, 1] for visualization."""
@@ -64,6 +79,18 @@ class WaveletDecomposeNode(BaseNode):
     def step(self):
         if not PYWT_AVAILABLE:
             return
+            
+        # --- FIX: Use the correct filter_len (int) in the check ---
+        try:
+            wavelet = pywt.Wavelet(self.wavelet_name)
+            filter_len = wavelet.dec_len
+            expected_h = pywt.dwt_coeff_len(self.size, filter_len, mode='symmetric')
+        except (ValueError, TypeError):
+            expected_h = self.size // 2
+            
+        if self.ll_out.shape[0] != expected_h:
+            self._init_arrays()
+        # --- END FIX ---
 
         input_img = self.get_blended_input('image', 'mean')
         
@@ -106,16 +133,25 @@ class WaveletDecomposeNode(BaseNode):
         
     def get_display_image(self):
         # Create a tiled image for the node's display
-        h, w = self.size // 2, self.size // 2
+        # Use the shape of the component array, not self.size
+        h, w = self.ll_out.shape 
+        
+        h_total, w_total = h*2, w*2
+        if self.display_tiled.shape != (h_total, w_total):
+            self.display_tiled = np.zeros((h_total, w_total), dtype=np.float32)
         
         self.display_tiled[:h, :w] = self.ll_out # Top-Left
-        self.display_tiled[:h, w:] = self.lh_out # Top-Right
-        self.display_tiled[h:, :w] = self.hl_out # Bottom-Left
-        self.display_tiled[h:, w:] = self.hh_out # Bottom-Right
+        self.display_tiled[:h, w:w_total] = self.lh_out # Top-Right
+        self.display_tiled[h:h_total, :w] = self.hl_out # Bottom-Left
+        self.display_tiled[h:h_total, w:w_total] = self.hh_out # Bottom-Right
         
         img_u8 = (np.clip(self.display_tiled, 0, 1) * 255).astype(np.uint8)
-        img_u8 = np.ascontiguousarray(img_u8)
-        return QtGui.QImage(img_u8.data, self.size, self.size, self.size, QtGui.QImage.Format.Format_Grayscale8)
+        
+        # Resize to a consistent display size (e.g., self.size) for the node preview
+        img_u8_resized = cv2.resize(img_u8, (self.size, self.size), interpolation=cv2.INTER_NEAREST)
+        img_u8_resized = np.ascontiguousarray(img_u8_resized)
+        
+        return QtGui.QImage(img_u8_resized.data, self.size, self.size, self.size, QtGui.QImage.Format.Format_Grayscale8)
 
     def get_config_options(self):
         # Get common wavelets
