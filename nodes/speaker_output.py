@@ -1,49 +1,87 @@
 """
 Speaker Output Node - Outputs audio to speakers/headphones
+** REBUILT **
+This version uses a non-blocking callback and synthesizes a
+sine wave, using the input signals for frequency and amplitude.
 Place this file in the 'nodes' folder
 """
 
 import numpy as np
-from collections import deque
 from PyQt6 import QtGui
-
+import pyaudio
 import sys
 import os
+
 # --- This is the new, correct block ---
 import __main__
 BaseNode = __main__.BaseNode
 PA_INSTANCE = getattr(__main__, "PA_INSTANCE", None)
 # ------------------------------------
 
-try:
-    import pyaudio
-except ImportError:
-    pyaudio = None
 
 class SpeakerOutputNode(BaseNode):
-    """Real signal output device using PyAudio."""
     NODE_CATEGORY = "Output"
     NODE_COLOR = QtGui.QColor(120, 40, 120) 
     
-    def __init__(self, buffer_len=512, sample_rate=44100, device_index=None):
+    def __init__(self, sample_rate=44100, device_index=None):
         super().__init__()
-        self.node_title = "Speaker Output"
-        self.inputs = {'signal': 'signal'}
-        self.buffer = deque(maxlen=buffer_len)
-        self.rms_level = 0.0
+        self.node_title = "Speaker (Synth)"
+        # FIX: Inputs are now 'frequency' and 'amplitude'
+        self.inputs = {'frequency': 'signal', 'amplitude': 'signal'}
         
         self.pa = PA_INSTANCE
         self.sample_rate = int(sample_rate)
-        self.stream = None
         self.device_index = device_index
-        self.is_playing = False
+        self.stream = None
         
-        if self.pa and self.device_index is None:
+        # Synthesis parameters
+        self.current_freq = 440.0 # A4
+        self.current_amp = 0.0
+        self.phase = 0.0
+        
+        # Store last values for interpolation
+        self._last_amp = 0.0
+        self._last_freq = 440.0
+        
+        if not self.pa:
+            self.node_title = "Speaker (NO PA)"
+            return
+        
+        if self.device_index is None:
             try:
                 self.device_index = self.pa.get_default_output_device_info()['index']
             except Exception:
                 self.device_index = -1 
-#        self.open_stream()
+        
+        self.open_stream()
+        
+    def _audio_callback(self, in_data, frame_count, time_info, status):
+        """This is called by a separate audio thread"""
+        
+        # Get smooth ramps for parameters
+        target_freq = self.current_freq
+        target_amp = self.current_amp
+        
+        # Simple linear interpolation for smoothing
+        amp_ramp = np.linspace(self._last_amp, target_amp, frame_count, dtype=np.float32)
+        freq_ramp = np.linspace(self._last_freq, target_freq, frame_count, dtype=np.float32)
+        
+        # Calculate phase increments
+        phase_inc = (2 * np.pi * freq_ramp) / self.sample_rate
+        
+        # Generate audio buffer
+        phase_buffer = np.cumsum(phase_inc) + self.phase
+        audio_buffer = (np.sin(phase_buffer) * amp_ramp).astype(np.float32)
+        
+        # Store last state for next buffer
+        self.phase = phase_buffer[-1] % (2 * np.pi)
+        self._last_amp = target_amp
+        self._last_freq = target_freq
+        
+        # Convert to 16-bit int
+        audio_int = np.clip(audio_buffer * 32767.0, -32768, 32767).astype(np.int16)
+        
+        return (audio_int.tobytes(), pyaudio.paContinue)
         
     def open_stream(self):
         """Opens or re-opens the PyAudio stream."""
@@ -51,10 +89,12 @@ class SpeakerOutputNode(BaseNode):
             try: self.stream.stop_stream(); self.stream.close()
             except Exception: pass
             
-        self.is_playing = False
         if not self.pa or self.device_index < 0:
-            self.node_title = "Speaker (NO PA)"
             return
+            
+        # Store last values for interpolation
+        self._last_amp = self.current_amp
+        self._last_freq = self.current_freq
             
         try:
             self.stream = self.pa.open(
@@ -63,9 +103,10 @@ class SpeakerOutputNode(BaseNode):
                 rate=self.sample_rate,
                 output=True,
                 output_device_index=self.device_index,
-                frames_per_buffer=64 
+                frames_per_buffer=256,
+                stream_callback=self._audio_callback
             )
-            self.is_playing = True
+            self.stream.start_stream()
             try:
                 device_name = self.pa.get_device_info_by_index(self.device_index)['name']
                 self.node_title = f"Speaker ({device_name[:15]}...)"
@@ -78,41 +119,32 @@ class SpeakerOutputNode(BaseNode):
             self.node_title = "Speaker (ERROR)"
             
     def step(self):
-        val = self.get_blended_input('signal', 'sum') or 0.0
+        # This runs at the SIMULATION frame rate
+        # Map input signals to audio parameters
         
-        clipped_val = np.clip(val, -1.0, 1.0)
-        self.buffer.append(clipped_val)
+        # Freq: map [0, 1] (from analyzer) to audible range [100, 1000 Hz]
+        freq_in = self.get_blended_input('frequency', 'sum') or 0.0
+        self.current_freq = np.clip(freq_in * 900.0 + 100.0, 100.0, 1000.0)
         
-        if len(self.buffer) > 0:
-            rms_val = np.sqrt(np.mean(np.square(np.array(list(self.buffer)))))
-            self.rms_level = self.rms_level * 0.8 + rms_val * 0.2
-        
-        if self.stream and self.is_playing and len(self.buffer) >= 64:
-            audio_data = np.array(list(self.buffer)[:64], dtype=np.float32)
-            audio_data = np.clip(audio_data * 32767.0, -32768, 32767).astype(np.int16)
-            
-            try:
-                self.stream.write(audio_data.tobytes())
-                for _ in range(64):
-                    self.buffer.popleft() 
-            except IOError:
-                self.is_playing = False 
-                
+        # Amp: map [0, 1] to [0, 0.5] (so it's not too loud)
+        amp_in = self.get_blended_input('amplitude', 'sum')
+        if amp_in is None:
+            # If amplitude is not connected, set it to 0.5
+            self.current_amp = 0.5
+        else:
+            self.current_amp = np.clip(amp_in * 0.5, 0.0, 0.5)
+
     def get_display_image(self):
         w, h = 64, 64
         img = np.zeros((h, w), dtype=np.uint8)
         
-        buffer_array = np.array(list(self.buffer))
-        if len(buffer_array) > w:
-            vis_data = buffer_array[-w:]
-            vis_data = (vis_data + 1.0) / 2.0 * (h-1)
-            for i in range(w):
-                y = int(h - 1 - vis_data[i]) 
-                y = max(0, min(h-1, y))
-                img[y, i] = 255
-                
-        bar_height = int(np.clip(self.rms_level * 5.0, 0.0, 1.0) * h)
-        img[h - bar_height:, w-5:w-1] = 180 
+        # Draw amplitude bar
+        amp_h = int(np.clip(self.current_amp * 2.0, 0, 1) * h)
+        img[h - amp_h:, :w//2] = 255
+        
+        # Draw frequency bar
+        freq_h = int(np.clip((self.current_freq - 100) / 900, 0, 1) * h)
+        img[h - freq_h:, w//2:] = 180 
 
         img = np.ascontiguousarray(img)
         return QtGui.QImage(img.data, w, h, w, QtGui.QImage.Format.Format_Grayscale8)
@@ -123,9 +155,12 @@ class SpeakerOutputNode(BaseNode):
             
         devices = []
         for i in range(self.pa.get_device_count()):
-            info = self.pa.get_device_info_by_index(i)
-            if info['max_output_channels'] > 0:
-                devices.append((f"{info['name']} ({i})", i))
+            try:
+                info = self.pa.get_device_info_by_index(i)
+                if info['max_output_channels'] > 0:
+                    devices.append((f"{info['name']} ({i})", i))
+            except Exception:
+                continue # Skip invalid devices
             
         if not any(v == self.device_index for _, v in devices):
             devices.append((f"Selected Device ({self.device_index})", self.device_index))
