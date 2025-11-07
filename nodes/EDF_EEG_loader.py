@@ -39,13 +39,15 @@ class EEGFileSourceNode(BaseNode):
     def __init__(self, edf_file_path=""):
         super().__init__()
         self.node_title = "EEG File Source"
-        
+     
         self.outputs = {
             'delta': 'signal', 
             'theta': 'signal', 
             'alpha': 'signal', 
             'beta': 'signal', 
-            'gamma': 'signal'
+            'gamma': 'signal',
+            # --- FIX: ADD NEW RAW SIGNAL OUTPUT ---
+            'raw_signal': 'signal' 
         }
         
         self.edf_file_path = edf_file_path
@@ -57,8 +59,9 @@ class EEGFileSourceNode(BaseNode):
         self.fs = 100.0 # Resample to this frequency
         self.current_time = 0.0
         self.window_size = 1.0 # 1-second window
-        
+      
         self.output_powers = {band: 0.0 for band in self.outputs}
+        self.output_powers['raw_signal'] = 0.0 # Initialize new output
         self.history = np.zeros(64) # For display
 
         if not MNE_AVAILABLE:
@@ -93,7 +96,7 @@ class EEGFileSourceNode(BaseNode):
             self._last_region = self.selected_region
             self.node_title = f"EEG ({self.selected_region})"
             print(f"Successfully loaded EEG: {self.edf_file_path}")
-            
+           
         except Exception as e:
             self.raw = None
             self.node_title = f"EEG (Load Error)"
@@ -125,7 +128,12 @@ class EEGFileSourceNode(BaseNode):
         if data.size == 0:
             return
             
-        # Calculate band powers (simplified from brain_set_system.py)
+        # --- FIX: Calculate and normalize the raw signal output ---
+        # Output the *normalized* instantaneous level
+        self.output_powers['raw_signal'] = np.mean(data) * 5.0 # Scale up for visibility
+        # --- END FIX ---
+
+        # Calculate band powers 
         bands = {
             'delta': (1, 4), 'theta': (4, 8), 'alpha': (8, 13), 
             'beta': (13, 30), 'gamma': (30, 45)
