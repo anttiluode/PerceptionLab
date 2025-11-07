@@ -118,12 +118,9 @@ def load_nodes_from_folder(folder_path):
                 spec = importlib.util.spec_from_file_location(module_name, file_path)
                 module = importlib.util.module_from_spec(spec)
                 
-                # --- This is the key fix ---
                 # Add host's globals (like BaseNode, QtGui) to the module
-                # before it executes, so its classes can be defined.
                 module.__dict__['__main__'] = sys.modules['__main__']
-                # -------------------------
-
+                
                 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
                 spec.loader.exec_module(module)
                 
@@ -134,7 +131,8 @@ def load_nodes_from_folder(folder_path):
                         node_key_name = cls.__name__
                         found_nodes[node_key_name] = {
                             "class": cls,
-                            "module_name": module_name
+                            "module_name": module_name,
+                            "category": cls.NODE_CATEGORY # Store category for menu
                         }
                         module_nodes.append(name)
                         
@@ -351,6 +349,12 @@ class NodeItem(QtWidgets.QGraphicsItem):
             self.rect.setHeight(new_h)
             self.update_port_positions()
             
+            # --- FIX: Update internal size of passive nodes ---
+            if hasattr(self.sim, 'w') and hasattr(self.sim, 'h'):
+                 self.sim.w = int(new_w)
+                 self.sim.h = int(new_h)
+            # -------------------------------------------------
+            
             ev.accept()
             return
         # --- End Resizing Logic ---
@@ -425,7 +429,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
             painter.setFont(QtGui.QFont("Arial", 8, QtGui.QFont.Weight.Bold))
             painter.drawText(self.random_btn_rect, QtCore.Qt.AlignmentFlag.AlignCenter, "R")
             
-        if self.zoom_in_rect and self.zoom_out_rect: 
+        if self.zoom_in_rect and self.zoom_in_rect.contains(ev.pos()):
             painter.setBrush(QtGui.QColor(60, 180, 255))
             painter.setPen(QtGui.QColor(40, 40, 40))
             painter.drawEllipse(self.zoom_in_rect)
@@ -481,7 +485,13 @@ class NodeConfigDialog(QtWidgets.QDialog):
                 h_layout.addWidget(combo, 1)
                 self.inputs[key] = combo
             else:
-                line_edit = QtWidgets.QLineEdit(str(current_value))
+                # Use QTextEdit for multi-line strings (like DocumentationNode)
+                if isinstance(current_value, str) and ('\n' in current_value or len(current_value) > 40):
+                     line_edit = QtWidgets.QTextEdit(str(current_value))
+                     line_edit.setFixedHeight(100) # Fixed height for documentation
+                else:
+                     line_edit = QtWidgets.QLineEdit(str(current_value))
+                     
                 h_layout.addWidget(line_edit, 1)
                 self.inputs[key] = line_edit
                 
@@ -510,6 +520,9 @@ class NodeConfigDialog(QtWidgets.QDialog):
                     new_config[key] = new_val
                 except ValueError:
                     new_config[key] = text
+            elif isinstance(widget, QtWidgets.QTextEdit):
+                new_config[key] = widget.toPlainText()
+                
         return new_config
 
 # ==================== MAIN SCENE ====================
@@ -650,8 +663,10 @@ class PerceptionLab(QtWidgets.QWidget):
         self.view.setViewportUpdateMode(
             QtWidgets.QGraphicsView.ViewportUpdateMode.BoundingRectViewportUpdate)
         
+        # --- Context Menu Setup ---
         self.view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.view.customContextMenuRequested.connect(self.on_context_menu)
+        # --------------------------
         
         layout.addWidget(self.view, 1)
         
@@ -774,8 +789,30 @@ class PerceptionLab(QtWidgets.QWidget):
             
         self.status.setText(f"Added {node.sim.node_title}")
 
+    # --- NEW: Context Menu for Adding Nodes ---
+    def add_node_context_menu(self, scene_pos):
+        """Displays a categorized, scrollable menu for adding nodes."""
+        menu = QtWidgets.QMenu(self)
+        
+        # Group nodes by category
+        categories = {}
+        for name, info in sorted(self.NODE_CLASS_MAP.items(), key=lambda item: item[1]['category']):
+            category = info['category']
+            if category not in categories:
+                categories[category] = []
+            categories[category].append((name, info['class']))
+        
+        for category, nodes in categories.items():
+            submenu = menu.addMenu(category)
+            
+            for name, cls in nodes:
+                action = submenu.addAction(name)
+                action.triggered.connect(lambda _, nc=cls: self.add_node_at_pos(nc, scene_pos))
+                
+        return menu
+
     def on_context_menu(self, view_pos):
-        """Handles right-click on the QGraphicsView."""
+        """Handles right-click on the QGraphicsView and NodeItems."""
         scene_pos = self.view.mapToScene(view_pos)
         item = self.scene.itemAt(scene_pos, QtGui.QTransform())
         
@@ -804,11 +841,13 @@ class PerceptionLab(QtWidgets.QWidget):
                 config_action = menu.addAction("⚙ Configure Node...")
                 config_action.triggered.connect(lambda: self.configure_node(selected_nodes[0]))
         else:
-            add_action = menu.addAction("➕ Load Node Script...")
-            add_action.triggered.connect(self.show_add_node_dialog)
-        
+            # If nothing is selected, show the categorized Add Node menu
+            add_menu = self.add_node_context_menu(scene_pos)
+            menu.addMenu(add_menu)
+            
         global_pos = self.view.mapToGlobal(view_pos)
         menu.exec(global_pos)
+    # --------------------------------
 
     def configure_node(self, node_item):
         dialog = NodeConfigDialog(node_item, self)
@@ -962,8 +1001,8 @@ class PerceptionLab(QtWidgets.QWidget):
                 "class_name": sim_node.__class__.__name__,
                 "pos_x": node_item.pos().x(),
                 "pos_y": node_item.pos().y(),
-                "width": node_item.rect.width(),   # --- Save width
-                "height": node_item.rect.height(), # --- Save height
+                "width": node_item.rect.width(),
+                "height": node_item.rect.height(),
                 "config": config_data
             })
 
@@ -1014,8 +1053,8 @@ class PerceptionLab(QtWidgets.QWidget):
                 
                 pos_x = node_data.get("pos_x", 0)
                 pos_y = node_data.get("pos_y", 0)
-                width = node_data.get("width", NODE_W)   # --- Load width
-                height = node_data.get("height", NODE_H) # --- Load height
+                width = node_data.get("width", NODE_W)
+                height = node_data.get("height", NODE_H)
                 config = node_data.get("config", {})
                 
                 node_item = self.scene.add_node(node_class, x=pos_x, y=pos_y, w=width, h=height)
@@ -1030,7 +1069,7 @@ class PerceptionLab(QtWidgets.QWidget):
                     node_item.sim.setup_source()
                 
                 node_item.update()
-                node_item.update_port_positions() # Ensure ports are correct on loaded size
+                node_item.update_port_positions()
                 id_to_node_item[node_data["id"]] = node_item
             else:
                 print(f"Warning: Node class '{class_name}' not found in registry. Skipping.")
@@ -1127,6 +1166,13 @@ def main():
             color: #ddd;
             border-radius: 4px;
             height: 24px;
+        }
+        QTextEdit {
+            background: #3a3a3a;
+            border: 1px solid #555;
+            padding: 2px;
+            color: #ddd;
+            border-radius: 4px;
         }
         QComboBox::drop-down {
             subcontrol-origin: padding;
