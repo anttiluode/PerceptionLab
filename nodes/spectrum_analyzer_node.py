@@ -1,6 +1,6 @@
 """
 Spectrum Analyzer Node - Splits an FFT spectrum into discrete bands
-Place this file in the 'nodes' folder
+Place this file in the 'nodes/ folder
 """
 
 import numpy as np
