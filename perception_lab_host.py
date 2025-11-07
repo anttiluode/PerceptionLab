@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """
-Antti's Perception Laboratory - Main Host Application
-A professional node-based interface for multi-domain perception experiments.
-
-This is the main host that loads nodes from the 'nodes' folder.
+Antti's Perception Laboratory - Enhanced Version
+Improved text rendering and workflow buttons while maintaining backward compatibility.
 """
 
 import sys
@@ -36,17 +34,15 @@ class BaseNode:
     NODE_COLOR = QtGui.QColor(80, 80, 80)
     
     def __init__(self):
-        self.inputs = {}   # {'port_name': 'port_type'}
-        self.outputs = {}  # {'port_name': 'port_type'}
+        self.inputs = {}
+        self.outputs = {}
         self.input_data = {}
         self.node_title = "Base Node"
         
     def pre_step(self):
-        """Clear input buffers before propagation"""
         self.input_data = {name: [] for name in self.inputs}
         
     def set_input(self, port_name, value, port_type='signal', coupling=1.0):
-        """Receive data from connected edges"""
         if port_name not in self.input_data:
             return
         if port_type == 'signal':
@@ -58,7 +54,6 @@ class BaseNode:
                 self.input_data[port_name].append(value)
                 
     def get_blended_input(self, port_name, blend_mode='sum'):
-        """Get combined input from all connections"""
         values = self.input_data.get(port_name, [])
         if not values:
             return None
@@ -72,32 +67,23 @@ class BaseNode:
         return values[0]
         
     def step(self):
-        """Override in subclass - main processing logic"""
         pass
         
     def get_output(self, port_name):
-        """Override in subclass - return output data"""
         return None
         
     def get_display_image(self):
-        """Override in subclass - return QImage for node preview"""
         return None
         
     def close(self):
-        """Cleanup resources. Called when node is deleted."""
         pass
 
     def get_config_options(self):
-        """Returns a list of (display_name, key, current_value, options) for configuration dialog."""
         return []
 
 # ==================== NODE LOADING SYSTEM ====================
 
 def load_nodes_from_folder(folder_path):
-    """
-    Scans a folder for .py files, imports them, and finds all subclasses
-    of BaseNode to add to the registry.
-    """
     if not os.path.exists(folder_path):
         print(f"Nodes folder not found, creating: {folder_path}")
         try:
@@ -106,7 +92,6 @@ def load_nodes_from_folder(folder_path):
             print(f"Could not create nodes folder: {e}")
             return {}
             
-    # Key: Class Name (string), Value: {"class": Class Object, "module_name": str}
     found_nodes = {}
     
     for filename in os.listdir(folder_path):
@@ -117,35 +102,29 @@ def load_nodes_from_folder(folder_path):
             try:
                 spec = importlib.util.spec_from_file_location(module_name, file_path)
                 module = importlib.util.module_from_spec(spec)
-                
-                # Add host's globals (like BaseNode, QtGui) to the module
                 module.__dict__['__main__'] = sys.modules['__main__']
-                
                 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
                 spec.loader.exec_module(module)
                 
                 module_nodes = []
                 for name, cls in inspect.getmembers(module, inspect.isclass):
-                    # Only register classes that inherit BaseNode and are NOT BaseNode itself
                     if issubclass(cls, BaseNode) and cls is not BaseNode:
                         node_key_name = cls.__name__
                         found_nodes[node_key_name] = {
                             "class": cls,
                             "module_name": module_name,
-                            "category": cls.NODE_CATEGORY # Store category for menu
+                            "category": cls.NODE_CATEGORY
                         }
                         module_nodes.append(name)
                         
-                        
                 if module_nodes:
-                    print(f"  > Loaded external nodes: {', '.join(module_nodes)} from {filename}")
+                    print(f"  > Loaded: {', '.join(module_nodes)} from {filename}")
 
             except Exception as e:
-                print(f"Error loading node from {filename}: {e}")
+                print(f"Error loading {filename}: {e}")
                 
     return found_nodes
 
-# Load external nodes ONCE at module level
 print("Loading external nodes from './nodes' folder...")
 NODE_TYPES = load_nodes_from_folder('nodes')
 
@@ -159,7 +138,7 @@ PORT_COLORS = {
 # ==================== GRAPHICS ITEMS ====================
 
 PORT_RADIUS = 7
-NODE_W, NODE_H = 200, 160 # These are now MINIMUMS
+NODE_W, NODE_H = 200, 180  # Increased default height for better text
 
 class PortItem(QtWidgets.QGraphicsEllipseItem):
     def __init__(self, parent, name, port_type, is_output=False):
@@ -225,7 +204,6 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.in_ports = {}
         self.out_ports = {}
         
-        # --- Resizing Logic ---
         self.min_w = NODE_W
         self.min_h = NODE_H
         self.rect = QtCore.QRectF(0, 0, self.min_w, self.min_h)
@@ -239,9 +217,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         )
         self.is_resizing = False
         self.setAcceptHoverEvents(True)
-        # --- End Resizing Logic ---
 
-        # Create ports
         for name, ptype in self.sim.inputs.items():
             port = PortItem(self, name, ptype, is_output=False)
             self.in_ports[name] = port
@@ -257,46 +233,39 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.zoom_in_rect = None 
         self.zoom_out_rect = None 
         
-        # Check if node has special buttons
         if hasattr(self.sim, 'randomize'):
             self.random_btn_rect = QtCore.QRectF(self.rect.width() - 18, 4, 14, 14)
         if hasattr(self.sim, 'zoom_factor'):
             self.zoom_in_rect = QtCore.QRectF(self.rect.width() - 38, 4, 14, 14) 
             self.zoom_out_rect = QtCore.QRectF(self.rect.width() - 18, 4, 14, 14) 
         
-        # Position ports
         self.update_port_positions()
         
     def update_port_positions(self):
-        """Helper function to reposition ports and buttons when resizing."""
-        y_in = 40
+        y_in = 50  # Increased from 40 for better spacing
         for port in self.in_ports.values():
             port.setPos(0, y_in)
             y_in += 25
             
-        y_out = 40
+        y_out = 50
         for port in self.out_ports.values():
             port.setPos(self.rect.width(), y_out)
             y_out += 25
             
-        # Update button positions
         if self.random_btn_rect:
             self.random_btn_rect.moveTopRight(self.rect.topRight() + QtCore.QPointF(-4, 4))
         if self.zoom_in_rect and self.zoom_out_rect:
             self.zoom_in_rect.moveTopRight(self.rect.topRight() + QtCore.QPointF(-24, 4))
             self.zoom_out_rect.moveTopRight(self.rect.topRight() + QtCore.QPointF(-4, 4))
             
-        # Update resize handle position
         self.resize_handle.moveBottomRight(self.rect.bottomRight())
         
-        # Update connected edges
         if self.scene():
             for edge in self.scene().edges:
                 if (edge.src.parentItem() == self) or (edge.tgt.parentItem() == self):
                     edge.update_path()
 
     def hoverMoveEvent(self, ev):
-        """Change cursor when hovering over resize handle."""
         if self.resize_handle.contains(ev.pos()):
             self.setCursor(QtCore.Qt.CursorShape.SizeFDiagCursor)
         else:
@@ -308,14 +277,12 @@ class NodeItem(QtWidgets.QGraphicsItem):
         super().hoverLeaveEvent(ev)
 
     def mousePressEvent(self, ev):
-        # --- Resizing Logic ---
         if self.resize_handle.contains(ev.pos()) and ev.button() == QtCore.Qt.MouseButton.LeftButton:
             self.is_resizing = True
             self.resize_start_pos = ev.pos()
             self.resize_start_rect = QtCore.QRectF(self.rect)
             ev.accept()
             return
-        # --- End Resizing Logic ---
 
         if self.random_btn_rect and self.random_btn_rect.contains(ev.pos()):
             if hasattr(self.sim, 'randomize'):
@@ -337,10 +304,8 @@ class NodeItem(QtWidgets.QGraphicsItem):
         super().mousePressEvent(ev)
         
     def mouseMoveEvent(self, ev):
-        # --- Resizing Logic ---
         if self.is_resizing:
             delta = ev.pos() - self.resize_start_pos
-            
             new_w = max(self.min_w, self.resize_start_rect.width() + delta.x())
             new_h = max(self.min_h, self.resize_start_rect.height() + delta.y())
             
@@ -349,34 +314,29 @@ class NodeItem(QtWidgets.QGraphicsItem):
             self.rect.setHeight(new_h)
             self.update_port_positions()
             
-            # --- FIX: Update internal size of passive nodes ---
             if hasattr(self.sim, 'w') and hasattr(self.sim, 'h'):
                  self.sim.w = int(new_w)
                  self.sim.h = int(new_h)
-            # -------------------------------------------------
             
             ev.accept()
             return
-        # --- End Resizing Logic ---
 
         super().mouseMoveEvent(ev)
 
     def mouseReleaseEvent(self, ev):
-        # --- Resizing Logic ---
         if self.is_resizing:
             self.is_resizing = False
             self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
             ev.accept()
             return
-        # --- End Resizing Logic ---
         super().mouseReleaseEvent(ev)
 
     def boundingRect(self):
-        # Adjust bounding rect to include shadows/glows/handles
         return self.rect.adjusted(-8, -8, 8, 8)
         
     def paint(self, painter, option, widget):
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.TextAntialiasing)  # ADDED: Better text
         
         base = self.sim.NODE_COLOR
         if self.isSelected():
@@ -385,18 +345,30 @@ class NodeItem(QtWidgets.QGraphicsItem):
         painter.setPen(QtGui.QPen(QtGui.QColor(60, 60, 60), 2))
         painter.drawRoundedRect(self.rect, 10, 10)
         
-        title_rect = QtCore.QRectF(8, 4, self.rect.width()-24, 20)
-        painter.setPen(QtGui.QColor(240, 240, 240))
-        font = QtGui.QFont("Arial", 10, QtGui.QFont.Weight.Bold)
+        # IMPROVED: Better title rendering
+        title_rect = QtCore.QRectF(8, 6, self.rect.width()-24, 22)
+        painter.setPen(QtGui.QColor(255, 255, 255))  # Pure white for contrast
+        font = QtGui.QFont("Segoe UI", 11, QtGui.QFont.Weight.Bold)
+        font.setHintingPreference(QtGui.QFont.HintingPreference.PreferFullHinting)
         painter.setFont(font)
-        painter.drawText(title_rect, self.sim.node_title)
+        painter.drawText(title_rect, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter, 
+                        self.sim.node_title)
         
-        category_rect = QtCore.QRectF(8, 18, self.rect.width()-16, 12)
-        painter.setPen(QtGui.QColor(180, 180, 180))
-        painter.setFont(QtGui.QFont("Arial", 7))
-        painter.drawText(category_rect, self.sim.NODE_CATEGORY)
+        # IMPROVED: Better category text
+        category_rect = QtCore.QRectF(8, 26, self.rect.width()-16, 16)
+        painter.setPen(QtGui.QColor(200, 200, 200))  # Lighter gray
+        category_font = QtGui.QFont("Segoe UI", 8)
+        category_font.setHintingPreference(QtGui.QFont.HintingPreference.PreferFullHinting)
+        painter.setFont(category_font)
+        painter.drawText(category_rect, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter,
+                        self.sim.NODE_CATEGORY)
         
-        painter.setFont(QtGui.QFont("Arial", 7))
+        # IMPROVED: Better port labels
+        port_font = QtGui.QFont("Segoe UI", 8)
+        port_font.setHintingPreference(QtGui.QFont.HintingPreference.PreferFullHinting)
+        painter.setFont(port_font)
+        painter.setPen(QtGui.QColor(220, 220, 220))
+        
         for name, port in self.in_ports.items():
             painter.drawText(port.pos() + QtCore.QPointF(12, 4), name)
         for name, port in self.out_ports.items():
@@ -404,22 +376,20 @@ class NodeItem(QtWidgets.QGraphicsItem):
             painter.drawText(port.pos() + QtCore.QPointF(-w - 12, 4), name)
             
         if self.display_pix:
-            img_h = self.rect.height() - 50
+            img_h = self.rect.height() - 60  # Adjusted for new spacing
             img_w = self.rect.width() - 16
             
-            if img_h < 10 or img_w < 10: # Don't draw if too small
-                return
-
-            target_rect = QtCore.QRectF(8, 38, img_w, img_h)
-            scaled = self.display_pix.scaled(
-                int(img_w), int(img_h),
-                QtCore.Qt.AspectRatioMode.KeepAspectRatio,
-                QtCore.Qt.TransformationMode.FastTransformation
-            )
-            x = 8 + (img_w - scaled.width()) / 2
-            y = 38 + (img_h - scaled.height()) / 2
-            painter.drawPixmap(QtCore.QRectF(x, y, scaled.width(), scaled.height()),
-                               scaled, QtCore.QRectF(scaled.rect()))
+            if img_h >= 10 and img_w >= 10:
+                target_rect = QtCore.QRectF(8, 48, img_w, img_h)
+                scaled = self.display_pix.scaled(
+                    int(img_w), int(img_h),
+                    QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+                    QtCore.Qt.TransformationMode.SmoothTransformation  # IMPROVED: Better scaling
+                )
+                x = 8 + (img_w - scaled.width()) / 2
+                y = 48 + (img_h - scaled.height()) / 2
+                painter.drawPixmap(QtCore.QRectF(x, y, scaled.width(), scaled.height()),
+                                   scaled, QtCore.QRectF(scaled.rect()))
                                 
         if self.random_btn_rect:
             painter.setBrush(QtGui.QColor(255, 200, 60))
@@ -430,28 +400,20 @@ class NodeItem(QtWidgets.QGraphicsItem):
             painter.drawText(self.random_btn_rect, QtCore.Qt.AlignmentFlag.AlignCenter, "R")
             
         if self.zoom_in_rect and self.zoom_out_rect:
-            # Draw '-' button (zoom in)
             painter.setBrush(QtGui.QColor(60, 180, 255))
             painter.setPen(QtGui.QColor(40, 40, 40))
             painter.drawEllipse(self.zoom_in_rect)
-            painter.setPen(QtGui.QColor(40, 40, 40))
             painter.setFont(QtGui.QFont("Arial", 8, QtGui.QFont.Weight.Bold))
             painter.drawText(self.zoom_in_rect, QtCore.Qt.AlignmentFlag.AlignCenter, "-")
 
-            # Draw '+' button (zoom out)
-            painter.setBrush(QtGui.QColor(60, 180, 255))
-            painter.setPen(QtGui.QColor(40, 40, 40))
             painter.drawEllipse(self.zoom_out_rect)
-            painter.setPen(QtGui.QColor(40, 40, 40))
-            painter.setFont(QtGui.QFont("Arial", 8, QtGui.QFont.Weight.Bold))
             painter.drawText(self.zoom_out_rect, QtCore.Qt.AlignmentFlag.AlignCenter, "+")
         
-        # --- Draw Resize Handle ---
+        # Draw resize handle
         p = self.rect.bottomRight()
         painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 80), 1))
         painter.drawLine(int(p.x() - 12), int(p.y() - 4), int(p.x() - 4), int(p.y() - 12))
         painter.drawLine(int(p.x() - 8), int(p.y() - 4), int(p.x() - 4), int(p.y() - 8))
-        # --- End Draw Handle ---
                                 
     def update_display(self):
         qimg = self.sim.get_display_image()
@@ -487,10 +449,9 @@ class NodeConfigDialog(QtWidgets.QDialog):
                 h_layout.addWidget(combo, 1)
                 self.inputs[key] = combo
             else:
-                # Use QTextEdit for multi-line strings (like DocumentationNode)
                 if isinstance(current_value, str) and ('\n' in current_value or len(current_value) > 40):
                      line_edit = QtWidgets.QTextEdit(str(current_value))
-                     line_edit.setFixedHeight(100) # Fixed height for documentation
+                     line_edit.setFixedHeight(100)
                 else:
                      line_edit = QtWidgets.QLineEdit(str(current_value))
                      
@@ -515,7 +476,6 @@ class NodeConfigDialog(QtWidgets.QDialog):
             elif isinstance(widget, QtWidgets.QLineEdit):
                 text = widget.text()
                 try:
-                    # Try to convert to int, then float, then keep as string
                     new_val = float(text)
                     if new_val.is_integer():
                         new_val = int(new_val)
@@ -542,7 +502,6 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
         sim = node_class()
         node = NodeItem(sim)
         
-        # Set size if specified (e.g., from save file)
         if w != NODE_W or h != NODE_H:
             node.prepareGeometryChange()
             node.rect.setWidth(w)
@@ -661,63 +620,95 @@ class PerceptionLab(QtWidgets.QWidget):
         
         self.view = QtWidgets.QGraphicsView(self.scene)
         self.view.setRenderHints(QtGui.QPainter.RenderHint.Antialiasing | 
-                                QtGui.QPainter.RenderHint.SmoothPixmapTransform)
+                                QtGui.QPainter.RenderHint.SmoothPixmapTransform |
+                                QtGui.QPainter.RenderHint.TextAntialiasing)  # ADDED
         self.view.setViewportUpdateMode(
             QtWidgets.QGraphicsView.ViewportUpdateMode.BoundingRectViewportUpdate)
         
-        # --- Context Menu Setup ---
         self.view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.view.customContextMenuRequested.connect(self.on_context_menu)
-        # --------------------------
         
         layout.addWidget(self.view, 1)
         
         self.status = QtWidgets.QLabel("Welcome! Add nodes and connect them.")
-        self.status.setStyleSheet("color: #aaa; padding: 4px;")
+        self.status.setStyleSheet("color: #aaa; padding: 4px; font-size: 11px;")  # IMPROVED
         layout.addWidget(self.status)
         
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.step)
         self.is_running = False
         
-        # Create node class map for loading saved graphs
         self.NODE_CLASS_MAP = NODE_TYPES
         
-        # Create toolbar
         toolbar = self._create_toolbar()
         layout.insertLayout(0, toolbar)
         
     def _create_toolbar(self):
         tb = QtWidgets.QHBoxLayout()
         
-        add_btn = QtWidgets.QPushButton("➕ Load Node Script")
+        # IMPROVED: Better button styling
+        button_style = """
+            QPushButton {
+                font-size: 12px;
+                font-weight: bold;
+                padding: 8px 16px;
+                border-radius: 5px;
+                border: none;
+            }
+            QPushButton:hover {
+                opacity: 0.9;
+            }
+        """
+        
+        add_btn = QtWidgets.QPushButton("➕ Add Node")
         add_btn.clicked.connect(self.show_add_node_dialog) 
+        add_btn.setStyleSheet(button_style + "background: #3a5a8a; color: white;")
         tb.addWidget(add_btn)
         
         self.run_btn = QtWidgets.QPushButton("▶ Start")
         self.run_btn.clicked.connect(self.toggle_run)
-        self.run_btn.setStyleSheet("background: #16a34a; color: white; padding: 6px 12px; font-weight: bold;")
+        self.run_btn.setStyleSheet(button_style + "background: #16a34a; color: white;")
         tb.addWidget(self.run_btn)
+        
+        tb.addSpacing(10)  # Visual separator
         
         clear_btn = QtWidgets.QPushButton("🗑 Clear Edges")
         clear_btn.clicked.connect(self.clear_edges)
+        clear_btn.setStyleSheet(button_style + "background: #dc2626; color: white;")
         tb.addWidget(clear_btn)
         
-        save_btn = QtWidgets.QPushButton("💾 Save Graph")
+        tb.addSpacing(20)  # Larger separator for workflow section
+        
+        # NEW: Workflow section with better styling
+        workflow_label = QtWidgets.QLabel("WORKFLOW:")
+        workflow_label.setStyleSheet("color: #4ade80; font-weight: bold; font-size: 11px;")
+        tb.addWidget(workflow_label)
+        
+        save_btn = QtWidgets.QPushButton("💾 Save")
         save_btn.clicked.connect(self.save_graph)
+        save_btn.setStyleSheet(button_style + "background: #2563eb; color: white;")
         tb.addWidget(save_btn)
         
-        load_btn = QtWidgets.QPushButton("📂 Load Graph")
+        load_btn = QtWidgets.QPushButton("📂 Load")
         load_btn.clicked.connect(self.load_graph)
+        load_btn.setStyleSheet(button_style + "background: #7c3aed; color: white;")
         tb.addWidget(load_btn)
         
-        tb.addWidget(QtWidgets.QLabel("  Coupling:"))
+        new_btn = QtWidgets.QPushButton("🆕 New")
+        new_btn.clicked.connect(self.clear_all)
+        new_btn.setStyleSheet(button_style + "background: #f59e0b; color: white;")
+        tb.addWidget(new_btn)
+        
+        tb.addSpacing(20)
+        
+        tb.addWidget(QtWidgets.QLabel("Coupling:"))
         self.coupling_slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
         self.coupling_slider.setRange(0, 100)
         self.coupling_slider.setValue(70)
         self.coupling_slider.setMaximumWidth(150)
         tb.addWidget(self.coupling_slider)
         self.coupling_label = QtWidgets.QLabel("70%")
+        self.coupling_label.setStyleSheet("font-weight: bold; min-width: 40px;")
         self.coupling_slider.valueChanged.connect(
             lambda v: self.coupling_label.setText(f"{v}%"))
         tb.addWidget(self.coupling_label)
@@ -725,16 +716,15 @@ class PerceptionLab(QtWidgets.QWidget):
         tb.addStretch()
         
         self.fps_label = QtWidgets.QLabel("FPS: 0")
-        self.fps_label.setStyleSheet("color: #666; font-family: monospace;")
+        self.fps_label.setStyleSheet("color: #4ade80; font-family: monospace; font-size: 11px; font-weight: bold;")
         tb.addWidget(self.fps_label)
         
         return tb
 
     def show_add_node_dialog(self):
-        """Opens a file dialog to select a node script directly."""
         nodes_path = os.path.join(os.path.dirname(__file__), 'nodes')
         if not os.path.exists(nodes_path):
-            nodes_path = os.path.dirname(__file__) # Fallback if 'nodes' doesn't exist
+            nodes_path = os.path.dirname(__file__)
 
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, 
@@ -748,27 +738,19 @@ class PerceptionLab(QtWidgets.QWidget):
             self.add_node_from_file(module_name)
     
     def add_node_from_file(self, module_name):
-        """
-        Finds all node classes from the selected module_name and adds them.
-        If multiple classes are found (e.g., math_node.py), it asks which one.
-        """
-        
-        # Find all classes loaded from this module
         classes_from_module = []
         for node_key, node_info in self.NODE_CLASS_MAP.items():
             if node_info["module_name"] == module_name:
                 classes_from_module.append(node_info["class"])
         
-        # Get the position to add the node
         view_center = self.view.mapToScene(self.view.viewport().rect().center())
         
         if not classes_from_module:
-            self.status.setText(f"Error: No node classes found from '{module_name}.py'. Did it fail to load? Check dependencies.")
+            self.status.setText(f"Error: No node classes found from '{module_name}.py'")
             return
 
         if len(classes_from_module) == 1:
             self.add_node_at_pos(classes_from_module[0], view_center)
-
         else:
             menu = QtWidgets.QMenu(self)
             menu.setTitle(f"Select node from {module_name}.py")
@@ -780,23 +762,18 @@ class PerceptionLab(QtWidgets.QWidget):
             menu.exec(QtGui.QCursor.pos())
 
     def add_node_at_pos(self, node_class, scene_pos):
-        """Helper to add a specific node class at a specific scene position."""
         node = self.scene.add_node(node_class, x=scene_pos.x()-100, y=scene_pos.y()-80)
         
-        # Auto-configure setup methods if available
         if hasattr(node.sim, 'open_stream'):
             node.sim.open_stream()
         elif hasattr(node.sim, 'setup_source'):
             node.sim.setup_source()
             
-        self.status.setText(f"Added {node.sim.node_title}")
+        self.status.setText(f"✓ Added {node.sim.node_title}")
 
-    # --- NEW: Context Menu for Adding Nodes ---
     def add_node_context_menu(self, scene_pos):
-        """Displays a categorized, scrollable menu for adding nodes."""
         menu = QtWidgets.QMenu(self)
         
-        # Group nodes by category
         categories = {}
         for name, info in sorted(self.NODE_CLASS_MAP.items(), key=lambda item: item[1]['category']):
             category = info['category']
@@ -814,7 +791,6 @@ class PerceptionLab(QtWidgets.QWidget):
         return menu
 
     def on_context_menu(self, view_pos):
-        """Handles right-click on the QGraphicsView and NodeItems."""
         scene_pos = self.view.mapToScene(view_pos)
         item = self.scene.itemAt(scene_pos, QtGui.QTransform())
         
@@ -835,7 +811,7 @@ class PerceptionLab(QtWidgets.QWidget):
              selected_nodes = [clicked_node_item]
 
         if selected_nodes:
-            delete_action = menu.addAction(f"Delete Selected Node{'s' if len(selected_nodes) > 1 else ''} ({len(selected_nodes)})")
+            delete_action = menu.addAction(f"🗑 Delete Selected Node{'s' if len(selected_nodes) > 1 else ''} ({len(selected_nodes)})")
             delete_action.triggered.connect(lambda: self.scene.delete_selected_nodes())
             
             if len(selected_nodes) == 1:
@@ -843,13 +819,11 @@ class PerceptionLab(QtWidgets.QWidget):
                 config_action = menu.addAction("⚙ Configure Node...")
                 config_action.triggered.connect(lambda: self.configure_node(selected_nodes[0]))
         else:
-            # If nothing is selected, show the categorized Add Node menu
             add_menu = self.add_node_context_menu(scene_pos)
             menu.addMenu(add_menu)
             
         global_pos = self.view.mapToGlobal(view_pos)
         menu.exec(global_pos)
-    # --------------------------------
 
     def configure_node(self, node_item):
         dialog = NodeConfigDialog(node_item, self)
@@ -865,33 +839,33 @@ class PerceptionLab(QtWidgets.QWidget):
                 node_item.sim.setup_source()
             
             node_item.update()
-            node_item.update_port_positions() # Update in case config changed size
-            self.status.setText(f"Configured {node_item.sim.node_title}")
+            node_item.update_port_positions()
+            self.status.setText(f"✓ Configured {node_item.sim.node_title}")
         
     def toggle_run(self):
         self.is_running = not self.is_running
         if self.is_running:
             self.run_btn.setText("⏸ Stop")
-            self.run_btn.setStyleSheet("background: #dc2626; color: white; padding: 6px 12px; font-weight: bold;")
+            self.run_btn.setStyleSheet("font-size: 12px; font-weight: bold; padding: 8px 16px; border-radius: 5px; border: none; background: #dc2626; color: white;")
             self.timer.start(33)
-            self.status.setText("Running...")
+            self.status.setText("▶ Running...")
             self.last_time = QtCore.QTime.currentTime()
             self.frame_count = 0
         else:
             self.run_btn.setText("▶ Start")
-            self.run_btn.setStyleSheet("background: #16a34a; color: white; padding: 6px 12px; font-weight: bold;")
+            self.run_btn.setStyleSheet("font-size: 12px; font-weight: bold; padding: 8px 16px; border-radius: 5px; border: none; background: #16a34a; color: white;")
             self.timer.stop()
-            self.status.setText("Stopped")
+            self.status.setText("⏸ Stopped")
             
     def clear_edges(self):
         for edge in list(self.scene.edges):
             self.scene.remove_edge(edge)
-        self.status.setText("Cleared all edges")
+        self.status.setText("✓ Cleared all edges")
         
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key.Key_Delete or event.key() == QtCore.Qt.Key.Key_Backspace:
             self.scene.delete_selected_nodes()
-            self.status.setText("Deleted selected nodes.")
+            self.status.setText("✓ Deleted selected nodes")
             return
         super().keyPressEvent(event)
         
@@ -949,27 +923,33 @@ class PerceptionLab(QtWidgets.QWidget):
         if PA_INSTANCE:
             try:
                 PA_INSTANCE.terminate()
-                print("PyAudio instance terminated.")
             except Exception as e:
                 print(f"Error terminating PyAudio: {e}")
         super().closeEvent(event)
 
     def clear_all(self):
-        """Clears all nodes and edges from the scene."""
         if self.is_running:
             self.toggle_run()
         
-        self.clear_edges()
-        for node in list(self.scene.nodes):
-            self.scene.remove_node(node)
-        self.status.setText("Graph cleared")
+        reply = QtWidgets.QMessageBox.question(
+            self, 'Clear Graph', 
+            'Are you sure you want to clear all nodes and start fresh?',
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+            QtWidgets.QMessageBox.StandardButton.No
+        )
+        
+        if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+            self.clear_edges()
+            for node in list(self.scene.nodes):
+                self.scene.remove_node(node)
+            self.status.setText("✓ Graph cleared - Ready for new workflow")
 
     def save_graph(self):
-        """Saves the current node graph to a JSON file."""
         if self.is_running:
             self.toggle_run()
 
-        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Graph", "", "JSON Files (*.json)")
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Save Graph", "", "JSON Files (*.json)")
         if not fileName:
             return
 
@@ -1023,14 +1003,14 @@ class PerceptionLab(QtWidgets.QWidget):
         try:
             with open(fileName, 'w') as f:
                 json.dump(graph_data, f, indent=2)
-            self.status.setText(f"Graph saved to {os.path.basename(fileName)}")
+            self.status.setText(f"✓ Graph saved to {os.path.basename(fileName)}")
         except Exception as e:
-            self.status.setText(f"Error saving graph: {e}")
+            self.status.setText(f"❌ Error saving graph: {e}")
             print(f"Error saving graph: {e}")
 
     def load_graph(self):
-        """Loads a node graph from a JSON file."""
-        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Load Graph", "", "JSON Files (*.json)")
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, "Load Graph", "", "JSON Files (*.json)")
         if not fileName:
             return
             
@@ -1038,21 +1018,21 @@ class PerceptionLab(QtWidgets.QWidget):
             with open(fileName, 'r') as f:
                 graph_data = json.load(f)
         except Exception as e:
-            self.status.setText(f"Error loading file: {e}")
+            self.status.setText(f"❌ Error loading file: {e}")
             return
 
-        self.clear_all()
+        self.clear_edges()
+        for node in list(self.scene.nodes):
+            self.scene.remove_node(node)
         
         id_to_node_item = {}
 
         for node_data in graph_data.get("nodes", []):
             class_name = node_data["class_name"]
-            
             node_info = self.NODE_CLASS_MAP.get(class_name) 
             
             if node_info:
                 node_class = node_info["class"]
-                
                 pos_x = node_data.get("pos_x", 0)
                 pos_y = node_data.get("pos_y", 0)
                 width = node_data.get("width", NODE_W)
@@ -1074,7 +1054,7 @@ class PerceptionLab(QtWidgets.QWidget):
                 node_item.update_port_positions()
                 id_to_node_item[node_data["id"]] = node_item
             else:
-                print(f"Warning: Node class '{class_name}' not found in registry. Skipping.")
+                print(f"Warning: Node class '{class_name}' not found. Skipping.")
 
         for edge_data in graph_data.get("edges", []):
             try:
@@ -1088,12 +1068,12 @@ class PerceptionLab(QtWidgets.QWidget):
                 self.scene.edges.append(edge)
                 edge.update_path()
             except Exception as e:
-                print(f"Error loading edge: {e}. Skipping.")
+                print(f"Error loading edge: {e}")
 
         settings = graph_data.get("global_settings", {})
         self.coupling_slider.setValue(settings.get("coupling", 70))
 
-        self.status.setText(f"Graph loaded from {os.path.basename(fileName)}")
+        self.status.setText(f"✓ Graph loaded from {os.path.basename(fileName)}")
 
 # ==================== APPLICATION ENTRY ====================
 
@@ -1121,25 +1101,16 @@ def main():
         QWidget {
             font-family: 'Segoe UI', Arial, sans-serif;
         }
-        QPushButton {
-            border: none;
-            border-radius: 4px;
-            padding: 6px 12px;
-            background: #3a3a3a;
-            color: #ddd;
-        }
         QPushButton:hover {
             background: #4a4a4a;
         }
         QPushButton:pressed {
             background: #2a2a2a;
         }
-        QPushButton::menu-indicator {
-            width: 0px;
-        }
         QMenu {
             background: #2a2a2a;
             border: 1px solid #444;
+            font-size: 11px;
         }
         QMenu::item {
             padding: 6px 20px;
@@ -1164,25 +1135,18 @@ def main():
         QLineEdit, QComboBox {
             background: #3a3a3a;
             border: 1px solid #555;
-            padding: 2px;
+            padding: 4px;
             color: #ddd;
             border-radius: 4px;
-            height: 24px;
+            font-size: 11px;
         }
         QTextEdit {
             background: #3a3a3a;
             border: 1px solid #555;
-            padding: 2px;
+            padding: 4px;
             color: #ddd;
             border-radius: 4px;
-        }
-        QComboBox::drop-down {
-            subcontrol-origin: padding;
-            subcontrol-position: top right;
-            width: 15px;
-            border-left-width: 1px;
-            border-left-color: #555;
-            border-left-style: solid;
+            font-size: 11px;
         }
     """)
     
