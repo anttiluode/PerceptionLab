@@ -58,6 +58,10 @@ class ReactiveSpaceNode(BaseNode):
         # The "density" image
         self.space = np.zeros((self.h, self.w), dtype=np.float32)
         
+        # --- FIX: Initialize the display_img array ---
+        self.display_img = np.zeros((self.h, self.w), dtype=np.float32)
+        # --- END FIX ---
+        
         self.time = 0.0
 
     def step(self):
