@@ -80,7 +80,12 @@ class SignalMathNode(BaseNode):
             'pow': '^', 'min': 'min', 'max': 'max', 'avg': 'avg'
         }.get(self.operation, '?')
         
-        text = f"A {op_symbol} B\n= {self.result:.2f}"
+        # --- FIX: Ensure self.result is a single float before formatting ---
+        display_result = self.result
+        if isinstance(self.result, np.ndarray) and self.result.size > 0:
+            display_result = self.result.flat[0]
+            
+        text = f"A {op_symbol} B\n= {display_result:.2f}"
         
         img_pil = Image.fromarray(img)
         draw = ImageDraw.Draw(img_pil)
