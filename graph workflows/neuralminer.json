@@ -1,0 +1,142 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "LivingOrganismNode",
+      "pos_x": 50,
+      "pos_y": 250,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "size": 96,
+        "steps_per_frame": 2
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "StrangeAttractorNode",
+      "pos_x": 50,
+      "pos_y": 550,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "a": -1.4,
+        "b": 1.6,
+        "c": 1.0,
+        "d": 0.7
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "FractalAnalyzerNode",
+      "pos_x": 350,
+      "pos_y": 250,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "size": 96,
+        "fit_range_min": 5,
+        "levels": 5
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "FractalAnalyzerNode",
+      "pos_x": 350,
+      "pos_y": 550,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "size": 96,
+        "fit_range_min": 5,
+        "levels": 5
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "MetaDynamicCouplerNode",
+      "pos_x": 650,
+      "pos_y": 400,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "initial_coupling": 0.5,
+        "learning_rate": 0.01
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 950,
+      "pos_y": 400,
+      "width": 200,
+      "height": 100,
+      "config": {}
+    },
+    {
+      "id": 6,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 350,
+      "pos_y": 50,
+      "width": 200,
+      "height": 100,
+      "config": {}
+    },
+    {
+      "id": 7,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 350,
+      "pos_y": 750,
+      "width": 200,
+      "height": 100,
+      "config": {}
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "field_image",
+      "to_node_id": 2,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 3,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "fractal_beta",
+      "to_node_id": 4,
+      "to_port": "input_a"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "fractal_beta",
+      "to_node_id": 4,
+      "to_port": "success_target"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "current_coupling",
+      "to_node_id": 5,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "fractal_beta",
+      "to_node_id": 6,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "fractal_beta",
+      "to_node_id": 7,
+      "to_port": "signal"
+    }
+  ]
+}
