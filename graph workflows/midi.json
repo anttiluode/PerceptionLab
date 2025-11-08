@@ -1,0 +1,122 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": 50,
+      "pos_y": 250,
+      "width": 200,
+      "height": 160,
+      "config": {
+        "w": 64,
+        "h": 64,
+        "noise_type": "white",
+        "speed": 0.5
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "SignalMathNode",
+      "pos_x": 300,
+      "pos_y": 250,
+      "width": 150,
+      "height": 100,
+      "config": {
+        "operation": "multiply"
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "FreqToMidiNode",
+      "pos_x": 500,
+      "pos_y": 250,
+      "width": 200,
+      "height": 160,
+      "config": {
+        "midi_offset": 0
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "MidiToFreqNode",
+      "pos_x": 750,
+      "pos_y": 250,
+      "width": 200,
+      "height": 160,
+      "config": {}
+    },
+    {
+      "id": 4,
+      "class_name": "SpeakerOutputNode",
+      "pos_x": 1000,
+      "pos_y": 250,
+      "width": 200,
+      "height": 160,
+      "config": {}
+    },
+    {
+      "id": 5,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 300,
+      "pos_y": 400,
+      "width": 150,
+      "height": 100,
+      "config": {
+        "value": 0.8
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "A"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "B"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "result",
+      "to_node_id": 2,
+      "to_port": "frequency_in"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "amplitude_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "midi_note",
+      "to_node_id": 3,
+      "to_port": "midi_note_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "velocity",
+      "to_node_id": 3,
+      "to_port": "velocity_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "frequency_out",
+      "to_node_id": 4,
+      "to_port": "frequency"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "amplitude_out",
+      "to_node_id": 4,
+      "to_port": "amplitude"
+    }
+  ]
+}

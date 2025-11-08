@@ -1,0 +1,222 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "FFTCochleaNode",
+      "pos_x": 28.0,
+      "pos_y": -8.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "outputs": {
+          "spectrum": "spectrum",
+          "signal": "signal",
+          "image": "image",
+          "complex_spectrum": "complex_spectrum"
+        },
+        "node_title": "FFT Cochlea",
+        "freq_bins": 64,
+        "x": 0.0,
+        "internal_freq": 5.42071824151466
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "FractalSteeringPilotNode",
+      "pos_x": -249.0,
+      "pos_y": 200.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "steering_factor": "signal"
+        },
+        "outputs": {
+          "x_nudge": "signal",
+          "y_nudge": "signal",
+          "complexity": "signal"
+        },
+        "node_title": "Fractal Steering Pilot",
+        "nudge_factor": 0.005,
+        "complexity_smoothing": 0.9,
+        "measured_complexity": 0.13253467210742378,
+        "last_nudge_x": -0.0034618823464590484,
+        "last_nudge_y": -0.009381650740635957
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "MandelbrotNode",
+      "pos_x": 271.0,
+      "pos_y": 166.0,
+      "width": 417.0,
+      "height": 354.0,
+      "config": {
+        "inputs": {
+          "zoom": "signal",
+          "x_pos": "signal",
+          "y_pos": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "input_data": {
+          "zoom": [
+            0.0001
+          ],
+          "x_pos": [
+            -0.005330641446555326
+          ],
+          "y_pos": [
+            -0.008460748298363836
+          ]
+        },
+        "node_title": "Mandelbrot Explorer",
+        "resolution": 128,
+        "max_iterations": 30,
+        "center_x": -0.7429818891941059,
+        "center_y": 0.026065969842888184,
+        "zoom": 5.700533956076724
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 318.0,
+      "pos_y": -66.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "signal": [
+            -0.005330641446555326
+          ]
+        },
+        "node_title": "Signal Display",
+        "current_value": -0.005330641446555326
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -23.0,
+      "pos_y": 260.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 0.0001
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "FFTCochleaNode",
+      "pos_x": 735.0,
+      "pos_y": 281.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "outputs": {
+          "spectrum": "spectrum",
+          "signal": "signal",
+          "image": "image",
+          "complex_spectrum": "complex_spectrum"
+        },
+        "node_title": "FFT Cochlea",
+        "freq_bins": 64,
+        "x": 0.0,
+        "internal_freq": 10.14832050355004
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "iFFTCochleaNode",
+      "pos_x": 738.0,
+      "pos_y": -15.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "iFFT Cochlea",
+        "h": 120,
+        "w": 160
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "y_nudge",
+      "to_node_id": 2,
+      "to_port": "x_pos"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "x_nudge",
+      "to_node_id": 2,
+      "to_port": "y_pos"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "y_nudge",
+      "to_node_id": 3,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "zoom"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 5,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "complex_spectrum",
+      "to_node_id": 6,
+      "to_port": "complex_spectrum"
+    }
+  ]
+}

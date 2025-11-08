@@ -1,0 +1,4790 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "IHTPhaseFieldNode",
+      "pos_x": -577.0,
+      "pos_y": -288.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "dilution": "signal",
+          "alignment": "signal",
+          "perturbation": "image"
+        },
+        "outputs": {
+          "phase_field": "image",
+          "coherence": "signal",
+          "constraint_density": "image",
+          "participation_ratio": "signal"
+        },
+        "input_data": {
+          "dilution": [],
+          "alignment": [
+            0.7
+          ],
+          "perturbation": []
+        },
+        "node_title": "IHT Phase Field",
+        "N": 64,
+        "alpha": 0.1,
+        "gamma": 0.05,
+        "eta": 0.425
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "GalaxyFieldNode",
+      "pos_x": -326.0,
+      "pos_y": -291.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "energy": "signal",
+          "spin": "signal",
+          "seed_image": "image"
+        },
+        "outputs": {
+          "field": "image",
+          "memory": "image",
+          "total_energy": "signal"
+        },
+        "input_data": {
+          "energy": [
+            0.7
+          ],
+          "spin": [
+            277.84467163085935
+          ],
+          "seed_image": []
+        },
+        "node_title": "Galaxy Field",
+        "grid_size": 128,
+        "dt": 0.015,
+        "time": 148.64999999998568
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "TopologicalAtomNode",
+      "pos_x": -83.0,
+      "pos_y": -283.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "noise_strength": "signal",
+          "rotation_rate": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "field_image": "image",
+          "stability": "signal",
+          "charge": "signal",
+          "rotation_angle": "signal"
+        },
+        "input_data": {
+          "noise_strength": [
+            286594.984375
+          ],
+          "rotation_rate": [],
+          "reset": []
+        },
+        "node_title": "Topological Atom",
+        "atomic_number": 6,
+        "stable": true,
+        "rotation_speed_base": 0.0,
+        "last_reset_sig": 0.0
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "HSLPatternNode",
+      "pos_x": -620.0,
+      "pos_y": -67.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "H_in": "signal",
+          "S_in": "signal",
+          "L_in": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "input_data": {
+          "H_in": [
+            0.7
+          ],
+          "S_in": [
+            4.472569660248978,
+            0.7
+          ],
+          "L_in": [
+            -0.7
+          ]
+        },
+        "node_title": "HSL Pattern (MTX)",
+        "size": 128,
+        "speed": 1.0,
+        "pulse": 0.8,
+        "depth": 4,
+        "time": 180.30000000001843,
+        "last_h": 0.7,
+        "last_s": 5.172569660248978,
+        "last_l": -0.7
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "WaveletDecomposeNode",
+      "pos_x": -383.0,
+      "pos_y": -65.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {
+          "LL": "image",
+          "LH": "image",
+          "HL": "image",
+          "HH": "image"
+        },
+        "node_title": "Wavelet Decompose (DWT)",
+        "wavelet_name": "haar",
+        "size": 128
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "ImageMoireNode",
+      "pos_x": -111.0,
+      "pos_y": -69.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "peak_freq": "signal",
+          "bandwidth": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "Image to Moir\u00e9",
+        "resolution": 128,
+        "peak_freq": 0.1,
+        "bandwidth": 0.1
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "FFTCochleaNode",
+      "pos_x": 180.0,
+      "pos_y": -301.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "outputs": {
+          "spectrum": "spectrum",
+          "signal": "signal",
+          "image": "image",
+          "complex_spectrum": "complex_spectrum"
+        },
+        "node_title": "FFT Cochlea",
+        "freq_bins": 64,
+        "x": 11.249097834739525,
+        "internal_freq": 10.790966695474689
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "iFFTCochleaNode",
+      "pos_x": 147.0,
+      "pos_y": -63.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "iFFT Cochlea",
+        "h": 120,
+        "w": 160
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "ScalogramAnalyzerNode",
+      "pos_x": -824.0,
+      "pos_y": -416.0,
+      "width": 228.0,
+      "height": 257.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "Scalogram Analyzer",
+        "num_scales": 64,
+        "wavelet_name": "morl"
+      }
+    },
+    {
+      "id": 9,
+      "class_name": "PhaseExplorerNode",
+      "pos_x": -864.0,
+      "pos_y": -79.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "trigger": "signal"
+        },
+        "outputs": {
+          "phase_diagram": "image",
+          "status": "signal"
+        },
+        "input_data": {
+          "trigger": [
+            7.8743684843176665
+          ]
+        },
+        "node_title": "Phase Explorer",
+        "num_trials": 500,
+        "grid_size": 64,
+        "results": [
+          {
+            "params": {
+              "lambda_coupling": 1.7547252081577684,
+              "spin_force": 0.36578959094350627,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.880864128546933,
+              "spin_force": 0.5877560401346457,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6945852152416594,
+              "spin_force": 0.09305619423904768,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6073182325676076,
+              "spin_force": 0.3044854955829235,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.709577640457816,
+              "spin_force": 0.3409224613987165,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.907045710799927,
+              "spin_force": 0.4087364233287197,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7988297214359548,
+              "spin_force": 0.529347744740816,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9478036850984621,
+              "spin_force": 0.7261771808397651,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1203743863994648,
+              "spin_force": 0.29665646139413177,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.302453459327285,
+              "spin_force": 0.6359409247353076,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2257398633635468,
+              "spin_force": 0.5462948708285615,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5468182735887002,
+              "spin_force": 0.773468575618707,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.432515963917566,
+              "spin_force": 0.6917116049351439,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4540903429047549,
+              "spin_force": 0.02258631705077683,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8641063048173874,
+              "spin_force": 0.6738882097862072,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.20616921427450216,
+              "spin_force": 0.10436605630664966,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0900037141835233,
+              "spin_force": 0.35952692902277755,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9234245004441606,
+              "spin_force": 0.0419335259465905,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3040666366086254,
+              "spin_force": 0.6831480197264246,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3190104619831915,
+              "spin_force": 0.03564455454391169,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1386570076929483,
+              "spin_force": 0.03775258387783662,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4851173375782987,
+              "spin_force": 0.21408513848241456,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7175556072439705,
+              "spin_force": 0.6261084550259042,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9488185382474985,
+              "spin_force": 0.6369407402538215,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8298707130210835,
+              "spin_force": 0.16160939885101105,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.16312584316812445,
+              "spin_force": 0.7693204173237329,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2789469811789068,
+              "spin_force": 0.32672092341380843,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6428190612206778,
+              "spin_force": 0.20351934998501733,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.546061308083072,
+              "spin_force": 0.22163652603386375,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8397429589008967,
+              "spin_force": 0.2294453661788466,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.37725822025048783,
+              "spin_force": 0.5161150308940691,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6211572799443175,
+              "spin_force": 0.1973947131804601,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7552137072218139,
+              "spin_force": 0.11290284785059407,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.46941868180346047,
+              "spin_force": 0.6389811189851539,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8074054771550234,
+              "spin_force": 0.20538789820788708,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5670326572990776,
+              "spin_force": 0.6613852679501817,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2180232330248866,
+              "spin_force": 0.48229080655363826,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8226375498503975,
+              "spin_force": 0.2897157181510765,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5342677634373182,
+              "spin_force": 0.1707678340488492,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7651472236097091,
+              "spin_force": 0.5055016419193614,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8542512451152042,
+              "spin_force": 0.7836292511040871,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4212150469751077,
+              "spin_force": 0.39194086264941563,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.007600855532931,
+              "spin_force": 0.5219228199480356,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.19490142365534993,
+              "spin_force": 0.39382481387214496,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9660151288432587,
+              "spin_force": 0.4443645499793305,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6420599010930832,
+              "spin_force": 0.5461034605921957,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.645521242049813,
+              "spin_force": 0.4827270314229112,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3470375695666672,
+              "spin_force": 0.32138411843524034,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8075578792429492,
+              "spin_force": 0.27650493054465114,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6473414419843367,
+              "spin_force": 0.7673592810890986,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7888405900489909,
+              "spin_force": 0.35920429192727515,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5144800077869038,
+              "spin_force": 0.7696968679637188,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2223321367329096,
+              "spin_force": 0.5517125908867981,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0944853490118778,
+              "spin_force": 0.6320481841604932,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2359485169109168,
+              "spin_force": 0.7399072384257869,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.36063568166962046,
+              "spin_force": 0.690868669299362,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3874608444549851,
+              "spin_force": 0.5711412933265734,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6329056907692432,
+              "spin_force": 0.5020686162604447,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.631950534378709,
+              "spin_force": 0.7314728451405093,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9719439565904604,
+              "spin_force": 0.6409997388107485,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7211069983895232,
+              "spin_force": 0.0070949472766361765,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2956424326331746,
+              "spin_force": 0.0950361295222221,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8915929616847662,
+              "spin_force": 0.13762500835376532,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.20765987687070692,
+              "spin_force": 0.7896247401526902,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2392820093214665,
+              "spin_force": 0.2058520473389674,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6937958421919677,
+              "spin_force": 0.782575363597369,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6354507583612866,
+              "spin_force": 0.6641049820742827,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5333047903248789,
+              "spin_force": 0.2210808131012561,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.859032781631228,
+              "spin_force": 0.2394196528847095,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9110116232254932,
+              "spin_force": 0.6918893761963284,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6941905897822975,
+              "spin_force": 0.467525191962076,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.32818929140094155,
+              "spin_force": 0.7481770706004092,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3433595826863365,
+              "spin_force": 0.09185569466258325,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.1104199017998138,
+              "spin_force": 0.2123775149026937,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4127856685828353,
+              "spin_force": 0.18829788759745228,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.246123552606388,
+              "spin_force": 0.5359391595679857,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.47225491633225924,
+              "spin_force": 0.05573782481315277,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5337978405412747,
+              "spin_force": 0.7533856428730844,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0674232962174093,
+              "spin_force": 0.0035809471043182664,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5525318846847865,
+              "spin_force": 0.7222129653782098,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4383990394437427,
+              "spin_force": 0.05771894430467173,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4824562853170389,
+              "spin_force": 0.5434516700788561,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.22852497530093727,
+              "spin_force": 0.6948786811911583,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4142428717947886,
+              "spin_force": 0.5026951470023947,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8906052380425697,
+              "spin_force": 0.189787258232845,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1264405357252272,
+              "spin_force": 0.7397846533085165,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7121393461930868,
+              "spin_force": 0.47725647969744794,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.204866343778848,
+              "spin_force": 0.3647047693391975,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9561549042094012,
+              "spin_force": 0.07583128878403747,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9584159976047544,
+              "spin_force": 0.047417250378617395,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6099229009517605,
+              "spin_force": 0.6074760197246359,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.14038793097045027,
+              "spin_force": 0.10034974082741135,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4458380845118357,
+              "spin_force": 0.25382894135948775,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8216471399644785,
+              "spin_force": 0.5800626447803712,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5214753255076895,
+              "spin_force": 0.3335067342037687,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3838135046456652,
+              "spin_force": 0.7408127814326487,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0540840706235806,
+              "spin_force": 0.7226290575237059,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4858842982724416,
+              "spin_force": 0.05475956431029694,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8522501051370137,
+              "spin_force": 0.7431087323178881,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4507393892625853,
+              "spin_force": 0.5990064678223603,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8996394455946164,
+              "spin_force": 0.6290830442594398,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1078293719280918,
+              "spin_force": 0.6925592491749302,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2540743805530046,
+              "spin_force": 0.01766510631088991,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.119617628172949,
+              "spin_force": 0.548134552360294,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.212606669228185,
+              "spin_force": 0.2725940817231975,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.11483569927506974,
+              "spin_force": 0.46393637142273053,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.923332109792237,
+              "spin_force": 0.1257853225816193,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8207409313095563,
+              "spin_force": 0.6934767029825017,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3291142541258145,
+              "spin_force": 0.32430112761340296,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.565859040090645,
+              "spin_force": 0.2531014717170807,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.555893506280748,
+              "spin_force": 0.3590463331324652,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.29045907853422026,
+              "spin_force": 0.3901492948750253,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3479117992447394,
+              "spin_force": 0.7431075663502106,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.890670132179707,
+              "spin_force": 0.3020032746009438,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5604158047301273,
+              "spin_force": 0.41912597202299695,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7180820117771756,
+              "spin_force": 0.7502900140435158,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3802181055643152,
+              "spin_force": 0.3316660731276733,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.10326788232929107,
+              "spin_force": 0.49698993092702404,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5884601200016947,
+              "spin_force": 0.5128585871412014,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5155124025195195,
+              "spin_force": 0.045698734734450235,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.982464513560295,
+              "spin_force": 0.28068308160225686,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9131516543593967,
+              "spin_force": 0.5188931052563904,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.695236716760136,
+              "spin_force": 0.18293770018370037,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.1858998453992171,
+              "spin_force": 0.42535980675853646,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.1322259102679365,
+              "spin_force": 0.5284738113647416,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8100021420095865,
+              "spin_force": 0.1989928788389327,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8287759453547542,
+              "spin_force": 0.6592740329746452,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5128211619419913,
+              "spin_force": 0.2643884098332722,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8674940089171326,
+              "spin_force": 0.003083065712760913,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2239050091023698,
+              "spin_force": 0.263838314436671,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3934093512520898,
+              "spin_force": 0.6286619252029846,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9037398202028917,
+              "spin_force": 0.023054940767158617,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.37647717333919895,
+              "spin_force": 0.5978617797793405,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6025778957653825,
+              "spin_force": 0.2382348776754177,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8948499353226183,
+              "spin_force": 0.5645968739215016,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8924178451093485,
+              "spin_force": 0.6666498091569498,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8665881120810264,
+              "spin_force": 0.39138447732895454,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8129277190048534,
+              "spin_force": 0.32132157046322485,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6754501131947096,
+              "spin_force": 0.341000653002192,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2786440533436463,
+              "spin_force": 0.017353204420376047,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3213780103397401,
+              "spin_force": 0.5594053679523686,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5534009470689734,
+              "spin_force": 0.11281973265907573,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9500006231528617,
+              "spin_force": 0.7438996084151934,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.465226902253167,
+              "spin_force": 0.0876902857731773,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1922052727433963,
+              "spin_force": 0.1752130836855134,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8594086302516121,
+              "spin_force": 0.25964884819351347,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2195858411058426,
+              "spin_force": 0.1823725491999614,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.21225482280895,
+              "spin_force": 0.49522025174059414,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4993111614290866,
+              "spin_force": 0.12672440726719145,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5917189470826303,
+              "spin_force": 0.7324154325408953,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1072582473187047,
+              "spin_force": 0.015492522027358735,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1311010419829097,
+              "spin_force": 0.39778481536107935,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9467662170028834,
+              "spin_force": 0.3944561496486656,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2247753915170874,
+              "spin_force": 0.3873858246634873,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6854830644234962,
+              "spin_force": 0.2134043334398057,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1080060105492648,
+              "spin_force": 0.3292371410688499,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5571659205842874,
+              "spin_force": 0.6957866395023808,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6837779708500319,
+              "spin_force": 0.6371920622677918,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3834305369476276,
+              "spin_force": 0.22008392175304056,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.664711714870197,
+              "spin_force": 0.15719004931304506,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1190385763593889,
+              "spin_force": 0.5696966156312968,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6916628817367054,
+              "spin_force": 0.622042635907416,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.768458054418084,
+              "spin_force": 0.24242161259946862,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5900081317776291,
+              "spin_force": 0.14674786828548916,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.61154961917237,
+              "spin_force": 0.31904080236080445,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8259523924086631,
+              "spin_force": 0.538774116960781,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.17693281679527853,
+              "spin_force": 0.05314894162376885,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4720677596361307,
+              "spin_force": 0.09196213214893999,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3338747527488277,
+              "spin_force": 0.6513040493576242,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5454464478372925,
+              "spin_force": 0.7911731498230563,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9410497953484354,
+              "spin_force": 0.48775663422624227,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1785825990917265,
+              "spin_force": 0.5361113553620935,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0157748344352933,
+              "spin_force": 0.6661837030567512,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6893505125468796,
+              "spin_force": 0.4902674884263952,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3529307832747857,
+              "spin_force": 0.4432379625177097,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9634335653003425,
+              "spin_force": 0.5752523040828262,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4318796879198529,
+              "spin_force": 0.008947887695201384,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8252539536520773,
+              "spin_force": 0.12886873350471834,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3917213586173903,
+              "spin_force": 0.7218537499304165,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7525381012475607,
+              "spin_force": 0.19490551911910928,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7725603332245504,
+              "spin_force": 0.46956691981985393,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5799270938701908,
+              "spin_force": 0.43775617102781306,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7863023160769607,
+              "spin_force": 0.7948324370662458,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.680548735841933,
+              "spin_force": 0.13840639104099015,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7744810120003343,
+              "spin_force": 0.48346023159776064,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1925877937791614,
+              "spin_force": 0.11773967105247057,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.22370381607919554,
+              "spin_force": 0.613311438902437,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9629251525558875,
+              "spin_force": 0.35494797417750457,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2837632429616892,
+              "spin_force": 0.4850980108146983,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.313182237510138,
+              "spin_force": 0.6676272580894369,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.24193938700544174,
+              "spin_force": 0.30551601732320893,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.1699986551896655,
+              "spin_force": 0.5765450503186357,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.039431028382513,
+              "spin_force": 0.23492671087463873,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7499802193533227,
+              "spin_force": 0.4488802050910842,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.237591771911179,
+              "spin_force": 0.2903659135693,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9748354372371362,
+              "spin_force": 0.4730090253309248,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5852806822335541,
+              "spin_force": 0.13470284172887298,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7438853679474682,
+              "spin_force": 0.39722486258192724,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.47945915089394264,
+              "spin_force": 0.5562731039174208,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.325500598982471,
+              "spin_force": 0.17089974778210204,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1100807700250424,
+              "spin_force": 0.6986954909949319,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.30664999350198097,
+              "spin_force": 0.25098800284366635,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.12017040674250799,
+              "spin_force": 0.20857295631877673,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3740419104857581,
+              "spin_force": 0.5430768688464289,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.21518180447327406,
+              "spin_force": 0.664810331563114,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.117092465317265,
+              "spin_force": 0.09644897790046265,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8250000798967496,
+              "spin_force": 0.6606013155102256,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9672813913148702,
+              "spin_force": 0.5846070889097184,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4267172876315473,
+              "spin_force": 0.27001260012368056,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3045561650543007,
+              "spin_force": 0.3517407527067537,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.34849959608179226,
+              "spin_force": 0.148576708129358,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2309774100083497,
+              "spin_force": 0.043772884248360545,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.18678044920230305,
+              "spin_force": 0.5761793853315044,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5338825369195029,
+              "spin_force": 0.15179403422928123,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3543888752743514,
+              "spin_force": 0.5195734034010052,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4363706476726632,
+              "spin_force": 0.31161928415880225,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4272615284775838,
+              "spin_force": 0.29612820278640956,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.946904014460039,
+              "spin_force": 0.2220539829991136,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.35556469157089854,
+              "spin_force": 0.4001520880132039,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.11067855964603618,
+              "spin_force": 0.05869727344947587,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6914587500350511,
+              "spin_force": 0.1438979071150099,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.894481596389443,
+              "spin_force": 0.5625401705364511,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9802395956910446,
+              "spin_force": 0.09747613070453448,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7527465364529684,
+              "spin_force": 0.1954744444309168,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.31436788930009063,
+              "spin_force": 0.5776543227583207,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7505418213807042,
+              "spin_force": 0.6052028556047547,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3660706151175313,
+              "spin_force": 0.29060581012216335,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.827472731251132,
+              "spin_force": 0.4236424199132947,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9526920962715555,
+              "spin_force": 0.6898553734811392,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4399820209405906,
+              "spin_force": 0.5295035493999428,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.20038683903068905,
+              "spin_force": 0.13773593711085005,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.228111681847088,
+              "spin_force": 0.6372289866959389,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8378963825302217,
+              "spin_force": 0.5170921722059115,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.29367059275358975,
+              "spin_force": 0.7806260709913655,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.673641355288969,
+              "spin_force": 0.024263919703619675,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6924442015427377,
+              "spin_force": 0.6458031221014799,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.20010234493279777,
+              "spin_force": 0.4367658214218179,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6728158226487688,
+              "spin_force": 0.6022800326876891,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6985653120303692,
+              "spin_force": 0.3532891882268818,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0802559791943902,
+              "spin_force": 0.17021582577766445,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.072108635548505,
+              "spin_force": 0.07778221712894329,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3240833815853744,
+              "spin_force": 0.29959568552035576,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8557347065582914,
+              "spin_force": 0.013150069029705502,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4890272585375983,
+              "spin_force": 0.1903338169559631,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6179028525908717,
+              "spin_force": 0.21851753370949237,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4035224326078348,
+              "spin_force": 0.7303003030937316,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0654140359899338,
+              "spin_force": 0.11415280426438823,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.10351011661878,
+              "spin_force": 0.6297478195843608,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2630343481155633,
+              "spin_force": 0.3177621014947458,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0674721717678635,
+              "spin_force": 0.7121085902346067,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7170138557037118,
+              "spin_force": 0.09791290392796191,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6577655643262716,
+              "spin_force": 0.1311464193793844,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.36225846599179645,
+              "spin_force": 0.14959931413247382,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1627576158842234,
+              "spin_force": 0.21791145570661188,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2602637967656831,
+              "spin_force": 0.009029075255535979,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7474826057054131,
+              "spin_force": 0.04791442246973024,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7537055286213592,
+              "spin_force": 0.7879452830353335,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.40517594320184613,
+              "spin_force": 0.7538329099362179,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.151334263323013,
+              "spin_force": 0.5643096160762718,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5485339512031724,
+              "spin_force": 0.5935248919062762,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1186301160748184,
+              "spin_force": 0.039594164449907154,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9453219265491422,
+              "spin_force": 0.06562869393221381,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5045665121814455,
+              "spin_force": 0.6750095162804053,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5360851226480964,
+              "spin_force": 0.15433272875780688,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5649693341415831,
+              "spin_force": 0.30902695846286465,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6662503061580494,
+              "spin_force": 0.5574221463332077,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1390399312491146,
+              "spin_force": 0.21715504942223884,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.578389633771333,
+              "spin_force": 0.1724972111490579,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9296692104788549,
+              "spin_force": 0.5574111603571723,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9809390792518582,
+              "spin_force": 0.1166683811352458,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3070411935830117,
+              "spin_force": 0.30834472547789854,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7317141306297668,
+              "spin_force": 0.04812783141337267,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.1887235638258412,
+              "spin_force": 0.14558672660804417,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7191678733149292,
+              "spin_force": 0.4234516947274431,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.30791776344825883,
+              "spin_force": 0.6418546069227876,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3559687355110608,
+              "spin_force": 0.1173769130386546,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.876329241253048,
+              "spin_force": 0.4589854179087845,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2901324354233416,
+              "spin_force": 0.21569097362263792,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2948823940935987,
+              "spin_force": 0.7435721600604229,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.40284788858242204,
+              "spin_force": 0.1786871011198965,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9851714513621395,
+              "spin_force": 0.012408586487837337,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5430341990280292,
+              "spin_force": 0.694833454012386,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8782013555006256,
+              "spin_force": 0.731615922029921,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.22510116457177512,
+              "spin_force": 0.6069858867790899,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0399060479532423,
+              "spin_force": 0.6571146346349956,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.538120973407668,
+              "spin_force": 0.7231582111840624,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3311360441867828,
+              "spin_force": 0.23920937543906362,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0884046631424869,
+              "spin_force": 0.18173728743080897,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6808600292783682,
+              "spin_force": 0.15978715402072902,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9595567295889202,
+              "spin_force": 0.5143848894511748,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5688001350223942,
+              "spin_force": 0.7882202981918397,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6455296133137656,
+              "spin_force": 0.472474877659109,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5681877835960409,
+              "spin_force": 0.06464874407460526,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0433373253115765,
+              "spin_force": 0.6567349520045629,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5072352443348164,
+              "spin_force": 0.2546058264464359,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9672046539956379,
+              "spin_force": 0.3988728821623658,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6849429522571238,
+              "spin_force": 0.16028064880644097,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.13870180073734698,
+              "spin_force": 0.16150497749532386,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.013715107136798,
+              "spin_force": 0.6394307070821725,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2008972473094661,
+              "spin_force": 0.30893589199194094,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.28283011553501036,
+              "spin_force": 0.5033803677120492,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3780572728646836,
+              "spin_force": 0.6411537425132529,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0834791920192979,
+              "spin_force": 0.09492027799736685,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1879896438888522,
+              "spin_force": 0.17649957815427744,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.1564965325031074,
+              "spin_force": 0.7499770971458402,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6787764447611313,
+              "spin_force": 0.593347379795872,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9635376580506538,
+              "spin_force": 0.5284508848210244,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3687375728059212,
+              "spin_force": 0.5755586453196656,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7744394366881018,
+              "spin_force": 0.5441612880421735,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.12058504100913228,
+              "spin_force": 0.4411230274360891,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5171880489038407,
+              "spin_force": 0.1084760661527997,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9689703770548318,
+              "spin_force": 0.6386384156835181,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7947451110799302,
+              "spin_force": 0.5831062712116479,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7695063713427988,
+              "spin_force": 0.7873686461942749,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.957356736921456,
+              "spin_force": 0.0655705107377238,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4600736758085144,
+              "spin_force": 0.272115810655237,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5559992679668737,
+              "spin_force": 0.09057963034822665,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6673139155986234,
+              "spin_force": 0.2613389445168717,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2753280933629716,
+              "spin_force": 0.12101288516785669,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5745500273619595,
+              "spin_force": 0.10379286907217794,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8831200766594411,
+              "spin_force": 0.1804992102964773,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9608019521083305,
+              "spin_force": 0.059614343692185746,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.935217778196573,
+              "spin_force": 0.04186280076477625,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7403629264683665,
+              "spin_force": 0.7700350084702157,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.433183583677944,
+              "spin_force": 0.23357690546685028,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5622645427703599,
+              "spin_force": 0.5001386481951505,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7311006176193102,
+              "spin_force": 0.3168225171946105,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2195135627665867,
+              "spin_force": 0.11861850029725973,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3380440996671391,
+              "spin_force": 0.39458350307862294,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9551211931985643,
+              "spin_force": 0.28251714514812537,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9026417792147494,
+              "spin_force": 0.5836123774292372,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6530177715930058,
+              "spin_force": 0.651017200200107,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5915312304800739,
+              "spin_force": 0.10386780312873684,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3909650726177527,
+              "spin_force": 0.3149682894216664,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.514916877484565,
+              "spin_force": 0.7865271883332606,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3788200142758992,
+              "spin_force": 0.605357946809082,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.25373411452220673,
+              "spin_force": 0.6271660436856318,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.58462862708193,
+              "spin_force": 0.15926404058699975,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9201364049119651,
+              "spin_force": 0.49766023972533485,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8480606140961903,
+              "spin_force": 0.695494968590743,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2901148740464662,
+              "spin_force": 0.6252747741769789,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.255222268496492,
+              "spin_force": 0.07448927552238747,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5783222781408722,
+              "spin_force": 0.314046103605763,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5431985006607584,
+              "spin_force": 0.48209967170221707,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.45509094132972217,
+              "spin_force": 0.23720786821327602,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9688731537743556,
+              "spin_force": 0.42882949992365926,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.33118516879495163,
+              "spin_force": 0.07493733819980886,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3701129319191869,
+              "spin_force": 0.7829043657339411,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7076398455234487,
+              "spin_force": 0.7104731261406796,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1067966114284284,
+              "spin_force": 0.573477804309753,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9598588997888167,
+              "spin_force": 0.3704247260783402,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2054907378060835,
+              "spin_force": 0.018571638077108245,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7765328651419268,
+              "spin_force": 0.541747629369212,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7437722547530703,
+              "spin_force": 0.41199007822285383,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3497277040092073,
+              "spin_force": 0.709334166238162,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9906475520088323,
+              "spin_force": 0.3929315726659242,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9653603539953737,
+              "spin_force": 0.05762220826322748,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6226498525336437,
+              "spin_force": 0.49902025225150015,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2571395713176692,
+              "spin_force": 0.32841795238736887,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.069768925039209,
+              "spin_force": 0.2537705699743005,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4424246873789579,
+              "spin_force": 0.7223155622380394,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9747953215923453,
+              "spin_force": 0.5541995043635676,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6910764120389482,
+              "spin_force": 0.41891895669983614,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8596402933467999,
+              "spin_force": 0.6781792145575253,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7790921544753092,
+              "spin_force": 0.6189102514427218,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.273587978988349,
+              "spin_force": 0.3214438070056341,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.732416106877048,
+              "spin_force": 0.3733229104409205,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0359374448076368,
+              "spin_force": 0.14436880086911855,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.24866592119350683,
+              "spin_force": 0.2647196576042977,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9384852333496974,
+              "spin_force": 0.24306408704524138,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3920174711898059,
+              "spin_force": 0.7736548604673034,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5611650132758629,
+              "spin_force": 0.6786550722234161,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8237741585151416,
+              "spin_force": 0.7354322855824825,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5152287354424288,
+              "spin_force": 0.18104842774024554,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9898000291779538,
+              "spin_force": 0.3032131780429178,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6810443016714663,
+              "spin_force": 0.41518436541011233,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.921939959520958,
+              "spin_force": 0.5526177067186533,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3148140602459276,
+              "spin_force": 0.7233528708875118,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7479950859212796,
+              "spin_force": 0.7808127810263006,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7462206736429294,
+              "spin_force": 0.4147948157851451,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.944590430109201,
+              "spin_force": 0.15482655992603833,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4027655884042765,
+              "spin_force": 0.1505693759306225,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9798806044289717,
+              "spin_force": 0.38299875897215074,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.4730754042717145,
+              "spin_force": 0.18205749226389828,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.12687394524379075,
+              "spin_force": 0.6781426357925588,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.523088595793351,
+              "spin_force": 0.030711569039949895,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7220889795656825,
+              "spin_force": 0.3573705308825564,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6742688565356274,
+              "spin_force": 0.16435643732985616,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5737344383646108,
+              "spin_force": 0.7519965458039486,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6066335475766946,
+              "spin_force": 0.10045357296710221,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.16237953370897273,
+              "spin_force": 0.41544470522776306,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9744325299576072,
+              "spin_force": 0.7681468960049098,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.284847928047136,
+              "spin_force": 0.5979512522621562,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.464829835524299,
+              "spin_force": 0.056178048982836695,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.111884964995444,
+              "spin_force": 0.3346511552081153,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2554030854361674,
+              "spin_force": 0.6081106841355425,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6055922233415447,
+              "spin_force": 0.7195464396230598,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.46902275004916494,
+              "spin_force": 0.17196859582022342,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5373714955915834,
+              "spin_force": 0.4010628917762369,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.32945312197896665,
+              "spin_force": 0.10999605975264296,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2850805156493249,
+              "spin_force": 0.4132230741326266,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.15531335997967394,
+              "spin_force": 0.024943576810305148,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2074807759281778,
+              "spin_force": 0.24266716458882273,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.28823704590579197,
+              "spin_force": 0.4747780474819234,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.963746969606578,
+              "spin_force": 0.3285602072949759,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2331007283059459,
+              "spin_force": 0.32920498652429536,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6389370491591155,
+              "spin_force": 0.10621275933483779,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7549281825172084,
+              "spin_force": 0.5876437815674144,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5895148622266823,
+              "spin_force": 0.17136817309296426,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6278331896050261,
+              "spin_force": 0.6294716526655448,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2277948585511256,
+              "spin_force": 0.2504513001310393,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7471242244163268,
+              "spin_force": 0.09079750071663009,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6596575130672255,
+              "spin_force": 0.34864028826198584,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6784254556835934,
+              "spin_force": 0.26968900629231607,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3183989716235343,
+              "spin_force": 0.5014518031591444,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9771228163732173,
+              "spin_force": 0.3664455502598295,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3913384736095725,
+              "spin_force": 0.22670551512806086,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2550342144315565,
+              "spin_force": 0.09249934240769475,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.33160814784998305,
+              "spin_force": 0.33024925403467376,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3443623824474418,
+              "spin_force": 0.18764997274949258,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8004545627605038,
+              "spin_force": 0.14779430185047612,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.47015364476555965,
+              "spin_force": 0.3013223181951715,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3706834908728758,
+              "spin_force": 0.7650661072665009,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3493763620614758,
+              "spin_force": 0.04038400993754694,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3589060630912542,
+              "spin_force": 0.5891767997695303,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1665322857210794,
+              "spin_force": 0.5818031466432148,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0284284178398013,
+              "spin_force": 0.7775844421217905,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2812539473540675,
+              "spin_force": 0.03844068877153344,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.1989363870321063,
+              "spin_force": 0.02644228987682409,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5087259004082514,
+              "spin_force": 0.2962640197827356,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8374997241771955,
+              "spin_force": 0.21159295714632914,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.1448066963247377,
+              "spin_force": 0.47818264776313896,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.51982440055008,
+              "spin_force": 0.5756291771827786,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6633169916179675,
+              "spin_force": 0.3731719901571892,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7698100242041926,
+              "spin_force": 0.403382866238569,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6579020875760238,
+              "spin_force": 0.33018146352722283,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2912528797319941,
+              "spin_force": 0.7537879700365907,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5248705062003907,
+              "spin_force": 0.1468696136423102,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.541632543671255,
+              "spin_force": 0.0899072221536934,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9715231086503762,
+              "spin_force": 0.11471334829451285,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.632259160247884,
+              "spin_force": 0.3673242066434954,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6124309282055959,
+              "spin_force": 0.27141919993331376,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.151216495040331,
+              "spin_force": 0.6154034869198675,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3286033042063679,
+              "spin_force": 0.5688881170712311,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0889781830917349,
+              "spin_force": 0.4022488741059451,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8712687752921688,
+              "spin_force": 0.30665527507242446,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.46450380040930406,
+              "spin_force": 0.7546711366715038,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3752477984179694,
+              "spin_force": 0.7378045431167579,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.757718615618202,
+              "spin_force": 0.668847516109986,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8999780438768175,
+              "spin_force": 0.4377845409769967,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.7869621275534242,
+              "spin_force": 0.041702786952997076,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3353151849438594,
+              "spin_force": 0.09416962362954734,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1631013375284067,
+              "spin_force": 0.21082883331210533,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0899789692526767,
+              "spin_force": 0.5906238019701407,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8036167130251648,
+              "spin_force": 0.38141383978805976,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.6022146980991891,
+              "spin_force": 0.001601107877985175,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.861677664142981,
+              "spin_force": 0.0943378516682679,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5170040250233401,
+              "spin_force": 0.6759303669480442,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4930450738042682,
+              "spin_force": 0.09588115360910443,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2999757876400291,
+              "spin_force": 0.4276346655582442,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8265490316737134,
+              "spin_force": 0.10313714552841474,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6660211683896058,
+              "spin_force": 0.43741648520498533,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7766717994235848,
+              "spin_force": 0.5575001675342838,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5295098029572635,
+              "spin_force": 0.14372655238428633,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.934951884730579,
+              "spin_force": 0.0542814914523933,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.885522904839524,
+              "spin_force": 0.7715543858972976,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.21890082116450718,
+              "spin_force": 0.5289866868458187,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.5499670852581018,
+              "spin_force": 0.5803906260729191,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3813497953459484,
+              "spin_force": 0.6102887326546674,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.6108936194353843,
+              "spin_force": 0.6154702098142214,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.3404351844983617,
+              "spin_force": 0.1445311847065609,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9458895279990938,
+              "spin_force": 0.4586085104686901,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9966237452933175,
+              "spin_force": 0.014636420016558384,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4303218072047271,
+              "spin_force": 0.37534979268733953,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.4023806857578056,
+              "spin_force": 0.021501200087794728,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.9816949893794928,
+              "spin_force": 0.20090675360636867,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.0996645278701602,
+              "spin_force": 0.4391244004176539,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9603967782238184,
+              "spin_force": 0.6236789568483586,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1105423439128523,
+              "spin_force": 0.7657236971378891,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2997350421204017,
+              "spin_force": 0.44655418746289793,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8130171432969147,
+              "spin_force": 0.12975985724705766,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.41347964751872635,
+              "spin_force": 0.48868874058876033,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.7683191269497812,
+              "spin_force": 0.428952977194754,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8297188657153968,
+              "spin_force": 0.24615770831226158,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8363395547825819,
+              "spin_force": 0.0011870462592354692,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.3777793405696299,
+              "spin_force": 0.7448003728180774,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.13456043786760377,
+              "spin_force": 0.022621564032729413,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.2634101355365426,
+              "spin_force": 0.24424963555795456,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.32392178571093766,
+              "spin_force": 0.2607885430886917,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8415502091052274,
+              "spin_force": 0.4307537162993505,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.2265372331532487,
+              "spin_force": 0.3522669384920142,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.9130367269818405,
+              "spin_force": 0.02532655643769397,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.21543906076175756,
+              "spin_force": 0.6123099954205387,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1568364393850448,
+              "spin_force": 0.4593926237908861,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.103287792268892,
+              "spin_force": 0.7343597345038932,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.8341057916834859,
+              "spin_force": 0.048837479879793394,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.1900356141742299,
+              "spin_force": 0.7408114324504541,
+              "vev": 1.0
+            },
+            "outcome": "SINGULARITY"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.5168256193585861,
+              "spin_force": 0.12087269189979076,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 0.22476469890479325,
+              "spin_force": 0.2466989991658803,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          },
+          {
+            "params": {
+              "lambda_coupling": 1.8252181186758203,
+              "spin_force": 0.15212206903615524,
+              "vev": 1.0
+            },
+            "outcome": "STABLE & COMPLEX"
+          }
+        ],
+        "param_space": {
+          "lambda_coupling": [
+            0.1,
+            2.0
+          ],
+          "spin_force": [
+            0.0,
+            0.8
+          ],
+          "vev": [
+            1.0,
+            1.0
+          ]
+        },
+        "last_trigger": 7.8743684843176665,
+        "is_running": false,
+        "progress": 1.0
+      }
+    },
+    {
+      "id": 10,
+      "class_name": "LoopAttractorNode",
+      "pos_x": -856.0,
+      "pos_y": 126.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "perturbation": "signal",
+          "parameter_a": "signal",
+          "parameter_c": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "x_out": "signal",
+          "y_out": "signal",
+          "z_out": "signal",
+          "phase_image": "image",
+          "energy": "signal"
+        },
+        "input_data": {
+          "perturbation": [
+            7.8743684843176665
+          ],
+          "parameter_a": [
+            286594.984375
+          ],
+          "parameter_c": [
+            -0.04205622439600404
+          ],
+          "reset": []
+        },
+        "node_title": "Loop Attractor",
+        "dt": 0.01,
+        "a": 1432984.921875,
+        "b": 2.6666666666666665,
+        "c": 29.579437756039958,
+        "x": 0.1523484017467709,
+        "y": -0.9345551122008011,
+        "z": 2.74027882127836,
+        "history_len": 500,
+        "loop_phase": 1.5011397849738484,
+        "loop_amplitude": 1.0,
+        "last_reset": 0.0
+      }
+    },
+    {
+      "id": 11,
+      "class_name": "MTXNeuronNode",
+      "pos_x": -242.0,
+      "pos_y": -466.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "H_out": "signal",
+          "S_out": "signal",
+          "L_out": "signal",
+          "voltage": "signal",
+          "novelty": "signal",
+          "coherence": "signal"
+        },
+        "input_data": {},
+        "node_title": "BioNeuron (MTX)",
+        "dt": 1.0,
+        "steps_per_frame": 10,
+        "time_ms": 33550.0,
+        "h_pulse": 0.0,
+        "s_pulse": 1.0,
+        "l_pulse": 0.0,
+        "novelty": 0.5061514632810451,
+        "coherence": 0.961679262415307
+      }
+    },
+    {
+      "id": 12,
+      "class_name": "BlochQubitNode",
+      "pos_x": -561.0,
+      "pos_y": 153.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "rx_angle": "signal",
+          "ry_angle": "signal",
+          "rz_angle": "signal",
+          "hadamard_trigger": "signal"
+        },
+        "outputs": {
+          "bloch_x": "signal",
+          "bloch_y": "signal",
+          "bloch_z": "signal",
+          "prob_0": "signal"
+        },
+        "input_data": {
+          "rx_angle": [
+            0.2672195646536846
+          ],
+          "ry_angle": [
+            0.3096296155535737
+          ],
+          "rz_angle": [
+            0.22070283685950748
+          ],
+          "hadamard_trigger": []
+        },
+        "node_title": "Bloch Qubit",
+        "hbar": 1.0,
+        "last_hadamard_trigger": 0.0
+      }
+    },
+    {
+      "id": 13,
+      "class_name": "LargeMoireFieldNode",
+      "pos_x": -315.0,
+      "pos_y": 148.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fast_field": "image",
+          "motion_signal": "signal",
+          "gamma_phase": "signal",
+          "is_receptive": "signal"
+        },
+        "node_title": "Large Moire Field",
+        "size": 64,
+        "motion_value": 0.0,
+        "gamma_phase": -0.06496235235473047,
+        "is_receptive": 0.0
+      }
+    },
+    {
+      "id": 14,
+      "class_name": "ReactionDiffusionNode",
+      "pos_x": -102.0,
+      "pos_y": 156.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "seed_image": "image",
+          "feed_rate": "signal",
+          "kill_rate": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "node_title": "Reaction-Diffusion",
+        "w": 128,
+        "h": 96,
+        "f": 0.010007604062557221,
+        "k": 0.045,
+        "dA": 1.0,
+        "dB": 0.5
+      }
+    },
+    {
+      "id": 15,
+      "class_name": "SpectralMemoryNode",
+      "pos_x": 128.0,
+      "pos_y": 148.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum",
+          "decay": "signal",
+          "boost": "signal"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "image": "image"
+        },
+        "node_title": "Spectral Memory",
+        "decay": 0.8,
+        "boost": 0.2
+      }
+    },
+    {
+      "id": 16,
+      "class_name": "InstantonTrainNode",
+      "pos_x": 408.0,
+      "pos_y": -50.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "tunneling_rate": "signal",
+          "coupling_strength": "signal",
+          "vacuum_bias": "signal",
+          "perturbation": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "vacuum_field": "image",
+          "action_density": "image",
+          "tunneling_events": "signal",
+          "winding_number": "signal",
+          "vacuum_0_density": "signal",
+          "vacuum_1_density": "signal",
+          "average_action": "signal"
+        },
+        "node_title": "Instanton Train",
+        "max_instantons": 20,
+        "tunneling_rate": 2.218592121079417,
+        "coupling_strength": 1.0,
+        "vacuum_bias": 1.0,
+        "winding_number": 0.0,
+        "vacuum_0_density": 0.0,
+        "vacuum_1_density": 1.0,
+        "average_action": 33.34506222927983,
+        "time": 114.89999999999775,
+        "last_spawn_time": 0.0,
+        "dt": 0.1
+      }
+    },
+    {
+      "id": 17,
+      "class_name": "CrystalMakerNode",
+      "pos_x": 395.0,
+      "pos_y": 158.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "tension": "signal",
+          "damping": "signal",
+          "nonlinearity_a": "signal",
+          "nonlinearity_b": "signal"
+        },
+        "outputs": {
+          "field_slice": "image",
+          "total_energy": "signal"
+        },
+        "input_data": {
+          "tension": [
+            14.0
+          ],
+          "damping": [
+            0.0
+          ],
+          "nonlinearity_a": [
+            0.0
+          ],
+          "nonlinearity_b": [
+            23.341543560495882
+          ]
+        },
+        "node_title": "Antti's CrystalMaker",
+        "N": 32,
+        "num_fields": 10,
+        "dt": 0.05,
+        "polyrhythm_coupling": 0.1,
+        "nonlinearity_A": 1.0,
+        "nonlinearity_B": 24.341543560495882,
+        "damping_factor": 0.02,
+        "tension": 150.0,
+        "base_frequencies_min": 0.5,
+        "base_frequencies_max": 2.5,
+        "diffusion_coeffs_min": 0.05,
+        "diffusion_coeffs_max": 0.1,
+        "total_energy": 0.03327040856428301
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "coherence",
+      "to_node_id": 1,
+      "to_port": "energy"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "participation_ratio",
+      "to_node_id": 1,
+      "to_port": "spin"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "total_energy",
+      "to_node_id": 2,
+      "to_port": "noise_strength"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "stability",
+      "to_node_id": 3,
+      "to_port": "H_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "charge",
+      "to_node_id": 3,
+      "to_port": "S_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "rotation_angle",
+      "to_node_id": 3,
+      "to_port": "L_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "field_image",
+      "to_node_id": 4,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "LL",
+      "to_node_id": 5,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "image",
+      "to_node_id": 6,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "complex_spectrum",
+      "to_node_id": 7,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "stability",
+      "to_node_id": 6,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "rotation_angle",
+      "to_node_id": 6,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "image",
+      "to_node_id": 8,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 9,
+      "to_port": "trigger"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 10,
+      "to_port": "perturbation"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "total_energy",
+      "to_node_id": 10,
+      "to_port": "parameter_a"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "status",
+      "to_node_id": 3,
+      "to_port": "S_in"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "status",
+      "to_node_id": 0,
+      "to_port": "alignment"
+    },
+    {
+      "from_node_id": 11,
+      "from_port": "voltage",
+      "to_node_id": 10,
+      "to_port": "parameter_c"
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "x_out",
+      "to_node_id": 12,
+      "to_port": "rx_angle"
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "y_out",
+      "to_node_id": 12,
+      "to_port": "ry_angle"
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "z_out",
+      "to_node_id": 12,
+      "to_port": "rz_angle"
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "phase_image",
+      "to_node_id": 13,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 13,
+      "from_port": "fast_field",
+      "to_node_id": 14,
+      "to_port": "seed_image"
+    },
+    {
+      "from_node_id": 13,
+      "from_port": "motion_signal",
+      "to_node_id": 14,
+      "to_port": "feed_rate"
+    },
+    {
+      "from_node_id": 13,
+      "from_port": "gamma_phase",
+      "to_node_id": 14,
+      "to_port": "kill_rate"
+    },
+    {
+      "from_node_id": 14,
+      "from_port": "signal",
+      "to_node_id": 15,
+      "to_port": "decay"
+    },
+    {
+      "from_node_id": 13,
+      "from_port": "is_receptive",
+      "to_node_id": 15,
+      "to_port": "boost"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "complex_spectrum",
+      "to_node_id": 15,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 16,
+      "to_port": "tunneling_rate"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "image",
+      "to_node_id": 16,
+      "to_port": "perturbation"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "charge",
+      "to_node_id": 16,
+      "to_port": "vacuum_bias"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "rotation_angle",
+      "to_node_id": 16,
+      "to_port": "reset"
+    },
+    {
+      "from_node_id": 16,
+      "from_port": "tunneling_events",
+      "to_node_id": 17,
+      "to_port": "tension"
+    },
+    {
+      "from_node_id": 16,
+      "from_port": "winding_number",
+      "to_node_id": 17,
+      "to_port": "damping"
+    },
+    {
+      "from_node_id": 16,
+      "from_port": "vacuum_0_density",
+      "to_node_id": 17,
+      "to_port": "nonlinearity_a"
+    },
+    {
+      "from_node_id": 16,
+      "from_port": "average_action",
+      "to_node_id": 17,
+      "to_port": "nonlinearity_b"
+    }
+  ]
+}
