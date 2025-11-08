@@ -1,0 +1,503 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "WorldSubstrateNode",
+      "pos_x": -762.0,
+      "pos_y": -379.0,
+      "width": 287.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "reset": "signal"
+        },
+        "outputs": {
+          "field_image": "image",
+          "psi_external": "signal",
+          "dopamine": "signal",
+          "pain_stimulus": "signal"
+        },
+        "input_data": {
+          "reset": []
+        },
+        "node_title": "World Substrate",
+        "grid_size": 96,
+        "substrate_noise": 0.0005,
+        "last_reset_sig": 0.0
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "InstantonTrainNode",
+      "pos_x": -452.0,
+      "pos_y": -375.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "tunneling_rate": "signal",
+          "coupling_strength": "signal",
+          "vacuum_bias": "signal",
+          "perturbation": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "vacuum_field": "image",
+          "action_density": "image",
+          "tunneling_events": "signal",
+          "winding_number": "signal",
+          "vacuum_0_density": "signal",
+          "vacuum_1_density": "signal",
+          "average_action": "signal"
+        },
+        "node_title": "Instanton Train",
+        "max_instantons": 20,
+        "tunneling_rate": 0.4196741032981701,
+        "coupling_strength": 1.6340849949806868,
+        "vacuum_bias": 0.40391196643107913,
+        "instantons": [],
+        "winding_number": 2.05,
+        "vacuum_0_density": 0.04405381944444445,
+        "vacuum_1_density": 0.9559461805555556,
+        "average_action": 0.0,
+        "time": 1435.0999999997903,
+        "last_spawn_time": 0.0,
+        "dt": 0.1
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ImageMoireNode",
+      "pos_x": -196.0,
+      "pos_y": -370.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "peak_freq": "signal",
+          "bandwidth": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "Image to Moir\u00e9",
+        "resolution": 128,
+        "peak_freq": 0.1,
+        "bandwidth": 0.1
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "GalaxyFieldNode",
+      "pos_x": -707.0,
+      "pos_y": -601.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "energy": "signal",
+          "spin": "signal",
+          "seed_image": "image"
+        },
+        "outputs": {
+          "field": "image",
+          "memory": "image",
+          "total_energy": "signal"
+        },
+        "node_title": "Galaxy Field",
+        "grid_size": 128,
+        "dt": 0.015,
+        "time": 128.13000000000434
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "ScalogramAnalyzerNode",
+      "pos_x": -463.0,
+      "pos_y": -603.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "Scalogram Analyzer",
+        "num_scales": 64,
+        "wavelet_name": "morl"
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "FFTCochleaNode",
+      "pos_x": -208.0,
+      "pos_y": -601.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "outputs": {
+          "spectrum": "spectrum",
+          "signal": "signal",
+          "image": "image",
+          "complex_spectrum": "complex_spectrum"
+        },
+        "node_title": "FFT Cochlea",
+        "freq_bins": 64,
+        "x": 11.25,
+        "internal_freq": 3.4013117060919322
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "iFFTCochleaNode",
+      "pos_x": 28.0,
+      "pos_y": -597.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "iFFT Cochlea",
+        "h": 120,
+        "w": 160
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "LoopAttractorNode",
+      "pos_x": 44.0,
+      "pos_y": -364.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "perturbation": "signal",
+          "parameter_a": "signal",
+          "parameter_c": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "x_out": "signal",
+          "y_out": "signal",
+          "z_out": "signal",
+          "phase_image": "image",
+          "energy": "signal"
+        },
+        "input_data": {
+          "perturbation": [
+            0.0
+          ],
+          "parameter_a": [
+            1.4909999999999999
+          ],
+          "parameter_c": [
+            0.6682508680555556
+          ],
+          "reset": []
+        },
+        "node_title": "Loop Attractor",
+        "dt": 0.01,
+        "a": 17.455,
+        "b": 2.6666666666666665,
+        "c": 36.68250868055556,
+        "x": -9.06224767082053,
+        "y": -14.235952008526489,
+        "z": 20.00564691254316,
+        "history_len": 500,
+        "loop_phase": 4.663067444213002,
+        "loop_amplitude": 1.0,
+        "last_reset": 0.0
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "PhaseFusionNode",
+      "pos_x": 294.0,
+      "pos_y": -588.0,
+      "width": 229.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_a": "signal",
+          "signal_b": "signal",
+          "coupling": "signal",
+          "damping": "signal"
+        },
+        "outputs": {
+          "fused_output": "signal",
+          "coherence": "signal",
+          "field_image": "image",
+          "phase_diff": "signal"
+        },
+        "input_data": {
+          "signal_a": [
+            -0.4712526885614441
+          ],
+          "signal_b": [
+            -0.6018626063226711
+          ],
+          "coupling": [
+            0.5234862519733234
+          ],
+          "damping": []
+        },
+        "node_title": "Phase Fusion Field",
+        "field_size": 256,
+        "alpha": 0.01,
+        "dt": 0.01,
+        "damping": 0.98,
+        "inject_a_pos": 64,
+        "inject_b_pos": 192,
+        "instantons": [
+          64,
+          192
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "class_name": "LivingOrganismNode",
+      "pos_x": 302.0,
+      "pos_y": -367.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "noise_toggle": "signal",
+          "guidance_pulse": "signal"
+        },
+        "outputs": {
+          "field_image": "image",
+          "avg_energy": "signal",
+          "bus_activity": "signal"
+        },
+        "input_data": {
+          "noise_toggle": [
+            5.074538051168216e-08
+          ],
+          "guidance_pulse": [
+            2.721141227474342e-16
+          ]
+        },
+        "node_title": "Living Organism (HCU)",
+        "size": 96,
+        "steps_per_frame": 2,
+        "last_guidance_trigger": 2.721141227474342e-16
+      }
+    },
+    {
+      "id": 10,
+      "class_name": "QuantumWaveNode",
+      "pos_x": -704.0,
+      "pos_y": -172.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "momentum_x": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "total_prob": "signal"
+        },
+        "input_data": {
+          "momentum_x": [
+            0.0
+          ],
+          "reset": []
+        },
+        "node_title": "Quantum Wave",
+        "Nx": 128,
+        "Ny": 128,
+        "k0x": 0.0,
+        "k0y": 0.0,
+        "steps_per_frame": 10,
+        "dx": 0.078125,
+        "dy": 0.078125,
+        "total_probability": 1.0000001192092896
+      }
+    },
+    {
+      "id": 11,
+      "class_name": "FractalAnalyzerNode",
+      "pos_x": -464.0,
+      "pos_y": -169.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fractal_beta": "signal",
+          "complexity": "signal",
+          "spectral_energy": "signal",
+          "spectrum_image": "image",
+          "fractal_twin": "image"
+        },
+        "node_title": "Fractal Analyzer (Robust)",
+        "size": 96,
+        "fit_range_min": 5,
+        "levels": 5,
+        "fractal_beta": -0.15034875689149108,
+        "complexity_value": 1.4248256215542545,
+        "measurement_method": "fractal_beta"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "psi_external",
+      "to_node_id": 1,
+      "to_port": "tunneling_rate"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "dopamine",
+      "to_node_id": 1,
+      "to_port": "coupling_strength"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "pain_stimulus",
+      "to_node_id": 1,
+      "to_port": "vacuum_bias"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "field_image",
+      "to_node_id": 1,
+      "to_port": "perturbation"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "vacuum_field",
+      "to_node_id": 2,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "vacuum_0_density",
+      "to_node_id": 2,
+      "to_port": "bandwidth"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 3,
+      "to_port": "seed_image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "winding_number",
+      "to_node_id": 3,
+      "to_port": "spin"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "average_action",
+      "to_node_id": 3,
+      "to_port": "energy"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "field",
+      "to_node_id": 4,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "image",
+      "to_node_id": 5,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "total_energy",
+      "to_node_id": 5,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "complex_spectrum",
+      "to_node_id": 6,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "tunneling_events",
+      "to_node_id": 7,
+      "to_port": "perturbation"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "winding_number",
+      "to_node_id": 7,
+      "to_port": "parameter_a"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "vacuum_1_density",
+      "to_node_id": 7,
+      "to_port": "parameter_c"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "x_out",
+      "to_node_id": 8,
+      "to_port": "signal_a"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "y_out",
+      "to_node_id": 8,
+      "to_port": "signal_b"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "z_out",
+      "to_node_id": 8,
+      "to_port": "coupling"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "fused_output",
+      "to_node_id": 9,
+      "to_port": "noise_toggle"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "phase_diff",
+      "to_node_id": 9,
+      "to_port": "guidance_pulse"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "bus_activity",
+      "to_node_id": 10,
+      "to_port": "momentum_x"
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "image",
+      "to_node_id": 11,
+      "to_port": "image_in"
+    }
+  ]
+}
