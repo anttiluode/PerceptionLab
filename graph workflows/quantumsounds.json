@@ -1,0 +1,395 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SignalMathNode",
+      "pos_x": 127.0,
+      "pos_y": -64.0,
+      "width": 150.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {
+          "A": "signal",
+          "B": "signal"
+        },
+        "outputs": {
+          "result": "signal"
+        },
+        "input_data": {
+          "A": [
+            -6.431061202829853
+          ],
+          "B": [
+            0.6,
+            -9.081648509793215
+          ]
+        },
+        "node_title": "Signal Math",
+        "operation": "divide",
+        "result": 0.758232458631635,
+        "last_a": -6.431061202829853,
+        "last_b": -8.481648509793215
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "FreqToMidiNode",
+      "pos_x": 315.0,
+      "pos_y": -289.0,
+      "width": 200.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {
+          "frequency_in": "signal",
+          "amplitude_in": "signal"
+        },
+        "outputs": {
+          "midi_note": "signal",
+          "velocity": "signal"
+        },
+        "input_data": {
+          "frequency_in": [
+            0.7677780160246852
+          ],
+          "amplitude_in": [
+            0.6
+          ]
+        },
+        "node_title": "Freq to MIDI",
+        "midi_offset": 0,
+        "output_note": 93.0,
+        "output_velocity": 0.6
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "MidiToFreqNode",
+      "pos_x": 591.0,
+      "pos_y": -271.0,
+      "width": 200.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {
+          "midi_note_in": "signal",
+          "velocity_in": "signal"
+        },
+        "outputs": {
+          "frequency_out": "signal",
+          "amplitude_out": "signal"
+        },
+        "input_data": {
+          "midi_note_in": [
+            93.0
+          ],
+          "velocity_in": [
+            0.6
+          ]
+        },
+        "node_title": "MIDI to Freq (Hz)",
+        "output_freq": 1760.0,
+        "output_amp": 0.6,
+        "current_note": 93,
+        "midi_offset": 0
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 113.0,
+      "pos_y": 112.0,
+      "width": 150.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 0.6
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "ChaoticControlNode",
+      "pos_x": -154.0,
+      "pos_y": -62.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "control_nudge": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "chaos_x": "signal",
+          "chaos_y": "signal",
+          "phase_image": "image"
+        },
+        "input_data": {
+          "control_nudge": [],
+          "reset": []
+        },
+        "node_title": "Chaotic Control (Lorenz)",
+        "sigma": 10.0,
+        "rho": 28.0,
+        "beta": 2.6666666666666665,
+        "dt": 0.01,
+        "history_len": 1000,
+        "output_x": -6.70509033683579,
+        "output_y": -9.53420743715439
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "SpeakerOutputNode",
+      "pos_x": 850.0,
+      "pos_y": -26.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "frequency": "signal",
+          "amplitude": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "frequency": [
+            1760.0,
+            0.0
+          ],
+          "amplitude": [
+            -0.11790365651307687,
+            0.9999999403953552
+          ]
+        },
+        "node_title": "Speaker (Speakers (Focus...)",
+        "sample_rate": 44100,
+        "device_index": 6,
+        "current_freq": 1760.0,
+        "current_amp": 0.44104814194113917,
+        "_last_amp": 0.44104814194113917,
+        "_last_freq": 1760.0
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "MTXNeuronNode",
+      "pos_x": 577.0,
+      "pos_y": 151.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "H_out": "signal",
+          "S_out": "signal",
+          "L_out": "signal",
+          "voltage": "signal",
+          "novelty": "signal",
+          "coherence": "signal"
+        },
+        "input_data": {},
+        "node_title": "BioNeuron (MTX)",
+        "dt": 1.0,
+        "steps_per_frame": 10,
+        "time_ms": 94150.0,
+        "h_pulse": 0.0,
+        "s_pulse": 0.0,
+        "l_pulse": 1.0,
+        "novelty": 1.0,
+        "coherence": 0.9337037065695046
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "FFTCochleaNode",
+      "pos_x": 327.0,
+      "pos_y": -59.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "outputs": {
+          "spectrum": "spectrum",
+          "signal": "signal",
+          "image": "image",
+          "complex_spectrum": "complex_spectrum"
+        },
+        "input_data": {
+          "image": [],
+          "signal": [
+            0.6
+          ]
+        },
+        "node_title": "FFT Cochlea",
+        "freq_bins": 64,
+        "x": 11.249728419602407,
+        "internal_freq": 12.802722868254627
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "FractalQuantumGateNode",
+      "pos_x": 567.0,
+      "pos_y": -63.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "potential_strength": "signal",
+          "damping": "signal",
+          "operation_trigger": "signal"
+        },
+        "outputs": {
+          "prob_density": "image",
+          "phase_field": "image",
+          "current_operation": "signal"
+        },
+        "input_data": {
+          "potential_strength": [
+            11.249728419602407
+          ],
+          "damping": [],
+          "operation_trigger": []
+        },
+        "node_title": "Fractal Quantum Gate",
+        "size": 64,
+        "dt": 0.05,
+        "time": 78.2999999999977,
+        "hbar_eff": 1.0,
+        "mass_eff": 1.0,
+        "potential_strength": 5.0,
+        "damping": 0.005,
+        "operation_step": 0,
+        "total_steps": 30,
+        "last_trigger_val": 0.0
+      }
+    },
+    {
+      "id": 9,
+      "class_name": "QuantumWaveNode",
+      "pos_x": 849.0,
+      "pos_y": -281.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "momentum_x": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "total_prob": "signal"
+        },
+        "input_data": {
+          "momentum_x": [
+            0.6
+          ],
+          "reset": []
+        },
+        "node_title": "Quantum Wave",
+        "Nx": 128,
+        "Ny": 128,
+        "k0x": 5.0,
+        "k0y": 0.0,
+        "steps_per_frame": 10,
+        "dx": 0.078125,
+        "dy": 0.078125,
+        "total_probability": 1.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 3,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "B"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "result",
+      "to_node_id": 1,
+      "to_port": "frequency_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "amplitude_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "midi_note",
+      "to_node_id": 2,
+      "to_port": "midi_note_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "velocity",
+      "to_node_id": 2,
+      "to_port": "velocity_in"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "chaos_x",
+      "to_node_id": 0,
+      "to_port": "A"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "chaos_y",
+      "to_node_id": 0,
+      "to_port": "B"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "frequency_out",
+      "to_node_id": 5,
+      "to_port": "frequency"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "voltage",
+      "to_node_id": 5,
+      "to_port": "amplitude"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "amplitude_out",
+      "to_node_id": 7,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "signal",
+      "to_node_id": 8,
+      "to_port": "potential_strength"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "current_operation",
+      "to_node_id": 5,
+      "to_port": "frequency"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "amplitude_out",
+      "to_node_id": 9,
+      "to_port": "momentum_x"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "total_prob",
+      "to_node_id": 5,
+      "to_port": "amplitude"
+    }
+  ]
+}
