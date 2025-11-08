@@ -1,5 +1,9 @@
 # Antti's Perception Laboratory (modular with node folder sepearate)
 
+EDIT: I added a autodependency installer that installs dependencies by extracting imports from nodes 
+folder. I have not tried it at all. Claude wrote it.. Could work, Could break your environment.. Who knows. 
+No guarantees. 
+
 ![GUI](./anttis.png)
 
 Welcome to the Perception Laboratory, a professional, node-based interface for designing and running 
