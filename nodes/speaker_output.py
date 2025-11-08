@@ -120,19 +120,24 @@ class SpeakerOutputNode(BaseNode):
             
     def step(self):
         # This runs at the SIMULATION frame rate
-        # Map input signals to audio parameters
         
-        # Freq: map [0, 1] (from analyzer) to audible range [100, 1000 Hz]
-        freq_in = self.get_blended_input('frequency', 'sum') or 0.0
-        self.current_freq = np.clip(freq_in * 900.0 + 100.0, 100.0, 1000.0)
-        
-        # Amp: map [0, 1] to [0, 0.5] (so it's not too loud)
+        # --- FIX: Receive Freq/Amp and use them directly ---
+        freq_in = self.get_blended_input('frequency', 'sum')
         amp_in = self.get_blended_input('amplitude', 'sum')
+        
+        # The input signal is assumed to be the correct, calculated Hertz value
+        self.current_freq = freq_in if freq_in is not None else 0.0
+        
         if amp_in is None:
-            # If amplitude is not connected, set it to 0.5
-            self.current_amp = 0.5
+            self.current_amp = 0.0 # Default to silence if amp is disconnected
         else:
+            # Map amplitude signal [0, 1] to a safe volume range [0, 0.5]
             self.current_amp = np.clip(amp_in * 0.5, 0.0, 0.5)
+        
+        # Ensure minimum frequency for stability
+        if self.current_freq < 10.0 and self.current_freq > 0.0:
+            self.current_freq = 10.0
+        # --- END FIX ---
 
     def get_display_image(self):
         w, h = 64, 64
@@ -143,6 +148,7 @@ class SpeakerOutputNode(BaseNode):
         img[h - amp_h:, :w//2] = 255
         
         # Draw frequency bar
+        # Normalize the frequency display based on the expected range (100 to 1000 Hz)
         freq_h = int(np.clip((self.current_freq - 100) / 900, 0, 1) * h)
         img[h - freq_h:, w//2:] = 180 
 
@@ -158,12 +164,9 @@ class SpeakerOutputNode(BaseNode):
             try:
                 info = self.pa.get_device_info_by_index(i)
                 if info['max_output_channels'] > 0:
-                    devices.append((f"{info['name']} ({i})", i))
+                    devices.append((f"Selected Device ({self.device_index})", self.device_index))
             except Exception:
-                continue # Skip invalid devices
-            
-        if not any(v == self.device_index for _, v in devices):
-            devices.append((f"Selected Device ({self.device_index})", self.device_index))
+                continue 
             
         return [
             ("Output Device", "device_index", self.device_index, devices),
