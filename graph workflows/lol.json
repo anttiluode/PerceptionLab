@@ -1,0 +1,263 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "WorldSubstrateNode",
+      "pos_x": -464.0,
+      "pos_y": -70.0,
+      "width": 336.0,
+      "height": 201.0,
+      "config": {
+        "inputs": {
+          "reset": "signal"
+        },
+        "outputs": {
+          "field_image": "image",
+          "psi_external": "signal",
+          "dopamine": "signal",
+          "pain_stimulus": "signal"
+        },
+        "input_data": {
+          "reset": []
+        },
+        "node_title": "World Substrate",
+        "grid_size": 96,
+        "substrate_noise": 0.0005,
+        "last_reset_sig": 0.0
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "HumanAttractorNode",
+      "pos_x": -88.0,
+      "pos_y": -70.0,
+      "width": 480.0,
+      "height": 352.0,
+      "config": {
+        "inputs": {
+          "psi_external": "signal",
+          "pain_stimulus": "signal",
+          "dopamine": "signal",
+          "reset_trauma": "signal"
+        },
+        "outputs": {
+          "consciousness": "signal",
+          "free_will_signal": "signal",
+          "pain_level": "signal",
+          "attractor_state": "image",
+          "memory_trace": "signal",
+          "refractory": "signal"
+        },
+        "input_data": {
+          "psi_external": [
+            0.5671549039353403
+          ],
+          "pain_stimulus": [
+            0.3047537796000977
+          ],
+          "dopamine": [
+            0.1848001890345136
+          ],
+          "reset_trauma": []
+        },
+        "node_title": "Human Attractor",
+        "w_size": 8,
+        "learning_rate": 0.01,
+        "refractory_max": 30,
+        "pain_sensitivity": 0.5,
+        "consciousness_value": -0.11860173138675291,
+        "refractory_timer": 0,
+        "dopamine_level": 0.1845040067931803,
+        "exhaustion": 0.0,
+        "pain_level": 0.19967799730046326,
+        "clarity_cost": 0.5781047577938617,
+        "memory_trace": -0.12038278259838679,
+        "choice_entropy": 0.0,
+        "free_will_signal": 0.0,
+        "loop_iterations": 572,
+        "time": 19.066666666666773
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 575.0,
+      "pos_y": -120.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {},
+        "node_title": "Image Display",
+        "w": 160,
+        "h": 120
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SignalMonitorNode",
+      "pos_x": 665.0,
+      "pos_y": 265.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "signal": [
+            0.0
+          ]
+        },
+        "node_title": "Signal Monitor",
+        "history_len": 500
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "SignalMonitorNode",
+      "pos_x": 665.0,
+      "pos_y": 71.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "signal": [
+            -0.08423827847960559
+          ]
+        },
+        "node_title": "Signal Monitor",
+        "history_len": 500
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "SignalMonitorNode",
+      "pos_x": 426.0,
+      "pos_y": 259.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "signal": [
+            0.14009349780738684
+          ]
+        },
+        "node_title": "Signal Monitor",
+        "history_len": 500
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "SignalMonitorNode",
+      "pos_x": 425.0,
+      "pos_y": 69.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "signal": [
+            0.0
+          ]
+        },
+        "node_title": "Signal Monitor",
+        "history_len": 500
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "SignalMonitorNode",
+      "pos_x": 193.0,
+      "pos_y": 296.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "signal": [
+            -0.08724144266699897
+          ]
+        },
+        "node_title": "Signal Monitor",
+        "history_len": 500
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "psi_external",
+      "to_node_id": 1,
+      "to_port": "psi_external"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "dopamine",
+      "to_node_id": 1,
+      "to_port": "dopamine"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "pain_stimulus",
+      "to_node_id": 1,
+      "to_port": "pain_stimulus"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "attractor_state",
+      "to_node_id": 2,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "refractory",
+      "to_node_id": 6,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "memory_trace",
+      "to_node_id": 4,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "pain_level",
+      "to_node_id": 5,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "free_will_signal",
+      "to_node_id": 3,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "consciousness",
+      "to_node_id": 7,
+      "to_port": "signal"
+    }
+  ]
+}
