@@ -16,6 +16,8 @@ resize it for better visibility.Save/Load Graphs: Save your complex node layouts
 file and load them later.Configurable: Right-click nodes to configure their internal parameters
 (e.g., sample rates, device IDs, physics constants).
 
+![midi](./midi.png)
+
 # Installation
 
 # Core Application Requirements
