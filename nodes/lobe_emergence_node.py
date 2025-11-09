@@ -361,10 +361,13 @@ class LobeEmergenceNode(BaseNode):
         
         # Resize to match grid
         phase_resized = cv2.resize(phase_field, (self.grid_size, self.grid_size))
-        psi_flat = phase_resized.flatten().astype(np.complex64)
         
-        # Instead of full W update, use a simpler Hebbian-style rule:
-        # W[i,j] increases when input[j] and output[i] are correlated
+        # --- FIX: Handle potential NaN/Inf in input ---
+        if not np.all(np.isfinite(phase_resized)):
+            # Input is corrupt, skip training this step
+            return 
+            
+        psi_flat = phase_resized.flatten().astype(np.complex64)
         
         # Project through current W
         output = np.dot(self.W, psi_flat)
@@ -373,10 +376,9 @@ class LobeEmergenceNode(BaseNode):
         output_2d = output.reshape(self.grid_size, self.grid_size)
         input_2d = psi_flat.reshape(self.grid_size, self.grid_size)
         
-        # Simple Hebbian update: strengthen connections between active input/output
-        # Only update a small subset for speed
-        n_updates = 50  # Much smaller than before
-        
+        n_updates = 50
+        rows_updated = set() # Track which rows we've touched
+
         for _ in range(n_updates):
             # Pick random locations
             i_out = np.random.randint(0, self.grid_size)
@@ -394,16 +396,28 @@ class LobeEmergenceNode(BaseNode):
                 # Correlation-based update
                 correlation = output[out_idx] * np.conj(psi_flat[in_idx])
                 
-                # Add locality bias
-                locality_factor = np.exp(-spatial_dist / 3.0)
+                # --- FIX 1: CLAMP THE GRADIENT ---
+                # Prevent runaway overflow by clamping the update magnitude
+                MAX_CORR_MAG = 100.0  # Set a reasonable upper limit
+                corr_mag = np.abs(correlation)
+                if corr_mag > MAX_CORR_MAG:
+                    correlation = correlation * (MAX_CORR_MAG / corr_mag)
                 
-                self.W[out_idx, in_idx] += self.learning_rate * correlation * locality_factor
+                locality_factor = np.exp(-spatial_dist / 3.0)
+                update_val = self.learning_rate * correlation * locality_factor
+
+                # --- FIX 2: CHECK FOR NAN / INF ---
+                # Only apply the update if it's a valid number
+                if np.isfinite(update_val):
+                    self.W[out_idx, in_idx] += update_val
+                    rows_updated.add(out_idx) # Mark this row for normalization
         
-        # Normalize W rows to prevent explosion
-        for i in range(min(50, self.W.shape[0])):  # Only normalize subset
-            idx = np.random.randint(0, self.W.shape[0])
+        # --- FIX 3: EFFICIENT & CORRECT NORMALIZATION ---
+        # Normalize only the rows that were actually updated and are growing too large
+        for idx in rows_updated:
             row_norm = np.linalg.norm(self.W[idx, :])
-            if row_norm > 1e-6:
+            # Only normalize if it's "blowing up" (e.g., magnitude > 1.5)
+            if row_norm > 1.5: 
                 self.W[idx, :] /= row_norm
         
         self.training_steps += 1
