@@ -1,11 +1,15 @@
 """
-Image Processor Node
+Image Processor Node (FIXED)
 --------------------
 A simple utility node to adjust the brightness and contrast of an
 incoming image stream.
 
 - 'Brightness' adds or subtracts from all pixel values.
 - 'Contrast' multiplies the pixel values relative to the midpoint (0.5).
+
+FIX v2: This version preserves the input data type and dimensions 
+(e.g., 2D float) for its 'image_out' port, which fixes compatibility
+with nodes that expect a specific format (like Scalogram).
 
 Place this file in the 'nodes' folder
 """
@@ -50,8 +54,10 @@ class ImageProcessorNode(BaseNode):
         self.contrast = float(contrast)
 
         # --- Internal State ---
-        self.processed_image = np.zeros((64, 64, 3), dtype=np.uint8)
-        self.input_image_buffer = None
+        self.processed_image = None # This will hold the format-preserved image
+        self.display_in_rgb = np.zeros((64, 64, 3), dtype=np.uint8) # For "Before" display
+        self.display_out_rgb = np.zeros((64, 64, 3), dtype=np.uint8) # For "After" display
+
 
     def step(self):
         if self._error: return
@@ -60,25 +66,19 @@ class ImageProcessorNode(BaseNode):
         img_in = self.get_blended_input('image_in', 'mean')
         
         if img_in is None:
-            # If no input, just hold the last processed image
             return
             
-        # --- 2. Convert to Float (0.0 - 1.0) for processing ---
-        # We need to handle both grayscale and color images
-        if img_in.ndim == 2: # Grayscale
-            img_float = img_in.astype(np.float32)
-            if img_in.dtype == np.uint8:
-                img_float /= 255.0
-        elif img_in.ndim == 3 and img_in.shape[2] == 3: # Color (RGB)
-            img_float = img_in.astype(np.float32)
-            if img_in.dtype == np.uint8:
-                img_float /= 255.0
-        else: # Unrecognized format
-            return
+        # --- 2. Store original properties ---
+        original_dtype = img_in.dtype
+        
+        # --- 3. Convert to Float (0.0 - 1.0) for processing ---
+        if original_dtype == np.uint8:
+            img_float = img_in.astype(np.float32) / 255.0
+        else:
+            # Assumes it's a float array (e.g., from CorticalReconstruction)
+            img_float = img_in.astype(np.float32) 
             
-        self.input_image_buffer = img_float # Store for display
-            
-        # --- 3. Apply Brightness & Contrast ---
+        # --- 4. Apply Brightness & Contrast ---
         # Formula: new_val = (old_val - 0.5) * contrast + 0.5 + brightness
         
         # Apply contrast
@@ -90,14 +90,31 @@ class ImageProcessorNode(BaseNode):
         # Clip values to valid 0.0 - 1.0 range
         np.clip(processed_float, 0.0, 1.0, out=processed_float)
         
-        # --- 4. Convert back to uint8 for output ---
-        processed_u8 = (processed_float * 255).astype(np.uint8)
-        
-        # Ensure output is 3-channel RGB for compatibility
-        if processed_u8.ndim == 2:
-            self.processed_image = cv2.cvtColor(processed_u8, cv2.COLOR_GRAY2RGB)
+        # --- 5. Convert back to original format for OUTPUT port ---
+        if original_dtype == np.uint8:
+            self.processed_image = (processed_float * 255).astype(np.uint8)
         else:
-            self.processed_image = processed_u8
+            # IMPORTANT: Keep it as float if it came in as float
+            self.processed_image = processed_float.astype(original_dtype)
+            
+        # --- 6. Create separate uint8 RGB versions for DISPLAY ---
+        
+        # Create "Before" display
+        if img_float.ndim == 2:
+            before_u8 = (np.clip(img_float, 0, 1) * 255).astype(np.uint8)
+            self.display_in_rgb = cv2.cvtColor(before_u8, cv2.COLOR_GRAY2RGB)
+        elif img_float.shape[2] == 3:
+            before_u8 = (np.clip(img_float, 0, 1) * 255).astype(np.uint8)
+            self.display_in_rgb = before_u8
+        
+        # Create "After" display
+        if processed_float.ndim == 2:
+            after_u8 = (np.clip(processed_float, 0, 1) * 255).astype(np.uint8)
+            self.display_out_rgb = cv2.cvtColor(after_u8, cv2.COLOR_GRAY2RGB)
+        elif processed_float.shape[2] == 3:
+            after_u8 = (np.clip(processed_float, 0, 1) * 255).astype(np.uint8)
+            self.display_out_rgb = after_u8
+        
         
     def get_output(self, port_name):
         if self._error: return None
@@ -111,7 +128,7 @@ class ImageProcessorNode(BaseNode):
 
     def get_display_image(self):
         if self._error: return None
-        if self.input_image_buffer is None: return None
+        if self.processed_image is None: return None
 
         # Create a side-by-side "Before" and "After"
         display_h = 128
@@ -119,18 +136,11 @@ class ImageProcessorNode(BaseNode):
         display = np.zeros((display_h, display_w, 3), dtype=np.uint8)
         
         # --- Left side: "Before" (Input) ---
-        if self.input_image_buffer.ndim == 2:
-            before_u8 = (np.clip(self.input_image_buffer, 0, 1) * 255).astype(np.uint8)
-            before_img = cv2.cvtColor(before_u8, cv2.COLOR_GRAY2RGB)
-        else:
-            before_u8 = (np.clip(self.input_image_buffer, 0, 1) * 255).astype(np.uint8)
-            before_img = before_u8 # Already RGB
-            
-        before_resized = cv2.resize(before_img, (display_h, display_h), interpolation=cv2.INTER_NEAREST)
+        before_resized = cv2.resize(self.display_in_rgb, (display_h, display_h), interpolation=cv2.INTER_NEAREST)
         display[:, :display_h] = before_resized
         
         # --- Right side: "After" (Processed Output) ---
-        after_resized = cv2.resize(self.processed_image, (display_h, display_h), interpolation=cv2.INTER_NEAREST)
+        after_resized = cv2.resize(self.display_out_rgb, (display_h, display_h), interpolation=cv2.INTER_NEAREST)
         display[:, display_w-display_h:] = after_resized
         
         # Add dividing line
