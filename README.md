@@ -52,6 +52,8 @@ python perception_lab_host.py
 The application will start, scan the nodes/ folder, and print a list of all successfully loaded nodes 
 to the console.
 
+![fractalareyou](./youarethefractal.png)
+
 # How to Use
 
 Add Node: Click the "Load Node Script" button and select a file from the nodes/ folder. If the file
