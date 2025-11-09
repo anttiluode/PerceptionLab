@@ -1,0 +1,213 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": -257.0,
+      "pos_y": -334.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.2196781045751634
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "OpticalFlowNode",
+      "pos_x": 213.0,
+      "pos_y": -310.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {
+          "motion_x": "signal",
+          "motion_y": "signal",
+          "motion_magnitude": "signal",
+          "motion_angle": "signal",
+          "flow_vis": "image",
+          "has_motion": "signal"
+        },
+        "node_title": "Optical Flow Tracker",
+        "points_to_track": 20,
+        "quality_level": 0.3,
+        "min_distance": 7,
+        "motion_x": 0.0003273305483162403,
+        "motion_y": 0.000807538628578186,
+        "motion_magnitude": 0.0017599693965166807,
+        "motion_angle": 0.3774174771781779,
+        "has_motion": 1.0,
+        "lk_params": {
+          "winSize": [
+            15,
+            15
+          ],
+          "maxLevel": 2,
+          "criteria": [
+            3,
+            10,
+            0.03
+          ]
+        },
+        "feature_params": {
+          "maxCorners": 20,
+          "qualityLevel": 0.3,
+          "minDistance": 7,
+          "blockSize": 7
+        }
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "LargeMoireFieldNode",
+      "pos_x": -17.0,
+      "pos_y": -323.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fast_field": "image",
+          "motion_signal": "signal",
+          "gamma_phase": "signal",
+          "is_receptive": "signal"
+        },
+        "node_title": "Large Moire Field",
+        "size": 64,
+        "motion_value": 0.0,
+        "gamma_phase": -0.9338805115859488,
+        "is_receptive": 1.0
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "BlochQubitNode",
+      "pos_x": -227.0,
+      "pos_y": -68.0,
+      "width": 399.0,
+      "height": 284.0,
+      "config": {
+        "inputs": {
+          "rx_angle": "signal",
+          "ry_angle": "signal",
+          "rz_angle": "signal",
+          "hadamard_trigger": "signal"
+        },
+        "outputs": {
+          "bloch_x": "signal",
+          "bloch_y": "signal",
+          "bloch_z": "signal",
+          "prob_0": "signal"
+        },
+        "input_data": {
+          "rx_angle": [
+            -3.2596290111541746e-10
+          ],
+          "ry_angle": [
+            -6.519258022308349e-10
+          ],
+          "rz_angle": [
+            9.778887033462523e-10
+          ],
+          "hadamard_trigger": []
+        },
+        "node_title": "Bloch Qubit",
+        "hbar": 1.0,
+        "last_hadamard_trigger": 0.0
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "JuliaNode",
+      "pos_x": 438.0,
+      "pos_y": -285.0,
+      "width": 529.0,
+      "height": 470.0,
+      "config": {
+        "inputs": {
+          "c_real": "signal",
+          "c_imag": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "input_data": {
+          "c_real": [
+            -0.43211304809817047
+          ],
+          "c_imag": [
+            0.5222012978753167
+          ]
+        },
+        "node_title": "Julia Set Explorer",
+        "resolution": 128,
+        "max_iterations": 40,
+        "c_real": -0.43211304809817047,
+        "c_imag": 0.5222012978753167
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 2,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "fast_field",
+      "to_node_id": 1,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "motion_x",
+      "to_node_id": 3,
+      "to_port": "rx_angle"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "motion_y",
+      "to_node_id": 3,
+      "to_port": "ry_angle"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "motion_magnitude",
+      "to_node_id": 3,
+      "to_port": "rz_angle"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "bloch_x",
+      "to_node_id": 4,
+      "to_port": "c_real"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "bloch_y",
+      "to_node_id": 4,
+      "to_port": "c_imag"
+    }
+  ]
+}
