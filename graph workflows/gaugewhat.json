@@ -1,0 +1,116 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SU3FieldNode",
+      "pos_x": 116.0,
+      "pos_y": -61.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "field_in": "image",
+          "confinement": "signal"
+        },
+        "outputs": {
+          "field_out": "image"
+        },
+        "node_title": "SU(3) Field (Strong)",
+        "size": 128
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "SU2FieldNode",
+      "pos_x": -241.0,
+      "pos_y": -62.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "field_in": "image",
+          "rot_X": "signal",
+          "rot_Y": "signal",
+          "rot_Z": "signal"
+        },
+        "outputs": {
+          "field_out": "image"
+        },
+        "node_title": "SU(2) Field (Weak)",
+        "size": 128,
+        "t": 0.0
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "U1FieldNode",
+      "pos_x": -486.0,
+      "pos_y": -54.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "charge_in": "image",
+          "strength": "signal"
+        },
+        "outputs": {
+          "potential_out": "image",
+          "field_viz": "image"
+        },
+        "node_title": "U(1) Field (E/M)",
+        "size": 128
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -771.0,
+      "pos_y": -41.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Noise Gen",
+        "w": 160,
+        "h": 120,
+        "noise_type": "white",
+        "speed": 0.1,
+        "signal_value": 2.9841506229866255e-05
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 2,
+      "from_port": "potential_out",
+      "to_node_id": 1,
+      "to_port": "field_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "field_out",
+      "to_node_id": 0,
+      "to_port": "field_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "image",
+      "to_node_id": 2,
+      "to_port": "charge_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "strength"
+    }
+  ]
+}
