@@ -1,0 +1,373 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": -54.0,
+      "pos_y": -396.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.13531413398692813
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "LargeMoireFieldNode",
+      "pos_x": 214.0,
+      "pos_y": -399.0,
+      "width": 200.0,
+      "height": 204.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fast_field": "image",
+          "motion_signal": "signal",
+          "gamma_phase": "signal",
+          "is_receptive": "signal"
+        },
+        "node_title": "Large Moire Field",
+        "size": 64,
+        "motion_value": 0.004296936094760895,
+        "gamma_phase": -0.6706821834548335,
+        "is_receptive": 1.0
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "OpticalFlowNode",
+      "pos_x": 471.0,
+      "pos_y": -392.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {
+          "motion_x": "signal",
+          "motion_y": "signal",
+          "motion_magnitude": "signal",
+          "motion_angle": "signal",
+          "flow_vis": "image",
+          "has_motion": "signal"
+        },
+        "node_title": "Optical Flow Tracker",
+        "points_to_track": 30,
+        "quality_level": 0.3,
+        "min_distance": 7,
+        "motion_x": -0.004490764811635017,
+        "motion_y": 0.002544720657169819,
+        "motion_magnitude": 0.005220043007284403,
+        "motion_angle": 0.8358981258670699,
+        "has_motion": 1.0,
+        "lk_params": {
+          "winSize": [
+            15,
+            15
+          ],
+          "maxLevel": 2,
+          "criteria": [
+            3,
+            10,
+            0.03
+          ]
+        },
+        "feature_params": {
+          "maxCorners": 20,
+          "qualityLevel": 0.3,
+          "minDistance": 7,
+          "blockSize": 7
+        }
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "MotionToCoordinatesNode",
+      "pos_x": -53.0,
+      "pos_y": -115.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "motion_x": "signal",
+          "motion_y": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "x_coord": "signal",
+          "y_coord": "signal",
+          "distance_from_center": "signal",
+          "normalized_angle": "signal"
+        },
+        "input_data": {
+          "motion_x": [
+            0.010351735167205334
+          ],
+          "motion_y": [
+            0.0005367326666601002
+          ],
+          "reset": []
+        },
+        "node_title": "Motion \u2192 Coordinates",
+        "sensitivity": 3.0,
+        "decay": 0.9,
+        "bounds": 1.0,
+        "x": -0.08776049125632145,
+        "y": -0.30278317476316713,
+        "last_reset": 0.0
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "VoronoiFieldNode",
+      "pos_x": 225.0,
+      "pos_y": -112.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "seed1_x": "signal",
+          "seed1_y": "signal",
+          "seed2_x": "signal",
+          "seed2_y": "signal",
+          "rotation": "signal",
+          "scale": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "edge_density": "signal"
+        },
+        "input_data": {
+          "seed1_x": [
+            0.010351735167205334
+          ],
+          "seed1_y": [
+            0.0005367326666601002
+          ],
+          "seed2_x": [],
+          "seed2_y": [],
+          "rotation": [
+            0.36306734262630486
+          ],
+          "scale": []
+        },
+        "node_title": "Voronoi Field",
+        "size": 256,
+        "num_seeds": 8,
+        "edge_density": 0.016448974609375
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "EmergentGravityNode",
+      "pos_x": 491.0,
+      "pos_y": -95.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "constraint_density": "image",
+          "g_coupling": "signal"
+        },
+        "outputs": {
+          "gravity_potential": "image",
+          "curvature_field": "image",
+          "total_mass": "signal"
+        },
+        "node_title": "Emergent Gravity",
+        "g_coupling": 1.016448974609375,
+        "blur_strength": 21,
+        "total_mass": 80921.544685503
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "FilamentBoxcountNode",
+      "pos_x": 722.0,
+      "pos_y": -386.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "threshold": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "fractal_dim": "signal",
+          "density": "signal"
+        },
+        "node_title": "Filament Boxcounter",
+        "size": 128,
+        "fractal_dim": 1.9365375803319593,
+        "density": 0.9921875
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "FractalBlendNode",
+      "pos_x": 734.0,
+      "pos_y": -106.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in1": "image",
+          "image_in2": "image",
+          "c_real": "signal",
+          "c_imag": "signal",
+          "max_iter": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "Fractal Blender",
+        "size": 256
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "ImageProcessorNode",
+      "pos_x": 955.0,
+      "pos_y": -288.0,
+      "width": 428.0,
+      "height": 364.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "image_out": "image",
+          "brightness_signal": "signal",
+          "contrast_signal": "signal"
+        },
+        "node_title": "Image Processor",
+        "_error": false,
+        "brightness": 0.0,
+        "contrast": 1.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "fast_field",
+      "to_node_id": 2,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "motion_x",
+      "to_node_id": 3,
+      "to_port": "motion_x"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "motion_y",
+      "to_node_id": 3,
+      "to_port": "motion_y"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "motion_x",
+      "to_node_id": 4,
+      "to_port": "seed1_x"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "motion_y",
+      "to_node_id": 4,
+      "to_port": "seed1_y"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "distance_from_center",
+      "to_node_id": 4,
+      "to_port": "rotation"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "image",
+      "to_node_id": 5,
+      "to_port": "constraint_density"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "edge_density",
+      "to_node_id": 5,
+      "to_port": "g_coupling"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "fast_field",
+      "to_node_id": 6,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "motion_magnitude",
+      "to_node_id": 6,
+      "to_port": "threshold"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "gravity_potential",
+      "to_node_id": 7,
+      "to_port": "image_in2"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "image",
+      "to_node_id": 7,
+      "to_port": "image_in1"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "image",
+      "to_node_id": 8,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "total_mass",
+      "to_node_id": 7,
+      "to_port": "c_real"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "density",
+      "to_node_id": 7,
+      "to_port": "c_imag"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "edge_density",
+      "to_node_id": 7,
+      "to_port": "max_iter"
+    }
+  ]
+}
