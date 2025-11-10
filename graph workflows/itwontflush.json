@@ -1,0 +1,268 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": -257.0,
+      "pos_y": -334.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.1271860702614379
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "OpticalFlowNode",
+      "pos_x": -9.0,
+      "pos_y": -496.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {
+          "motion_x": "signal",
+          "motion_y": "signal",
+          "motion_magnitude": "signal",
+          "motion_angle": "signal",
+          "flow_vis": "image",
+          "has_motion": "signal"
+        },
+        "node_title": "Optical Flow Tracker",
+        "points_to_track": 20,
+        "quality_level": 0.3,
+        "min_distance": 7,
+        "motion_x": -0.0002063363790512085,
+        "motion_y": 0.001913701999001205,
+        "motion_magnitude": 0.002107968321070075,
+        "motion_angle": 0.5341882687931739,
+        "has_motion": 1.0,
+        "lk_params": {
+          "winSize": [
+            15,
+            15
+          ],
+          "maxLevel": 2,
+          "criteria": [
+            3,
+            10,
+            0.03
+          ]
+        },
+        "feature_params": {
+          "maxCorners": 20,
+          "qualityLevel": 0.3,
+          "minDistance": 7,
+          "blockSize": 7
+        }
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "LargeMoireFieldNode",
+      "pos_x": -27.0,
+      "pos_y": -278.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fast_field": "image",
+          "motion_signal": "signal",
+          "gamma_phase": "signal",
+          "is_receptive": "signal"
+        },
+        "node_title": "Large Moire Field",
+        "size": 64,
+        "motion_value": 0.0,
+        "gamma_phase": 0.40044510597707306,
+        "is_receptive": 0.0
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "WaveInterferenceNode",
+      "pos_x": -7.0,
+      "pos_y": -60.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "source1_x": "signal",
+          "source1_y": "signal",
+          "source2_x": "signal",
+          "source2_y": "signal",
+          "frequency": "signal",
+          "phase_speed": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "intensity": "signal"
+        },
+        "input_data": {
+          "source1_x": [
+            -9.482557405959824e-10
+          ],
+          "source1_y": [
+            0.0
+          ],
+          "source2_x": [
+            -0.005227227205326403
+          ],
+          "source2_y": [
+            0.006459424820408276
+          ],
+          "frequency": [],
+          "phase_speed": [
+            0.19574148378193987
+          ]
+        },
+        "node_title": "Wave Interference",
+        "size": 256,
+        "num_sources": 3,
+        "phase": 276.6527923343313,
+        "intensity": 0.2501576542854309
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "MotionToCoordinatesNode",
+      "pos_x": -287.0,
+      "pos_y": -64.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "motion_x": "signal",
+          "motion_y": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "x_coord": "signal",
+          "y_coord": "signal",
+          "distance_from_center": "signal",
+          "normalized_angle": "signal"
+        },
+        "input_data": {
+          "motion_x": [
+            -9.482557405959824e-10
+          ],
+          "motion_y": [
+            0.0
+          ],
+          "reset": []
+        },
+        "node_title": "Motion \u2192 Coordinates",
+        "sensitivity": 0.5,
+        "decay": 0.95,
+        "bounds": 1.0,
+        "x": -0.0070940945384994165,
+        "y": 0.008766362256268374,
+        "last_reset": 0.0
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "ImageProcessorNode",
+      "pos_x": 319.0,
+      "pos_y": -490.0,
+      "width": 496.0,
+      "height": 479.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "image_out": "image",
+          "brightness_signal": "signal",
+          "contrast_signal": "signal"
+        },
+        "node_title": "Image Processor",
+        "_error": false,
+        "brightness": 0.0,
+        "contrast": 1.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 2,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "fast_field",
+      "to_node_id": 1,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "motion_x",
+      "to_node_id": 3,
+      "to_port": "source1_x"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "motion_y",
+      "to_node_id": 3,
+      "to_port": "source1_y"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "motion_x",
+      "to_node_id": 4,
+      "to_port": "motion_x"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "motion_y",
+      "to_node_id": 4,
+      "to_port": "motion_y"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "x_coord",
+      "to_node_id": 3,
+      "to_port": "source2_x"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "y_coord",
+      "to_node_id": 3,
+      "to_port": "source2_y"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "image",
+      "to_node_id": 5,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "gamma_phase",
+      "to_node_id": 3,
+      "to_port": "phase_speed"
+    }
+  ]
+}
