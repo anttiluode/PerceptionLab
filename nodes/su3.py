@@ -4,6 +4,8 @@ SU3FieldNode (Strong Force Metaphor)
 Simulates an SU(3) "color" force with confinement.
 Pure colors (R, G, B) are "far" from neutral gray and are
 "pulled" back strongly, creating a vibrating/jiggling effect.
+
+[FIXED] Initialized self.field_out in __init__ to prevent AttributeError.
 """
 
 import numpy as np
@@ -41,6 +43,11 @@ class SU3FieldNode(BaseNode):
         y, x = np.mgrid[0:self.size, 0:self.size]
         self.grid_x = x.astype(np.float32)
         self.grid_y = y.astype(np.float32)
+        
+        # --- START FIX ---
+        # Initialize the output variable to prevent race condition
+        self.field_out = np.zeros((self.size, self.size, 3), dtype=np.float32)
+        # --- END FIX ---
         
     def _prepare_image(self, img):
         if img is None:
@@ -92,6 +99,7 @@ class SU3FieldNode(BaseNode):
         # --- 5. Apply "Color Rotation" (Gluon Exchange) ---
         # We also slowly pull the colors toward the mean
         self.field_out = self.field_out * 0.99 + mean_color * 0.01
+        self.field_out = np.clip(self.field_out, 0, 1) # Add clip for safety
 
     def get_output(self, port_name):
         if port_name == 'field_out':
@@ -99,6 +107,5 @@ class SU3FieldNode(BaseNode):
         return None
 
     def get_display_image(self):
-        if hasattr(self, 'field_out'):
-            return self.field_out
-        return np.zeros((self.size, self.size, 3), dtype=np.float32)
+        # self.field_out is guaranteed to exist now
+        return self.field_out
