@@ -1,0 +1,276 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": -189.0,
+      "pos_y": 302.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.4267420343137255
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "RealVAENode",
+      "pos_x": 42.0,
+      "pos_y": 361.0,
+      "width": 250.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "latent_in": "spectrum",
+          "train": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "latent_out": "spectrum",
+          "loss": "signal"
+        },
+        "node_title": "Real VAE",
+        "latent_dim": 16,
+        "img_size": 64,
+        "current_loss": 6.301457405090332,
+        "training_steps": 130
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "VectorSplitterNode",
+      "pos_x": 329.0,
+      "pos_y": 162.0,
+      "width": 250.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "spectrum_in": "spectrum",
+          "scale": "signal"
+        },
+        "outputs": {
+          "out_0": "signal",
+          "out_1": "signal",
+          "out_2": "signal",
+          "out_3": "signal",
+          "out_4": "signal",
+          "out_5": "signal",
+          "out_6": "signal",
+          "out_7": "signal",
+          "out_8": "signal",
+          "out_9": "signal",
+          "out_10": "signal",
+          "out_11": "signal",
+          "out_12": "signal",
+          "out_13": "signal",
+          "out_14": "signal",
+          "out_15": "signal"
+        },
+        "node_title": "Vector Splitter",
+        "num_outputs": 16,
+        "scale": 1.0
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SpringNode",
+      "pos_x": 603.0,
+      "pos_y": 160.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {
+          "target_pos": "signal"
+        },
+        "outputs": {
+          "position": "signal"
+        },
+        "input_data": {
+          "target_pos": [
+            -0.16088157892227173
+          ]
+        },
+        "node_title": "Spring (1D)",
+        "mass": 1.0,
+        "stiffness": 0.1,
+        "damping": 0.05,
+        "position": 0.2720041305216002,
+        "velocity": -0.05586481149886841,
+        "last_time": 1762853428.5673816
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "FitzHughNagumoNode",
+      "pos_x": 625.0,
+      "pos_y": 327.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {
+          "pain_stimulus": "signal"
+        },
+        "outputs": {
+          "pain_out": "signal",
+          "stability_metric": "signal"
+        },
+        "input_data": {
+          "pain_stimulus": [
+            1.2431280612945557
+          ]
+        },
+        "node_title": "FHN Neuron",
+        "a": 0.7,
+        "b": 0.8,
+        "tau": 12.5,
+        "v": 1.6262971157420358,
+        "w": 1.4663349835555566,
+        "dt": 0.1
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": 872.0,
+      "pos_y": 414.0,
+      "width": 250.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "node_title": "Latent Assembler",
+        "latent_dim": 16
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "DisplayNode",
+      "pos_x": 74.0,
+      "pos_y": 586.0,
+      "width": 250.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -195.0,
+      "pos_y": 556.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "latent_out",
+      "to_node_id": 2,
+      "to_port": "spectrum_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "out_0",
+      "to_node_id": 3,
+      "to_port": "target_pos"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "out_1",
+      "to_node_id": 4,
+      "to_port": "pain_stimulus"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image_out",
+      "to_node_id": 6,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "position",
+      "to_node_id": 5,
+      "to_port": "in_0"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "pain_out",
+      "to_node_id": 5,
+      "to_port": "in_1"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "latent_out",
+      "to_node_id": 1,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "latent_out",
+      "to_node_id": 5,
+      "to_port": "latent_base"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "train"
+    }
+  ]
+}
