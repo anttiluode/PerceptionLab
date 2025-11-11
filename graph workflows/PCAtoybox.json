@@ -1,0 +1,315 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": 50,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "source_type": "Webcam",
+        "device_id": 0
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "FFTCochleaNode",
+      "pos_x": 300,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 300,
+      "pos_y": 250,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "value": 1.0,
+        "node_title": "Learn Trigger (ON)"
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SpectralPCANode",
+      "pos_x": 550,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "latent_dim": 16,
+        "buffer_size": 100
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "AutoExplorerNode",
+      "pos_x": 800,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "mode": "circular"
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "iFFTCochleaNode",
+      "pos_x": 1050,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 6,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 1300,
+      "pos_y": 50,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "node_title": "Main Recon (Auto)"
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "LatentExplorerNode",
+      "pos_x": 800,
+      "pos_y": 300,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "num_controls": 3
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "InteractiveSignalNode",
+      "pos_x": 550,
+      "pos_y": 300,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "zoom_factor": 0.0,
+        "node_title": "PC 0 Control"
+      }
+    },
+    {
+      "id": 9,
+      "class_name": "InteractiveSignalNode",
+      "pos_x": 550,
+      "pos_y": 420,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "zoom_factor": 0.0,
+        "node_title": "PC 1 Control"
+      }
+    },
+    {
+      "id": 10,
+      "class_name": "InteractiveSignalNode",
+      "pos_x": 550,
+      "pos_y": 540,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "zoom_factor": 0.0,
+        "node_title": "PC 2 Control"
+      }
+    },
+    {
+      "id": 11,
+      "class_name": "SpectralPCANode",
+      "pos_x": 550,
+      "pos_y": 700,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "latent_dim": 16,
+        "buffer_size": 100,
+        "node_title": "Spectral PCA (Scanner)"
+      }
+    },
+    {
+      "id": 12,
+      "class_name": "PCScannerNode",
+      "pos_x": 800,
+      "pos_y": 700,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "scan_amplitude": 2.0,
+        "grid_cols": 4
+      }
+    },
+    {
+      "id": 13,
+      "class_name": "iFFTCochleaNode",
+      "pos_x": 1050,
+      "pos_y": 700,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "node_title": "iFFT (Scanner)"
+      }
+    },
+    {
+      "id": 14,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 1300,
+      "pos_y": 700,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "node_title": "Scanner Contact Sheet"
+      }
+    },
+    {
+      "id": 15,
+      "class_name": "SinglePulseNode",
+      "pos_x": 800,
+      "pos_y": 900,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "node_title": "Scan Trigger"
+      }
+    },
+    {
+      "id": 16,
+      "class_name": "DocumentationNode",
+      "pos_x": 1050,
+      "pos_y": 300,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "doc_text": "MANUAL EXPLORER:\n\nTo use this, disconnect\nAutoExplorer->PCA_Main\n\nThen connect:\nManualExplorer.latent_out\n-> PCA_Main.pc_weights\n\nUse +/- on controls."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "complex_spectrum",
+      "to_node_id": 3,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "learn"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "latent_code",
+      "to_node_id": 4,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "latent_out",
+      "to_node_id": 3,
+      "to_port": "pc_weights"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "reconstructed_spectrum",
+      "to_node_id": 5,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "image",
+      "to_node_id": 6,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "latent_code",
+      "to_node_id": 7,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "signal",
+      "to_node_id": 7,
+      "to_port": "pc0_mod"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "signal",
+      "to_node_id": 7,
+      "to_port": "pc1_mod"
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "signal",
+      "to_node_id": 7,
+      "to_port": "pc2_mod"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "complex_spectrum",
+      "to_node_id": 11,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 11,
+      "to_port": "learn"
+    },
+    {
+      "from_node_id": 11,
+      "from_port": "latent_code",
+      "to_node_id": 12,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 12,
+      "from_port": "latent_out",
+      "to_node_id": 11,
+      "to_port": "pc_weights"
+    },
+    {
+      "from_node_id": 11,
+      "from_port": "reconstructed_spectrum",
+      "to_node_id": 13,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 13,
+      "from_port": "image",
+      "to_node_id": 12,
+      "to_port": "reconstructed_image"
+    },
+    {
+      "from_node_id": 12,
+      "from_port": "contact_sheet",
+      "to_node_id": 14,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 15,
+      "from_port": "pulse_out",
+      "to_node_id": 12,
+      "to_port": "trigger"
+    }
+  ]
+}
