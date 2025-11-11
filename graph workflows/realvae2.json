@@ -23,7 +23,7 @@
         "w": 160,
         "h": 120,
         "sample_rate": 44100,
-        "signal_output": 0.3243084150326797
+        "signal_output": 0.39192626633986927
       }
     },
     {
@@ -65,8 +65,8 @@
         "node_title": "Real VAE",
         "latent_dim": 16,
         "img_size": 64,
-        "current_loss": 3.532609462738037,
-        "training_steps": 1497
+        "current_loss": 34.895301818847656,
+        "training_steps": 1541
       }
     },
     {
@@ -119,6 +119,61 @@
         "node_title": "Vector Splitter",
         "num_outputs": 16,
         "scale": 1.0
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": 1053.0,
+      "pos_y": 176.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum",
+          "image_out": "image"
+        },
+        "input_data": {
+          "latent_base": [],
+          "in_0": [],
+          "in_1": [],
+          "in_2": [],
+          "in_3": [],
+          "in_4": [],
+          "in_5": [],
+          "in_6": [],
+          "in_7": [],
+          "in_8": [],
+          "in_9": [],
+          "in_10": [],
+          "in_11": [],
+          "in_12": [],
+          "in_13": [],
+          "in_14": [],
+          "in_15": []
+        },
+        "node_title": "Latent Assembler",
+        "latent_dim": 16,
+        "img_size": 64
       }
     }
   ],
