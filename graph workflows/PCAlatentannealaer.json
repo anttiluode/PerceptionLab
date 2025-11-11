@@ -1,0 +1,180 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": 50,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "source_type": "Webcam",
+        "device_id": 0
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "FFTCochleaNode",
+      "pos_x": 300,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 300,
+      "pos_y": 250,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "value": 1.0,
+        "node_title": "Learn Trigger (ON)"
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SpectralPCANode",
+      "pos_x": 550,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "latent_dim": 16,
+        "buffer_size": 100
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "LatentAnnealerNode",
+      "pos_x": 800,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "latent_dim": 16
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "InteractiveSignalNode",
+      "pos_x": 800,
+      "pos_y": 250,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "zoom_factor": 0.5,
+        "node_title": "Diffusion (Blur)"
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "InteractiveSignalNode",
+      "pos_x": 800,
+      "pos_y": 370,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "zoom_factor": 0.01,
+        "node_title": "Noise (Temperature)"
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "SinglePulseNode",
+      "pos_x": 800,
+      "pos_y": 490,
+      "width": 200,
+      "height": 100,
+      "config": {
+        "node_title": "Reset Seed (R)"
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "iFFTCochleaNode",
+      "pos_x": 1050,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {}
+    },
+    {
+      "id": 9,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 1300,
+      "pos_y": 50,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "node_title": "Evolved Concept"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "complex_spectrum",
+      "to_node_id": 3,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "learn"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "latent_code",
+      "to_node_id": 4,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "latent_out",
+      "to_node_id": 3,
+      "to_port": "pc_weights"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal",
+      "to_node_id": 4,
+      "to_port": "diffusion"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 4,
+      "to_port": "noise"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "pulse_out",
+      "to_node_id": 4,
+      "to_port": "reset"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "reconstructed_spectrum",
+      "to_node_id": 8,
+      "to_port": "complex_spectrum"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "image",
+      "to_node_id": 9,
+      "to_port": "image"
+    }
+  ]
+}
