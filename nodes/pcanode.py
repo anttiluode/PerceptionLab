@@ -1,3 +1,4 @@
+
 """
 Spectral PCA Node - Learns principal components of FFT spectra
 Discovers which frequency patterns co-occur in your visual environment

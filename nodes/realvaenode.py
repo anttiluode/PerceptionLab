@@ -1,9 +1,15 @@
 """
-Real VAE Node - Actually learns non-linear visual compression
+Real VAE Node - (v3 - Fixed External Latent Decoding)
 Trains incrementally on webcam, allows latent space exploration
 
 Requires: pip install torch torchvision
 Place this file in the 'nodes' folder as realvaenode.py
+
+FIX v3:
+- The step() function will now correctly check for 'latent_in'
+  even if 'image_in' is not connected.
+- This allows a "decoder-only" VAE node to work,
+  just as you intended in your graph.
 """
 
 import numpy as np
@@ -33,15 +39,15 @@ class ConvVAE(nn.Module):
         self.latent_dim = latent_dim
         self.img_size = img_size
         
-        # Encoder: 64x64 → 16D latent
+        # Encoder: 64x64 -> 16D latent
         self.encoder = nn.Sequential(
-            nn.Conv2d(1, 32, 4, 2, 1),   # 64 → 32
+            nn.Conv2d(1, 32, 4, 2, 1),   # 64 -> 32
             nn.ReLU(),
-            nn.Conv2d(32, 64, 4, 2, 1),  # 32 → 16
+            nn.Conv2d(32, 64, 4, 2, 1),  # 32 -> 16
             nn.ReLU(),
-            nn.Conv2d(64, 128, 4, 2, 1), # 16 → 8
+            nn.Conv2d(64, 128, 4, 2, 1), # 16 -> 8
             nn.ReLU(),
-            nn.Conv2d(128, 256, 4, 2, 1), # 8 → 4
+            nn.Conv2d(128, 256, 4, 2, 1), # 8 -> 4
             nn.ReLU(),
             nn.Flatten(),
         )
@@ -51,17 +57,17 @@ class ConvVAE(nn.Module):
         self.fc_mu = nn.Linear(hidden_dim, latent_dim)
         self.fc_logvar = nn.Linear(hidden_dim, latent_dim)
         
-        # Decoder: 16D latent → 64x64
+        # Decoder: 16D latent -> 64x64
         self.fc_decode = nn.Linear(latent_dim, hidden_dim)
         
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(256, 128, 4, 2, 1), # 4 → 8
+            nn.ConvTranspose2d(256, 128, 4, 2, 1), # 4 -> 8
             nn.ReLU(),
-            nn.ConvTranspose2d(128, 64, 4, 2, 1),  # 8 → 16
+            nn.ConvTranspose2d(128, 64, 4, 2, 1),  # 8 -> 16
             nn.ReLU(),
-            nn.ConvTranspose2d(64, 32, 4, 2, 1),   # 16 → 32
+            nn.ConvTranspose2d(64, 32, 4, 2, 1),   # 16 -> 32
             nn.ReLU(),
-            nn.ConvTranspose2d(32, 1, 4, 2, 1),    # 32 → 64
+            nn.ConvTranspose2d(32, 1, 4, 2, 1),    # 32 -> 64
             nn.Sigmoid()
         )
         
@@ -96,7 +102,7 @@ class RealVAENode(BaseNode):
     NODE_COLOR = QtGui.QColor(180, 100, 220)
     
     def __init__(self, latent_dim=16, img_size=64):
-        super().__init__()  # NO ARGUMENTS - this is the fix!
+        super().__init__()
         self.node_title = "Real VAE"
         
         self.inputs = {
@@ -142,10 +148,20 @@ class RealVAENode(BaseNode):
         if not TORCH_AVAILABLE:
             return
         
-        # Get inputs
+        # Get all inputs
         img_in = self.get_blended_input('image_in', 'mean')
         train_signal = self.get_blended_input('train', 'sum') or 0.0
         reset_signal = self.get_blended_input('reset', 'sum') or 0.0
+        external_latent = self.get_blended_input('latent_in', 'first')
+        
+        # --- FIX: Check for any activity at all ---
+        has_image = img_in is not None
+        has_external_latent = external_latent is not None
+        
+        if not has_image and not has_external_latent:
+            self.reconstructed *= 0.95 # Fade out
+            return
+        # --- END FIX ---
         
         # Reset training
         if reset_signal > 0.5:
@@ -154,53 +170,63 @@ class RealVAENode(BaseNode):
             self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
             self.training_steps = 0
         
-        if img_in is None:
-            return
         
-        # Prepare image
-        img = cv2.resize(img_in, (self.img_size, self.img_size))
-        if img.ndim == 3:
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        img = img.astype(np.float32)
-        if img.max() > 1.0:
-            img = img / 255.0
+        # --- Handle Training & Latent Output (Requires Image) ---
+        if has_image:
+            # Prepare image
+            img = cv2.resize(img_in, (self.img_size, self.img_size))
+            if img.ndim == 3:
+                img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+            img = img.astype(np.float32)
+            if img.max() > 1.0:
+                img = img / 255.0
+            
+            # Convert to torch tensor
+            x = torch.from_numpy(img).unsqueeze(0).unsqueeze(0).to(self.device)
         
-        # Convert to torch tensor
-        x = torch.from_numpy(img).unsqueeze(0).unsqueeze(0).to(self.device)
-        
-        # TRAINING MODE
-        if train_signal > 0.5:
-            self.model.train()
-            self.optimizer.zero_grad()
-            
-            recon, mu, logvar = self.model(x)
-            loss = self.vae_loss(recon, x, mu, logvar)
-            
-            loss.backward()
-            self.optimizer.step()
-            
-            self.current_loss = loss.item()
-            self.training_steps += 1
-            
-            if self.training_steps % 50 == 0:
-                print(f"VAE Step {self.training_steps}, Loss: {self.current_loss:.2f}")
-        
-        # INFERENCE MODE
-        self.model.eval()
-        with torch.no_grad():
-            external_latent = self.get_blended_input('latent_in', 'first')
-            
-            if external_latent is not None and len(external_latent) == self.latent_dim:
-                z = torch.from_numpy(external_latent).float().unsqueeze(0).to(self.device)
-                recon = self.model.decode(z)
-                self.current_latent = external_latent.copy()
-            else:
+            if train_signal > 0.5:
+                self.model.train()
+                self.optimizer.zero_grad()
+                
+                recon, mu, logvar = self.model(x)
+                loss = self.vae_loss(recon, x, mu, logvar)
+                
+                loss.backward()
+                self.optimizer.step()
+                
+                self.current_loss = loss.item()
+                self.training_steps += 1
+                
+                if self.training_steps % 50 == 0:
+                    print(f"VAE Step {self.training_steps}, Loss: {self.current_loss:.2f}")
+
+            # ALWAYS encode to update the latent_out port
+            self.model.eval()
+            with torch.no_grad():
                 mu, logvar = self.model.encode(x)
-                z = mu
-                recon = self.model.decode(z)
-                self.current_latent = z.cpu().numpy().flatten().astype(np.float32)
+                self.current_latent = mu.cpu().numpy().flatten().astype(np.float32)
+        
+        
+        # --- Handle Decoding (Image Output) ---
+        self.model.eval()
+        z_to_decode = None
+        
+        if has_external_latent:
+            # Priority: Use the external latent vector if plugged in
+            if len(external_latent) == self.latent_dim:
+                z_to_decode = torch.from_numpy(external_latent).float().unsqueeze(0).to(self.device)
+        
+        elif has_image:
+            # Fallback: Use the live latent vector from the image
+            z_to_decode = torch.from_numpy(self.current_latent).float().unsqueeze(0).to(self.device)
             
-            self.reconstructed = recon.squeeze().cpu().numpy()
+        # Run decoder
+        if z_to_decode is not None:
+            with torch.no_grad():
+                recon = self.model.decode(z_to_decode)
+                self.reconstructed = recon.squeeze().cpu().numpy()
+        else:
+            self.reconstructed *= 0.95 # Fade out
     
     def get_output(self, port_name):
         if port_name == 'latent_out':
@@ -208,7 +234,8 @@ class RealVAENode(BaseNode):
         elif port_name == 'image_out':
             return self.reconstructed
         elif port_name == 'loss':
-            return self.current_loss
+            # Scale loss to a more reasonable 0-1 signal range
+            return np.clip(self.current_loss / 10000.0, 0.0, 1.0)
         return None
     
     def get_display_image(self):
@@ -218,6 +245,7 @@ class RealVAENode(BaseNode):
                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
             return QtGui.QImage(img.data, 128, 128, 128*3, QtGui.QImage.Format.Format_RGB888)
         
+        # Display the reconstructed image
         img = (np.clip(self.reconstructed, 0, 1) * 255).astype(np.uint8)
         img = cv2.resize(img, (256, 256))
         
@@ -240,3 +268,11 @@ class RealVAENode(BaseNode):
             ("Latent Dim", "latent_dim", self.latent_dim, None),
             ("Image Size", "img_size", self.img_size, None)
         ]
+
+    def close(self):
+        # Clean up torch model
+        if hasattr(self, 'model') and self.model is not None:
+            del self.model
+            if TORCH_AVAILABLE and torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        super().close()
