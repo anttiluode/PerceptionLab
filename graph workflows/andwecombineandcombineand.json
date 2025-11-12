@@ -67,7 +67,7 @@
         "w": 160,
         "h": 120,
         "particle_count": 200,
-        "time": 25.5800000000012
+        "time": 30.13000000000191
       }
     },
     {
@@ -124,7 +124,7 @@
         "num_singularities": 100,
         "color_scheme": "plasma",
         "device": "cuda",
-        "total_mass": -591.139892578125
+        "total_mass": -315.5062561035156
       }
     },
     {
@@ -184,15 +184,15 @@
         },
         "node_title": "Instanton Train",
         "max_instantons": 20,
-        "tunneling_rate": -147.72381591796875,
-        "coupling_strength": 1.7386620491743088,
+        "tunneling_rate": -78.75084686279297,
+        "coupling_strength": 1.6825129091739655,
         "vacuum_bias": 0.0,
         "instantons": [],
-        "winding_number": 0.48,
-        "vacuum_0_density": 0.9926215277777778,
-        "vacuum_1_density": 0.007378472222222222,
+        "winding_number": 0.44,
+        "vacuum_0_density": 0.9922960069444444,
+        "vacuum_1_density": 0.007703993055555556,
         "average_action": 0.0,
-        "time": 118.89999999999752,
+        "time": 164.39999999999495,
         "last_spawn_time": 0.0,
         "dt": 0.1
       }
@@ -248,7 +248,7 @@
         "node_title": "HoloEncoder (Compress)",
         "_error": false,
         "mode": "Compress",
-        "compression_ratio": 0.1,
+        "compression_ratio": 1,
         "reference_phase_seed": 42,
         "_last_seed": 42
       }
