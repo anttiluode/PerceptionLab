@@ -1,0 +1,445 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "CirculatorSwarmNode",
+      "pos_x": -696.0,
+      "pos_y": -50.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "vector_field_in": "image",
+          "repulsion": "signal",
+          "damping": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "input_data": {
+          "vector_field_in": [],
+          "repulsion": [],
+          "damping": []
+        },
+        "node_title": "Circulator Swarm",
+        "size": 256,
+        "particle_count": 300
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "DistanceFieldNode",
+      "pos_x": -463.0,
+      "pos_y": -56.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "threshold": "signal",
+          "invert": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "Distance Field",
+        "size": 256
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "GlobeProjectorNode",
+      "pos_x": -217.0,
+      "pos_y": -61.0,
+      "width": 201.0,
+      "height": 199.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Globe Projector",
+        "zoom": 1.0,
+        "spin_x": 0.0,
+        "spin_y": 0.0,
+        "lighting": true,
+        "output_size": 256
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "EquivalenceNode",
+      "pos_x": -87.0,
+      "pos_y": -246.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "force_spectrum_out": "spectrum"
+        },
+        "node_title": "Equivalence (E=m*c^2)",
+        "spectrum_size": 512
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "AutoExplorerNode",
+      "pos_x": -475.0,
+      "pos_y": -408.0,
+      "width": 365.0,
+      "height": 340.0,
+      "config": {
+        "inputs": {
+          "latent_in": "spectrum",
+          "speed": "signal",
+          "amplitude": "signal",
+          "chaos": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum",
+          "current_pc": "signal",
+          "phase": "signal"
+        },
+        "node_title": "Auto-Explorer",
+        "mode": "sequential",
+        "phase": 1010.2499999996289,
+        "current_pc": 160
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -691.0,
+      "pos_y": -410.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "LatentAnnealerNode",
+      "pos_x": -89.0,
+      "pos_y": -437.0,
+      "width": 266.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_in": "spectrum",
+          "force_in": "spectrum",
+          "diffusion": "signal",
+          "seed": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "node_title": "Latent Annealer",
+        "current_diffusion": 0.2,
+        "current_seed": 1234.0
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": 139.0,
+      "pos_y": -236.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "node_title": "Latent Assembler",
+        "latent_dim": 16
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "RealVAENode",
+      "pos_x": 194.0,
+      "pos_y": -439.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "latent_in": "spectrum",
+          "train": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "latent_out": "spectrum",
+          "loss": "signal"
+        },
+        "node_title": "Real VAE",
+        "latent_dim": 16,
+        "img_size": 64,
+        "current_loss": 0.010727914981544018,
+        "training_steps": 16697,
+        "max_buffer_size": 50
+      }
+    },
+    {
+      "id": 9,
+      "class_name": "HoloEncoderNode",
+      "pos_x": 201.0,
+      "pos_y": -37.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "signal_in": "complex_spectrum"
+        },
+        "outputs": {
+          "image_out": "image",
+          "signal_out_complex": "complex_spectrum",
+          "signal_out_real": "spectrum"
+        },
+        "node_title": "HoloEncoder (Compress)",
+        "_error": false,
+        "mode": "Compress",
+        "compression_ratio": 0.001,
+        "reference_phase_seed": 42,
+        "_last_seed": 42
+      }
+    },
+    {
+      "id": 10,
+      "class_name": "ImageMoireNode",
+      "pos_x": 426.0,
+      "pos_y": -422.0,
+      "width": 249.0,
+      "height": 238.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "peak_freq": "signal",
+          "bandwidth": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "Image to Moir\u00e9",
+        "resolution": 128,
+        "peak_freq": 0.1,
+        "bandwidth": 0.1
+      }
+    },
+    {
+      "id": 11,
+      "class_name": "DepthFromMathematicsNode",
+      "pos_x": 729.0,
+      "pos_y": -335.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "fractal_dim": "signal",
+          "complexity": "signal",
+          "depth_scale": "signal",
+          "relief_strength": "signal"
+        },
+        "outputs": {
+          "heightmap": "image",
+          "shaded": "image",
+          "normals": "image",
+          "max_depth": "signal",
+          "depth_variance": "signal"
+        },
+        "node_title": "Depth from Math",
+        "size": 256
+      }
+    },
+    {
+      "id": 12,
+      "class_name": "FractalAnalyzerNode",
+      "pos_x": 962.0,
+      "pos_y": -346.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fractal_beta": "signal",
+          "complexity": "signal",
+          "spectral_energy": "signal",
+          "spectrum_image": "image",
+          "fractal_twin": "image"
+        },
+        "node_title": "Fractal Analyzer (Robust)",
+        "size": 96,
+        "fit_range_min": 5,
+        "levels": 5,
+        "fractal_beta": -1.510937825011162,
+        "complexity_value": 0.744531087494419,
+        "measurement_method": "fractal_beta"
+      }
+    },
+    {
+      "id": 13,
+      "class_name": "GlobeProjectorNode",
+      "pos_x": 444.0,
+      "pos_y": -108.0,
+      "width": 231.0,
+      "height": 243.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Globe Projector",
+        "zoom": 1.0,
+        "spin_x": 0.0,
+        "spin_y": 0.0,
+        "lighting": true,
+        "output_size": 256
+      }
+    },
+    {
+      "id": 14,
+      "class_name": "TemporalBlurNode",
+      "pos_x": 731.0,
+      "pos_y": -76.0,
+      "width": 390.0,
+      "height": 208.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Temporal Blur (Ghosting)",
+        "feedback": 0.9
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 2,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image_out",
+      "to_node_id": 3,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "force_spectrum_out",
+      "to_node_id": 4,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "latent_out",
+      "to_node_id": 6,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "latent_out",
+      "to_node_id": 7,
+      "to_port": "latent_base"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "latent_out",
+      "to_node_id": 8,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal",
+      "to_node_id": 8,
+      "to_port": "train"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "image_out",
+      "to_node_id": 9,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "image_out",
+      "to_node_id": 10,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "image",
+      "to_node_id": 11,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 11,
+      "from_port": "heightmap",
+      "to_node_id": 12,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 12,
+      "from_port": "spectrum_image",
+      "to_node_id": 13,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 13,
+      "from_port": "image_out",
+      "to_node_id": 14,
+      "to_port": "image_in"
+    }
+  ]
+}
