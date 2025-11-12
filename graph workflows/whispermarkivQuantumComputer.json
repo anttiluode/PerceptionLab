@@ -1,0 +1,334 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -600.0,
+      "pos_y": 100.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "node_title": "Initial State Seed",
+        "value": 0.5
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "ChaoticFieldNode",
+      "pos_x": -350.0,
+      "pos_y": 50.0,
+      "width": 250.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "state_in": "spectrum",
+          "bias_vector": "spectrum",
+          "measurement_trigger": "signal",
+          "chaos_strength": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "field_state": "spectrum",
+          "collapsed_state": "spectrum",
+          "coherence": "signal",
+          "energy": "signal"
+        },
+        "node_title": "Chaotic Field",
+        "dimensions": 16,
+        "chaos_strength": 1.0
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "WhisperGateNode",
+      "pos_x": -350.0,
+      "pos_y": 280.0,
+      "width": 200.0,
+      "height": 150.0,
+      "config": {
+        "inputs": {
+          "state_in": "spectrum",
+          "strength": "signal",
+          "target": "spectrum"
+        },
+        "outputs": {
+          "bias_out": "spectrum",
+          "gate_active": "signal"
+        },
+        "node_title": "Whisper Gate",
+        "gate_type": "hadamard",
+        "strength": 0.01
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "CoherenceMonitorNode",
+      "pos_x": -50.0,
+      "pos_y": 50.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "state": "spectrum"
+        },
+        "outputs": {
+          "coherence": "signal",
+          "entropy": "signal",
+          "purity": "signal",
+          "stability": "signal",
+          "energy": "signal"
+        },
+        "node_title": "Coherence Monitor"
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "MeasurementCollapseNode",
+      "pos_x": -50.0,
+      "pos_y": 260.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "state_in": "spectrum",
+          "trigger": "signal",
+          "basis": "spectrum"
+        },
+        "outputs": {
+          "state_out": "spectrum",
+          "collapsed_state": "spectrum",
+          "measurement_result": "signal",
+          "probability": "signal",
+          "measured": "signal"
+        },
+        "node_title": "Measurement",
+        "collapse_strength": 10.0
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "GateValidatorNode",
+      "pos_x": 200.0,
+      "pos_y": 50.0,
+      "width": 220.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "initial_state": "spectrum",
+          "final_state": "spectrum",
+          "gate_type": "signal",
+          "trigger": "signal"
+        },
+        "outputs": {
+          "is_valid": "signal",
+          "deviation": "signal",
+          "confidence": "signal",
+          "p_value": "signal"
+        },
+        "node_title": "Gate Validator",
+        "num_trials": 50
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "DecoherenceMonitorNode",
+      "pos_x": 200.0,
+      "pos_y": 260.0,
+      "width": 220.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "coherence_in": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "decoherence_rate": "signal",
+          "half_life": "signal",
+          "projected_lifetime": "signal",
+          "decay_fit_quality": "signal"
+        },
+        "node_title": "Decoherence Monitor"
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "ValidationSuiteNode",
+      "pos_x": 460.0,
+      "pos_y": 50.0,
+      "width": 400.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "system_state": "spectrum",
+          "trigger_test": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "test_active": "signal",
+          "current_test": "signal",
+          "overall_pass": "signal",
+          "gate_command": "signal",
+          "measure_trigger": "signal",
+          "report": "spectrum"
+        },
+        "node_title": "Validation Suite"
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "ButtonNode",
+      "pos_x": -600.0,
+      "pos_y": 250.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "node_title": "Run Tests",
+        "label": "RUN VALIDATION",
+        "mode": "Toggle",
+        "value": 0.0
+      }
+    },
+    {
+      "id": 9,
+      "class_name": "ButtonNode",
+      "pos_x": -600.0,
+      "pos_y": 380.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "node_title": "Reset",
+        "label": "RESET",
+        "mode": "Hold",
+        "value": 0.0
+      }
+    },
+    {
+      "id": 10,
+      "class_name": "DisplayNode",
+      "pos_x": 900.0,
+      "pos_y": 50.0,
+      "width": 256.0,
+      "height": 256.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Field Visualization"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "chaos_strength"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "field_state",
+      "to_node_id": 2,
+      "to_port": "state_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "bias_out",
+      "to_node_id": 1,
+      "to_port": "bias_vector"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "field_state",
+      "to_node_id": 3,
+      "to_port": "state"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "field_state",
+      "to_node_id": 4,
+      "to_port": "state_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "field_state",
+      "to_node_id": 5,
+      "to_port": "initial_state"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "state_out",
+      "to_node_id": 5,
+      "to_port": "final_state"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "coherence",
+      "to_node_id": 6,
+      "to_port": "coherence_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "field_state",
+      "to_node_id": 7,
+      "to_port": "system_state"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "gate_command",
+      "to_node_id": 5,
+      "to_port": "gate_type"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "measure_trigger",
+      "to_node_id": 4,
+      "to_port": "trigger"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "signal_out",
+      "to_node_id": 7,
+      "to_port": "trigger_test"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "signal_out",
+      "to_node_id": 5,
+      "to_port": "trigger"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "reset"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "signal_out",
+      "to_node_id": 6,
+      "to_port": "reset"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "signal_out",
+      "to_node_id": 7,
+      "to_port": "reset"
+    }
+  ]
+}

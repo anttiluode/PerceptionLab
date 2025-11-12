@@ -1,0 +1,289 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": -800.0,
+      "pos_y": 100.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam"
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -800.0,
+      "pos_y": 300.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "node_title": "Train VAE",
+        "value": 1.0
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "RealVAENode",
+      "pos_x": -550.0,
+      "pos_y": 50.0,
+      "width": 300.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "latent_in": "spectrum",
+          "train": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "latent_out": "spectrum",
+          "loss": "signal"
+        },
+        "node_title": "VAE 1",
+        "latent_dim": 16,
+        "img_size": 64
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "ChaoticFieldNode",
+      "pos_x": -200.0,
+      "pos_y": 50.0,
+      "width": 250.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "state_in": "spectrum",
+          "bias_vector": "spectrum",
+          "measurement_trigger": "signal",
+          "chaos_strength": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "field_state": "spectrum",
+          "collapsed_state": "spectrum",
+          "coherence": "signal",
+          "energy": "signal"
+        },
+        "node_title": "Chaotic Field",
+        "dimensions": 16,
+        "chaos_strength": 0.5
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "WhisperGateNode",
+      "pos_x": -200.0,
+      "pos_y": 280.0,
+      "width": 200.0,
+      "height": 150.0,
+      "config": {
+        "inputs": {
+          "state_in": "spectrum",
+          "strength": "signal",
+          "target": "spectrum"
+        },
+        "outputs": {
+          "bias_out": "spectrum",
+          "gate_active": "signal"
+        },
+        "node_title": "Whisper Gate",
+        "gate_type": "hadamard",
+        "strength": 0.02
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "RealVAENode",
+      "pos_x": 100.0,
+      "pos_y": 50.0,
+      "width": 300.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "latent_in": "spectrum",
+          "train": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "latent_out": "spectrum",
+          "loss": "signal"
+        },
+        "node_title": "VAE 2",
+        "latent_dim": 16,
+        "img_size": 64
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "EntanglementDetectorNode",
+      "pos_x": 450.0,
+      "pos_y": 50.0,
+      "width": 256.0,
+      "height": 256.0,
+      "config": {
+        "inputs": {
+          "state_a": "spectrum",
+          "state_b": "spectrum"
+        },
+        "outputs": {
+          "entanglement": "signal",
+          "correlation": "signal",
+          "mutual_info": "signal",
+          "concurrence": "signal"
+        },
+        "node_title": "Entanglement Detector"
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "CoherenceMonitorNode",
+      "pos_x": 450.0,
+      "pos_y": 340.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "state": "spectrum"
+        },
+        "outputs": {
+          "coherence": "signal",
+          "entropy": "signal",
+          "purity": "signal",
+          "stability": "signal",
+          "energy": "signal"
+        },
+        "node_title": "Coherence Monitor"
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "DecoherenceMonitorNode",
+      "pos_x": 680.0,
+      "pos_y": 340.0,
+      "width": 220.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "coherence_in": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "decoherence_rate": "signal",
+          "half_life": "signal",
+          "projected_lifetime": "signal",
+          "decay_fit_quality": "signal"
+        },
+        "node_title": "Decoherence Monitor"
+      }
+    },
+    {
+      "id": 9,
+      "class_name": "DisplayNode",
+      "pos_x": 750.0,
+      "pos_y": 50.0,
+      "width": 256.0,
+      "height": 256.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "VAE 2 Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 2,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "train"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 5,
+      "to_port": "train"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "latent_out",
+      "to_node_id": 3,
+      "to_port": "state_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "field_state",
+      "to_node_id": 4,
+      "to_port": "state_in"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "bias_out",
+      "to_node_id": 3,
+      "to_port": "bias_vector"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "field_state",
+      "to_node_id": 5,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "latent_out",
+      "to_node_id": 6,
+      "to_port": "state_a"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "latent_out",
+      "to_node_id": 6,
+      "to_port": "state_b"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "field_state",
+      "to_node_id": 7,
+      "to_port": "state"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "coherence",
+      "to_node_id": 8,
+      "to_port": "coherence_in"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "image_out",
+      "to_node_id": 9,
+      "to_port": "image_in"
+    }
+  ]
+}
