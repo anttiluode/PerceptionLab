@@ -177,6 +177,77 @@ class BlochQubitNode(BaseNode):
             ("Effective ħ (hbar)", "hbar", self.hbar, None),
         ]
 
+=== FILE: ButtonNode.py ===
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+import cv2
+import numpy as np
+
+class ButtonNode(BaseNode):
+    """
+    A simple clickable button node.
+    """
+    NODE_CATEGORY = "Input"
+    NODE_COLOR = QtGui.QColor(200, 200, 100)
+
+    def __init__(self, label="Button", mode="Toggle"):
+        super().__init__()
+        self.node_title = "Button"
+        self.label = str(label)
+        self.mode = str(mode)  # "Toggle" or "Hold"
+        
+        self.inputs = {}
+        self.outputs = {'signal_out': 'signal'}
+        
+        self.is_pressed = False
+        self.value = 0.0
+
+    def get_output(self, port_name):
+        if port_name == 'signal_out':
+            return self.value
+        return None
+
+    def step(self):
+        if self.mode == "Hold":
+            self.value = 1.0 if self.is_pressed else 0.0
+        # For "Toggle", value is changed in mousePressEvent
+
+    def mousePressEvent(self, event):
+        self.is_pressed = True
+        if self.mode == "Toggle":
+            self.value = 1.0 - self.value # Flip
+        self.update_display()
+
+    def mouseReleaseEvent(self, event):
+        self.is_pressed = False
+        self.update_display()
+
+    def get_display_image(self):
+        w, h = 256, 128
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        if self.value > 0.5:
+            # Active state
+            cv2.rectangle(img, (0, 0), (w-1, h-1), (0, 255, 0), -1)
+            cv2.putText(img, self.label, (w//2 - 4*len(self.label), h//2),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
+        else:
+            # Inactive state
+            cv2.rectangle(img, (5, 5), (w-6, h-6), (100, 100, 100), -1)
+            cv2.putText(img, self.label, (w//2 - 4*len(self.label), h//2),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+
+    def get_config_options(self):
+        return [
+            ("Label", "label", self.label, None),
+            ("Mode", "mode", self.mode, ["Toggle", "Hold"])
+        ]
+
 === FILE: CorticalReconstructionNode.py ===
 
 """
@@ -413,6 +484,56 @@ class CorticalReconstructionNode(BaseNode):
             ("Gamma Influence", "gamma_influence", self.gamma_influence, None),
             ("Noise Level", "noise_level", self.noise_level, None),
         ]
+
+=== FILE: DisplayNode.py ===
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+import cv2
+import numpy as np
+
+class DisplayNode(BaseNode):
+    """
+    Displays an image input directly.
+    """
+    NODE_CATEGORY = "Output"
+    NODE_COLOR = QtGui.QColor(100, 100, 150)
+
+    def __init__(self):
+        super().__init__()
+        self.node_title = "Display"
+        self.inputs = {'image_in': 'image'}
+        self.outputs = {}
+        self.image = np.zeros((256, 256, 3), dtype=np.uint8)
+
+    def step(self):
+        img_in = self.get_blended_input('image_in', 'first')
+        if img_in is not None:
+            # Convert to 0-255 uint8 BGR
+            if img_in.dtype == np.float32 or img_in.dtype == np.float64:
+                img = (np.clip(img_in, 0, 1) * 255).astype(np.uint8)
+            else:
+                img = img_in.astype(np.uint8)
+
+            # Handle grayscale
+            if img.ndim == 2:
+                img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+            
+            # Handle RGB
+            elif img.shape[2] == 3:
+                # Assuming input is RGB, convert to BGR for display
+                # img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) 
+                # ^ Let's assume the host handles RGB, if not, uncomment this
+                pass
+            
+            self.image = cv2.resize(img, (256, 256))
+        else:
+            self.image = (self.image * 0.9).astype(np.uint8) # Fade out
+
+    def get_display_image(self):
+        return QtGui.QImage(self.image.data, 256, 256, 256*3, QtGui.QImage.Format.Format_RGB888)
 
 === FILE: EDF_EEG_loader.py ===
 
@@ -715,6 +836,89 @@ class EEGSimulatorNode(BaseNode):
             ("Channel", "selected_channel", self.selected_channel, channel_options)
         ]
 
+
+=== FILE: FitzHughNagumoNode.py ===
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+import numpy as np
+import cv2
+
+class FitzHughNagumoNode(BaseNode):
+    """
+    Simulates a FitzHugh-Nagumo neuron model.
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(100, 180, 180)
+
+    def __init__(self, a=0.7, b=0.8, tau=12.5):
+        super().__init__()
+        self.node_title = "FHN Neuron"
+        
+        self.inputs = {'pain_stimulus': 'signal'}
+        self.outputs = {
+            'pain_out': 'signal',
+            'stability_metric': 'signal'
+        }
+        
+        self.a = float(a)
+        self.b = float(b)
+        self.tau = float(tau)
+        
+        self.v = 0.0  # Membrane potential ("pain")
+        self.w = 0.0  # Recovery variable ("stability")
+        self.dt = 0.1 # Simulation time step
+
+    def step(self):
+        # Get input current
+        I = self.get_blended_input('pain_stimulus', 'sum') or 0.0
+        
+        # Model equations (Euler integration)
+        dv = self.v - (self.v**3 / 3) - self.w + I
+        dw = (self.v + self.a - self.b * self.w) / self.tau
+        
+        self.v += dv * self.dt
+        self.w += dw * self.dt
+        
+        # Clamp values to prevent explosion
+        self.v = np.clip(self.v, -5, 5)
+        self.w = np.clip(self.w, -5, 5)
+
+    def get_output(self, port_name):
+        if port_name == 'pain_out':
+            return self.v
+        if port_name == 'stability_metric':
+            return self.w
+        return None
+
+    def get_display_image(self):
+        w, h = 256, 128
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        # Map v and w to screen
+        v_y = int(h/2 - (self.v / 3.0) * (h/2))
+        w_y = int(h/2 - (self.w / 3.0) * (h/2))
+        
+        cv2.circle(img, (w//2, v_y), 8, (0, 255, 255), -1) # 'v' (pain)
+        cv2.circle(img, (w//2, w_y), 4, (255, 0, 0), -1)   # 'w' (stability)
+
+        cv2.line(img, (0, h//2), (w, h//2), (50,50,50), 1)
+        
+        cv2.putText(img, f"Pain (v): {self.v:.2f}", (5, 15), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 255), 1)
+        cv2.putText(img, f"Stability (w): {self.w:.2f}", (5, 30), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+
+    def get_config_options(self):
+        return [
+            ("a", "a", self.a, None),
+            ("b", "b", self.b, None),
+            ("tau", "tau", self.tau, None)
+        ]
 
 === FILE: FreqToMidiNode.py ===
 
@@ -2300,6 +2504,93 @@ class ReactiveSpaceNode(BaseNode):
             ("Color Scheme", "color_scheme", self.color_scheme, color_options),
         ]
 
+
+=== FILE: SpringNode.py ===
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+import numpy as np
+import cv2
+import time
+
+class SpringNode(BaseNode):
+    """
+    Simulates a 1D damped spring.
+    F = -k*x - c*v
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(100, 180, 100)
+
+    def __init__(self, mass=1.0, stiffness=0.1, damping=0.05):
+        super().__init__()
+        self.node_title = "Spring (1D)"
+        
+        self.inputs = {'target_pos': 'signal'}
+        self.outputs = {'position': 'signal'}
+        
+        self.mass = float(mass)
+        self.stiffness = float(stiffness)
+        self.damping = float(damping)
+        
+        self.position = 0.0
+        self.velocity = 0.0
+        self.last_time = time.time()
+
+    def step(self):
+        # Calculate delta time
+        current_time = time.time()
+        dt = current_time - self.last_time
+        if dt > 0.1: # Clamp large timesteps (e.g., on load)
+            dt = 0.1
+        self.last_time = current_time
+
+        # Get target
+        target = self.get_blended_input('target_pos', 'sum') or 0.0
+        
+        # Calculate forces
+        displacement = self.position - target
+        spring_force = -self.stiffness * displacement
+        damping_force = -self.damping * self.velocity
+        total_force = spring_force + damping_force
+        
+        # Update physics (Euler integration)
+        acceleration = total_force / self.mass
+        self.velocity += acceleration * dt
+        self.position += self.velocity * dt
+
+    def get_output(self, port_name):
+        if port_name == 'position':
+            return self.position
+        return None
+
+    def get_display_image(self):
+        w, h = 256, 128
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        # Draw position
+        pos_x = int(np.clip((self.position + 2) / 4.0, 0, 1) * w)
+        cv2.circle(img, (pos_x, h//2), 10, (0, 255, 0), -1)
+        
+        # Draw target
+        target = self.get_blended_input('target_pos', 'sum') or 0.0
+        target_x = int(np.clip((target + 2) / 4.0, 0, 1) * w)
+        cv2.circle(img, (target_x, h//2), 5, (0, 0, 255), -1)
+        
+        cv2.putText(img, f"Pos: {self.position:.2f}", (5, 15), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        cv2.putText(img, f"Vel: {self.velocity:.2f}", (5, 30), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+
+    def get_config_options(self):
+        return [
+            ("Mass", "mass", self.mass, None),
+            ("Stiffness", "stiffness", self.stiffness, None),
+            ("Damping", "damping", self.damping, None)
+        ]
 
 === FILE: U1.py ===
 
@@ -4322,6 +4613,217 @@ class ChaoticControlNode(BaseNode):
             ("Beta (β)", "beta", self.beta, None),
         ]
 
+=== FILE: chaoticfieldnode.py ===
+
+"""
+Chaotic Field Node - Ultra-sensitive nonlinear dynamical system
+Based on Whisper Quantum Computer principles but integrated for Perception Lab
+
+Acts as a computational substrate for probabilistic operations on latent vectors.
+Uses Lorenz attractor dynamics extended to N dimensions.
+"""
+
+import numpy as np
+import cv2
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+class ChaoticFieldNode(BaseNode):
+    """
+    Simulates a chaotic attractor field that can be gently biased.
+    Replaces simple Gaussian noise with structured chaotic dynamics.
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(100, 100, 220)
+    
+    def __init__(self, dimensions=16, chaos_strength=1.0):
+        super().__init__()
+        self.node_title = "Chaotic Field"
+        
+        self.inputs = {
+            'state_in': 'spectrum',  # Input latent vector
+            'bias_vector': 'spectrum',  # Gentle statistical bias (Whisper Gate)
+            'measurement_trigger': 'signal',  # Collapse to definite state
+            'chaos_strength': 'signal',  # Modulate chaos intensity
+            'reset': 'signal'
+        }
+        self.outputs = {
+            'field_state': 'spectrum',  # Current chaotic state
+            'collapsed_state': 'spectrum',  # After measurement
+            'coherence': 'signal',  # How stable the field is
+            'energy': 'signal'  # Field energy level
+        }
+        
+        self.dimensions = int(dimensions)
+        self.chaos_strength = float(chaos_strength)
+        
+        # Internal chaotic state
+        self.field = np.random.randn(self.dimensions) * 0.01
+        self.velocity = np.zeros(self.dimensions)
+        self.coherence_level = 1.0
+        self.energy_level = 0.0
+        
+        # Lorenz-like parameters for chaos
+        self.sigma = 10.0
+        self.rho = 28.0
+        self.beta = 8.0 / 3.0
+        
+        # History for coherence tracking
+        self.history = []
+        self.max_history = 50
+        
+    def step(self):
+        state_in = self.get_blended_input('state_in', 'first')
+        bias = self.get_blended_input('bias_vector', 'first')
+        measure = self.get_blended_input('measurement_trigger', 'sum') or 0.0
+        chaos_mod = self.get_blended_input('chaos_strength', 'sum')
+        reset_signal = self.get_blended_input('reset', 'sum') or 0.0
+        
+        if chaos_mod is not None:
+            chaos_strength = chaos_mod
+        else:
+            chaos_strength = self.chaos_strength
+            
+        # Reset field
+        if reset_signal > 0.5:
+            if state_in is not None:
+                self.field = state_in.copy() * 0.1  # Seed from input
+            else:
+                self.field = np.random.randn(self.dimensions) * 0.01
+            self.coherence_level = 1.0
+            self.history = []
+            
+        # Inject input state as gentle attraction
+        if state_in is not None and len(state_in) >= self.dimensions:
+            attraction = (state_in[:self.dimensions] - self.field) * 0.01
+            self.field += attraction
+            
+        # Chaotic evolution (Lorenz attractor per triplet of dimensions)
+        dt = 0.01 * chaos_strength
+        
+        # Process dimensions in groups of 3 (Lorenz triplets)
+        for i in range(0, self.dimensions - 2, 3):
+            x, y, z = self.field[i:i+3]
+            
+            # Lorenz equations
+            dx = self.sigma * (y - x)
+            dy = x * (self.rho - z) - y
+            dz = x * y - self.beta * z
+            
+            # Apply gentle bias (Whisper Gate influence)
+            if bias is not None and i + 2 < len(bias):
+                dx += bias[i] * 0.001  # Ultra-light influence
+                dy += bias[i+1] * 0.001
+                dz += bias[i+2] * 0.001
+                
+            self.velocity[i:i+3] = [dx, dy, dz]
+            
+        # Handle remaining dimensions (if not divisible by 3)
+        remainder = self.dimensions % 3
+        if remainder > 0:
+            idx = self.dimensions - remainder
+            # Simple damped oscillator for remaining dims
+            self.velocity[idx:] = -self.field[idx:] * 0.5
+            
+        # Update field
+        self.field += self.velocity * dt
+        
+        # Add ultra-light noise (like audio hardware noise in Whisper)
+        self.field += np.random.randn(self.dimensions) * 0.0001 * chaos_strength
+        
+        # Calculate energy
+        self.energy_level = np.sum(self.field ** 2)
+        
+        # Store history
+        self.history.append(self.field.copy())
+        if len(self.history) > self.max_history:
+            self.history.pop(0)
+            
+        # Calculate coherence (low variance over time = high coherence)
+        if len(self.history) > 10:
+            recent = np.array(self.history[-10:])
+            variance = np.var(recent, axis=0).mean()
+            self.coherence_level = 1.0 / (1.0 + variance * 10.0)
+        
+        # Coherence degrades naturally over time (decoherence)
+        self.coherence_level *= 0.998
+        
+        # Measurement collapses the field
+        if measure > 0.5:
+            # "Measure" by amplifying dominant modes and suppressing others
+            self.collapsed = np.tanh(self.field * 5.0)
+            self.coherence_level = 0.0  # Measurement destroys coherence
+        else:
+            self.collapsed = self.field.copy()
+            
+    def get_output(self, port_name):
+        if port_name == 'field_state':
+            return self.field.astype(np.float32)
+        elif port_name == 'collapsed_state':
+            return self.collapsed.astype(np.float32)
+        elif port_name == 'coherence':
+            return float(self.coherence_level)
+        elif port_name == 'energy':
+            return float(self.energy_level)
+        return None
+        
+    def get_display_image(self):
+        """Visualize field state and coherence"""
+        w, h = 256, 256
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        # Top half: Field state as waveform
+        bar_width = max(1, w // self.dimensions)
+        
+        # Normalize field for display
+        field_norm = self.field.copy()
+        field_max = np.abs(field_norm).max()
+        if field_max > 1e-6:
+            field_norm = field_norm / field_max
+            
+        for i, val in enumerate(field_norm):
+            x = i * bar_width
+            h_bar = int(abs(val) * 80)
+            y_base = 100
+            
+            # Color by value sign
+            if val >= 0:
+                color = (0, int(255 * abs(val)), 255)
+                cv2.rectangle(img, (x, y_base-h_bar), (x+bar_width-1, y_base), color, -1)
+            else:
+                color = (255, int(255 * abs(val)), 0)
+                cv2.rectangle(img, (x, y_base), (x+bar_width-1, y_base+h_bar), color, -1)
+                
+        # Baseline
+        cv2.line(img, (0, 100), (w, 100), (100,100,100), 1)
+        
+        # Bottom half: Coherence indicator
+        coherence_width = int(self.coherence_level * w)
+        coherence_color = (0, int(255 * self.coherence_level), 0)
+        cv2.rectangle(img, (0, 180), (coherence_width, 200), coherence_color, -1)
+        
+        # Text info
+        cv2.putText(img, f"Coherence: {self.coherence_level:.3f}", (5, 20), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        cv2.putText(img, f"Energy: {self.energy_level:.3f}", (5, 40), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        
+        # Chaos indicator
+        chaos_text = "CHAOTIC" if self.coherence_level < 0.3 else "COHERENT"
+        chaos_color = (0, 0, 255) if self.coherence_level < 0.3 else (0, 255, 0)
+        cv2.putText(img, chaos_text, (5, h-10), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, chaos_color, 1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+        
+    def get_config_options(self):
+        return [
+            ("Dimensions", "dimensions", self.dimensions, None),
+            ("Chaos Strength", "chaos_strength", self.chaos_strength, None)
+        ]
+
 === FILE: checkerboardnode.py ===
 
 """
@@ -4961,6 +5463,160 @@ class CognitiveSetAnalyzerNode(BaseNode):
                 ("Similarity Matrix", "Similarity Matrix")
             ]),
         ]
+
+=== FILE: coherencemonitornode.py ===
+
+"""
+Coherence Monitor Node - Measures quantum-like properties of latent states
+Tracks entropy, purity, stability - the hallmarks of coherent states
+"""
+
+import numpy as np
+import cv2
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+class CoherenceMonitorNode(BaseNode):
+    """
+    Monitors how "quantum-like" a state is by tracking multiple metrics.
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(180, 180, 100)
+    
+    def __init__(self):
+        super().__init__()
+        self.node_title = "Coherence Monitor"
+        
+        self.inputs = {
+            'state': 'spectrum'
+        }
+        self.outputs = {
+            'coherence': 'signal',  # Overall coherence (0-1)
+            'entropy': 'signal',  # Shannon entropy (normalized)
+            'purity': 'signal',  # State purity (0-1)
+            'stability': 'signal',  # Temporal stability (0-1)
+            'energy': 'signal'  # State energy
+        }
+        
+        self.history = []
+        self.max_history = 100
+        
+        # Metrics
+        self.coherence_value = 0.0
+        self.entropy_value = 0.0
+        self.purity_value = 0.0
+        self.stability_value = 0.0
+        self.energy_value = 0.0
+        
+    def step(self):
+        state = self.get_blended_input('state', 'first')
+        
+        if state is None:
+            return
+            
+        # Store history
+        self.history.append(state.copy())
+        if len(self.history) > self.max_history:
+            self.history.pop(0)
+            
+        # 1. Entropy (low = coherent, pure state)
+        # Convert to probability distribution
+        state_abs = np.abs(state)
+        state_sum = state_abs.sum()
+        if state_sum > 1e-9:
+            probs = state_abs / state_sum
+            # Shannon entropy
+            self.entropy_value = -np.sum(probs * np.log(probs + 1e-9))
+            # Normalize by max possible entropy
+            max_entropy = np.log(len(state))
+            self.entropy_value = self.entropy_value / max_entropy
+        else:
+            self.entropy_value = 0.0
+            
+        # 2. Purity (high = pure state, low = mixed state)
+        # For density matrix ρ, purity = Tr(ρ²)
+        # For state vector, purity ≈ sum of squared probabilities
+        if state_sum > 1e-9:
+            probs = state_abs / state_sum
+            self.purity_value = np.sum(probs ** 2)
+        else:
+            self.purity_value = 0.0
+            
+        # 3. Temporal stability (low variance over time = coherent)
+        if len(self.history) > 10:
+            recent = np.array(self.history[-10:])
+            # Compute variance across time for each dimension
+            variance = np.var(recent, axis=0).mean()
+            # Convert to stability metric (high = stable)
+            self.stability_value = 1.0 / (1.0 + variance * 10.0)
+        else:
+            self.stability_value = 0.5
+            
+        # 4. Energy (magnitude of state vector)
+        self.energy_value = np.sum(state ** 2)
+        
+        # 5. Overall coherence (combination of metrics)
+        # High purity + low entropy + high stability = high coherence
+        self.coherence_value = (
+            self.purity_value * 0.4 +
+            (1.0 - self.entropy_value) * 0.3 +
+            self.stability_value * 0.3
+        )
+        
+    def get_output(self, port_name):
+        if port_name == 'coherence':
+            return float(self.coherence_value)
+        elif port_name == 'entropy':
+            return float(self.entropy_value)
+        elif port_name == 'purity':
+            return float(self.purity_value)
+        elif port_name == 'stability':
+            return float(self.stability_value)
+        elif port_name == 'energy':
+            return float(self.energy_value)
+        return None
+        
+    def get_display_image(self):
+        """Visualize all coherence metrics"""
+        w, h = 256, 256
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        # Draw metrics as bars
+        metrics = [
+            ("Coherence", self.coherence_value, (0, 255, 255)),
+            ("Purity", self.purity_value, (0, 255, 0)),
+            ("Stability", self.stability_value, (255, 255, 0)),
+            ("Entropy (inv)", 1.0 - self.entropy_value, (255, 0, 255))
+        ]
+        
+        bar_height = h // len(metrics)
+        
+        for i, (name, value, color) in enumerate(metrics):
+            y_start = i * bar_height
+            bar_width_px = int(value * (w - 60))
+            
+            # Draw bar
+            cv2.rectangle(img, (50, y_start + 10), (50 + bar_width_px, y_start + bar_height - 10),
+                         color, -1)
+            
+            # Draw label
+            cv2.putText(img, name, (5, y_start + bar_height // 2 + 5),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+                       
+            # Draw value
+            cv2.putText(img, f"{value:.3f}", (w - 50, y_start + bar_height // 2 + 5),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        
+        # Overall status
+        status = "COHERENT" if self.coherence_value > 0.7 else "DECOHERENT" if self.coherence_value < 0.3 else "MIXED"
+        status_color = (0, 255, 0) if self.coherence_value > 0.7 else (0, 0, 255) if self.coherence_value < 0.3 else (255, 255, 0)
+        
+        cv2.putText(img, status, (10, h - 10),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, status_color, 2)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
 
 === FILE: conscious_galaxy_node.py ===
 
@@ -6190,6 +6846,188 @@ class ReactionDiffusionNode(BaseNode):
         elif port_name == 'pattern_energy':
             return self.pattern_energy
         return None
+
+=== FILE: decoherenceratemonitor.py ===
+
+"""
+Decoherence Rate Monitor - Measures how fast quantum-like states decay
+Tracks the rate at which coherence is lost over time
+"""
+
+import numpy as np
+import cv2
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+class DecoherenceMonitorNode(BaseNode):
+    """
+    Monitors decoherence rate by tracking coherence decay over time.
+    Fits exponential decay model to coherence measurements.
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(150, 150, 200)
+    
+    def __init__(self):
+        super().__init__()
+        self.node_title = "Decoherence Monitor"
+        
+        self.inputs = {
+            'coherence_in': 'signal',
+            'reset': 'signal'
+        }
+        self.outputs = {
+            'decoherence_rate': 'signal',  # Rate constant (1/frames)
+            'half_life': 'signal',  # Frames until coherence halves
+            'projected_lifetime': 'signal',  # Frames until coherence ~0
+            'decay_fit_quality': 'signal'  # R² of exponential fit
+        }
+        
+        self.coherence_history = []
+        self.time_stamps = []
+        self.max_history = 500
+        
+        self.decoherence_rate = 0.0
+        self.half_life = 0.0
+        self.lifetime = 0.0
+        self.fit_quality = 0.0
+        
+        self.frame_count = 0
+        
+    def step(self):
+        coherence = self.get_blended_input('coherence_in', 'sum')
+        reset = self.get_blended_input('reset', 'sum') or 0.0
+        
+        if reset > 0.5:
+            self.coherence_history = []
+            self.time_stamps = []
+            self.frame_count = 0
+            
+        if coherence is not None:
+            self.coherence_history.append(coherence)
+            self.time_stamps.append(self.frame_count)
+            self.frame_count += 1
+            
+            if len(self.coherence_history) > self.max_history:
+                self.coherence_history.pop(0)
+                self.time_stamps.pop(0)
+                
+        # Fit exponential decay if enough data
+        if len(self.coherence_history) > 20:
+            self._fit_decay()
+            
+    def _fit_decay(self):
+        """Fit exponential decay: C(t) = C₀ * exp(-λt)"""
+        times = np.array(self.time_stamps)
+        coherences = np.array(self.coherence_history)
+        
+        # Remove zeros and negative values for log fit
+        valid = coherences > 1e-6
+        if valid.sum() < 10:
+            return
+            
+        times = times[valid]
+        coherences = coherences[valid]
+        
+        # Linear fit in log space: log(C) = log(C₀) - λt
+        log_coherences = np.log(coherences)
+        
+        # Fit line
+        coeffs = np.polyfit(times - times[0], log_coherences, 1)
+        self.decoherence_rate = -coeffs[0]  # λ = -slope
+        
+        # Half-life: t₁/₂ = ln(2) / λ
+        if self.decoherence_rate > 1e-6:
+            self.half_life = np.log(2) / self.decoherence_rate
+            self.lifetime = 4.6 / self.decoherence_rate  # ~99% decay
+        else:
+            self.half_life = float('inf')
+            self.lifetime = float('inf')
+            
+        # Fit quality (R²)
+        predicted = np.exp(coeffs[1] + coeffs[0] * (times - times[0]))
+        ss_res = np.sum((coherences - predicted) ** 2)
+        ss_tot = np.sum((coherences - coherences.mean()) ** 2)
+        
+        if ss_tot > 1e-9:
+            self.fit_quality = 1.0 - (ss_res / ss_tot)
+        else:
+            self.fit_quality = 0.0
+            
+    def get_output(self, port_name):
+        if port_name == 'decoherence_rate':
+            return float(self.decoherence_rate)
+        elif port_name == 'half_life':
+            return float(min(self.half_life, 1000.0))  # Cap at 1000 frames
+        elif port_name == 'projected_lifetime':
+            return float(min(self.lifetime, 5000.0))  # Cap at 5000 frames
+        elif port_name == 'decay_fit_quality':
+            return float(self.fit_quality)
+        return None
+        
+    def get_display_image(self):
+        """Visualize coherence decay"""
+        w, h = 256, 256
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        if len(self.coherence_history) < 2:
+            cv2.putText(img, "Collecting data...", (10, 128),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
+            return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+            
+        # Plot coherence over time
+        times = np.array(self.time_stamps)
+        coherences = np.array(self.coherence_history)
+        
+        # Normalize time to plot width
+        time_range = times.max() - times.min() if times.max() > times.min() else 1
+        
+        for i in range(1, len(times)):
+            x1 = int((times[i-1] - times[0]) / time_range * w)
+            y1 = int((1.0 - coherences[i-1]) * (h - 50))
+            x2 = int((times[i] - times[0]) / time_range * w)
+            y2 = int((1.0 - coherences[i]) * (h - 50))
+            
+            x1 = np.clip(x1, 0, w-1)
+            y1 = np.clip(y1, 0, h-50)
+            x2 = np.clip(x2, 0, w-1)
+            y2 = np.clip(y2, 0, h-50)
+            
+            cv2.line(img, (x1, y1), (x2, y2), (0, 255, 255), 1)
+            
+        # Draw exponential fit if available
+        if self.decoherence_rate > 1e-6 and len(times) > 20:
+            for x in range(0, w, 2):
+                t = (x / w) * time_range
+                c = np.exp(-self.decoherence_rate * t)
+                y = int((1.0 - c) * (h - 50))
+                y = np.clip(y, 0, h-50)
+                cv2.circle(img, (x, y), 1, (255, 0, 0), -1)
+                
+        # Info text
+        cv2.putText(img, f"Rate: {self.decoherence_rate:.5f} /frame", (5, h-35),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.35, (255,255,255), 1)
+        cv2.putText(img, f"Half-life: {self.half_life:.1f} frames", (5, h-20),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.35, (255,255,255), 1)
+        cv2.putText(img, f"R²: {self.fit_quality:.3f}", (5, h-5),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.35, (255,255,255), 1)
+        
+        # Lifetime indicator
+        if self.half_life < 100:
+            color = (0, 0, 255)  # Red = fast decay
+            status = "RAPID DECAY"
+        elif self.half_life < 500:
+            color = (0, 255, 255)  # Yellow = moderate
+            status = "MODERATE"
+        else:
+            color = (0, 255, 0)  # Green = slow decay
+            status = "STABLE"
+            
+        cv2.putText(img, status, (5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+
 
 === FILE: dendriticattentionnode.py ===
 
@@ -7791,6 +8629,212 @@ class EmergentRealityNode(BaseNode):
             ("Initial Alpha (α)", "alpha_resistence", self.current_alpha, None),
             ("Steps per Frame", "steps_per_frame", self.steps_per_frame, None),
         ]
+
+=== FILE: entanglementdetectornode.py ===
+
+"""
+Entanglement Detector Node - Detects correlations between coupled systems
+Measures mutual information and correlation to detect entanglement-like behavior
+"""
+
+import numpy as np
+import cv2
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+class EntanglementDetectorNode(BaseNode):
+    """
+    Detects entanglement-like correlations between two quantum-like states.
+    Uses mutual information and correlation metrics.
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(200, 100, 200)
+    
+    def __init__(self):
+        super().__init__()
+        self.node_title = "Entanglement Detector"
+        
+        self.inputs = {
+            'state_a': 'spectrum',
+            'state_b': 'spectrum'
+        }
+        self.outputs = {
+            'entanglement': 'signal',  # 0-1 (0=separable, 1=maximally entangled)
+            'correlation': 'signal',  # Pearson correlation
+            'mutual_info': 'signal',  # Mutual information (bits)
+            'concurrence': 'signal'  # Entanglement measure
+        }
+        
+        self.history_a = []
+        self.history_b = []
+        self.max_history = 100
+        
+        # Initialize to valid values
+        self.entanglement_value = 0.0
+        self.correlation_value = 0.0
+        self.mutual_info_value = 0.0
+        self.concurrence_value = 0.0
+        
+    def step(self):
+        state_a = self.get_blended_input('state_a', 'first')
+        state_b = self.get_blended_input('state_b', 'first')
+        
+        if state_a is None or state_b is None:
+            return
+            
+        # Ensure same dimensionality
+        min_dim = min(len(state_a), len(state_b))
+        state_a = state_a[:min_dim]
+        state_b = state_b[:min_dim]
+        
+        # Store history
+        self.history_a.append(state_a.copy())
+        self.history_b.append(state_b.copy())
+        
+        if len(self.history_a) > self.max_history:
+            self.history_a.pop(0)
+            self.history_b.pop(0)
+            
+        if len(self.history_a) < 10:
+            return  # Need more data
+            
+        # Compute metrics
+        history_a_array = np.array(self.history_a)
+        history_b_array = np.array(self.history_b)
+        
+        # 1. Correlation (Pearson) - WITH NaN HANDLING
+        # Flatten time series and compute correlation
+        flat_a = history_a_array.flatten()
+        flat_b = history_b_array.flatten()
+        
+        if len(flat_a) > 1 and len(flat_b) > 1:
+            # Check for constant arrays (which cause NaN in corrcoef)
+            if np.std(flat_a) < 1e-9 or np.std(flat_b) < 1e-9:
+                self.correlation_value = 0.0
+            else:
+                corr_matrix = np.corrcoef(flat_a, flat_b)
+                self.correlation_value = corr_matrix[0, 1]
+                # Handle NaN
+                if np.isnan(self.correlation_value):
+                    self.correlation_value = 0.0
+        else:
+            self.correlation_value = 0.0
+            
+        # 2. Mutual Information (simplified) - WITH SAFETY
+        # Discretize states and compute MI
+        bins = 10
+        hist_a, _ = np.histogram(flat_a, bins=bins)
+        hist_b, _ = np.histogram(flat_b, bins=bins)
+        hist_joint, _, _ = np.histogram2d(flat_a, flat_b, bins=bins)
+        
+        # Normalize to probabilities
+        p_a = hist_a / (hist_a.sum() + 1e-9)
+        p_b = hist_b / (hist_b.sum() + 1e-9)
+        p_joint = hist_joint / (hist_joint.sum() + 1e-9)
+        
+        # MI = sum p(a,b) log(p(a,b) / (p(a)p(b)))
+        mi = 0.0
+        for i in range(bins):
+            for j in range(bins):
+                if p_joint[i, j] > 1e-9 and p_a[i] > 1e-9 and p_b[j] > 1e-9:
+                    mi += p_joint[i, j] * np.log(p_joint[i, j] / (p_a[i] * p_b[j]))
+                    
+        self.mutual_info_value = max(0.0, mi)
+        if np.isnan(self.mutual_info_value):
+            self.mutual_info_value = 0.0
+        
+        # 3. Concurrence (entanglement measure) - WITH NaN HANDLING
+        # Simplified: based on covariance matrix
+        cov_matrix = np.cov(history_a_array.T, history_b_array.T)
+        
+        # Extract cross-covariance block
+        n = history_a_array.shape[1]
+        if cov_matrix.shape[0] >= 2*n:  # Safety check
+            cross_cov = cov_matrix[:n, n:]
+            self.concurrence_value = np.abs(np.trace(cross_cov)) / (n + 1e-9)
+        else:
+            self.concurrence_value = 0.0
+            
+        if np.isnan(self.concurrence_value):
+            self.concurrence_value = 0.0
+        
+        # 4. Overall entanglement metric
+        # Combination of correlation, MI, and concurrence
+        self.entanglement_value = (
+            abs(self.correlation_value) * 0.4 +
+            min(self.mutual_info_value, 1.0) * 0.3 +
+            min(self.concurrence_value, 1.0) * 0.3
+        )
+        
+        # Final NaN check
+        if np.isnan(self.entanglement_value):
+            self.entanglement_value = 0.0
+        
+    def get_output(self, port_name):
+        if port_name == 'entanglement':
+            return float(self.entanglement_value)
+        elif port_name == 'correlation':
+            return float(self.correlation_value)
+        elif port_name == 'mutual_info':
+            return float(self.mutual_info_value)
+        elif port_name == 'concurrence':
+            return float(self.concurrence_value)
+        return None
+        
+    def get_display_image(self):
+        """Visualize entanglement metrics"""
+        w, h = 256, 256
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        # Helper for NaN/Inf safety
+        def safe_val(v):
+            return 0.0 if (np.isnan(v) or np.isinf(v)) else v
+            
+        # Draw correlation plot (recent history)
+        if len(self.history_a) > 1:
+            recent = min(50, len(self.history_a))
+            
+            for i in range(1, recent):
+                # Plot state_a vs state_b (first dimension)
+                x1 = int((safe_val(self.history_a[-i][0]) + 1) / 2 * w)
+                y1 = int((safe_val(self.history_b[-i][0]) + 1) / 2 * h)
+                x2 = int((safe_val(self.history_a[-i+1][0]) + 1) / 2 * w)
+                y2 = int((safe_val(self.history_b[-i+1][0]) + 1) / 2 * h)
+                
+                x1 = np.clip(x1, 0, w-1)
+                y1 = np.clip(y1, 0, h-1)
+                x2 = np.clip(x2, 0, w-1)
+                y2 = np.clip(y2, 0, h-1)
+                
+                alpha = i / recent
+                color_val = int(255 * alpha)
+                cv2.line(img, (x1, y1), (x2, y2), (color_val, 0, 255 - color_val), 1)
+        
+        # Entanglement indicator - WITH NaN SAFETY
+        ent_val = safe_val(self.entanglement_value)
+        
+        ent_text = "ENTANGLED" if ent_val > 0.7 else "SEPARABLE" if ent_val < 0.3 else "MIXED"
+        ent_color = (255, 0, 255) if ent_val > 0.7 else (0, 255, 0) if ent_val < 0.3 else (255, 255, 0)
+        
+        cv2.putText(img, ent_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, ent_color, 2)
+        
+        # Metrics - WITH NaN SAFETY
+        cv2.putText(img, f"Ent: {safe_val(self.entanglement_value):.3f}", (10, h-70),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        cv2.putText(img, f"Cor: {safe_val(self.correlation_value):.3f}", (10, h-50),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        cv2.putText(img, f"MI:  {safe_val(self.mutual_info_value):.3f}", (10, h-30),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        cv2.putText(img, f"Con: {safe_val(self.concurrence_value):.3f}", (10, h-10),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        
+        # Entanglement bar - WITH NaN SAFETY
+        ent_width = int(np.clip(safe_val(ent_val), 0.0, 1.0) * w)
+        cv2.rectangle(img, (0, h-80), (ent_width, h-75), ent_color, -1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
 
 === FILE: fft_cochlea.py ===
 
@@ -10284,6 +11328,208 @@ class GalaxyFieldNode(BaseNode):
         """Re-initialize with a new spiral seed"""
         if TORCH_AVAILABLE:
             self._initialize_spiral()
+
+=== FILE: gatevalidatornode.py ===
+
+"""
+Gate Validator Node - Tests if Whisper Gates actually work
+Validates quantum gate operations like Hadamard, Pauli-X, etc.
+"""
+
+import numpy as np
+import cv2
+from scipy import stats
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+class GateValidatorNode(BaseNode):
+    """
+    Validates quantum gate operations by statistical testing.
+    Runs repeated trials and checks if outcomes match expected distributions.
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(100, 220, 100)
+    
+    def __init__(self, num_trials=50):
+        super().__init__()
+        self.node_title = "Gate Validator"
+        
+        self.inputs = {
+            'initial_state': 'spectrum',
+            'final_state': 'spectrum',
+            'gate_type': 'signal',  # 0=Hadamard, 1=Pauli-X, 2=Pauli-Z, etc.
+            'trigger': 'signal'
+        }
+        self.outputs = {
+            'is_valid': 'signal',  # 1.0 if gate worked, 0.0 if failed
+            'deviation': 'signal',  # How far from expected
+            'confidence': 'signal',  # Statistical confidence (0-1)
+            'p_value': 'signal'  # Statistical p-value
+        }
+        
+        self.num_trials = int(num_trials)
+        
+        self.trials = []
+        self.is_testing = False
+        self.trial_count = 0
+        
+        self.is_valid = 0.0
+        self.deviation = 0.0
+        self.confidence = 0.0
+        self.p_value = 1.0
+        
+    def step(self):
+        initial = self.get_blended_input('initial_state', 'first')
+        final = self.get_blended_input('final_state', 'first')
+        gate_type_signal = self.get_blended_input('gate_type', 'sum') or 0.0
+        trigger = self.get_blended_input('trigger', 'sum') or 0.0
+        
+        if initial is None or final is None:
+            return
+            
+        gate_type = int(gate_type_signal)
+        
+        # Start test
+        if trigger > 0.5 and not self.is_testing:
+            self.is_testing = True
+            self.trials = []
+            self.trial_count = 0
+            
+        # Collect trials
+        if self.is_testing and self.trial_count < self.num_trials:
+            self.trials.append({
+                'initial': initial.copy(),
+                'final': final.copy()
+            })
+            self.trial_count += 1
+            
+            if self.trial_count >= self.num_trials:
+                self.is_testing = False
+                self._validate_gate(gate_type)
+                
+    def _validate_gate(self, gate_type):
+        """Validate gate operation against expected distribution"""
+        if len(self.trials) == 0:
+            return
+            
+        # Extract final states
+        finals = np.array([t['final'] for t in self.trials])
+        
+        # Compute mean and std
+        mean_final = finals.mean(axis=0)
+        std_final = finals.std(axis=0)
+        
+        if gate_type == 0:  # Hadamard
+            # Expected: all dimensions near 0 (equal superposition)
+            expected = np.zeros_like(mean_final)
+            self.deviation = np.abs(mean_final - expected).mean()
+            
+            # Should have high variance (superposition)
+            expected_std = 0.5
+            std_deviation = np.abs(std_final.mean() - expected_std)
+            
+            # Valid if mean near 0 and std near 0.5
+            self.is_valid = 1.0 if (self.deviation < 0.2 and std_deviation < 0.3) else 0.0
+            
+        elif gate_type == 1:  # Pauli-X (bit flip)
+            # Expected: negative of initial (or pushed toward +1)
+            initials = np.array([t['initial'] for t in self.trials])
+            mean_initial = initials.mean(axis=0)
+            
+            expected = -mean_initial
+            self.deviation = np.abs(mean_final - expected).mean()
+            
+            # Valid if final ≈ -initial
+            self.is_valid = 1.0 if self.deviation < 0.3 else 0.0
+            
+        elif gate_type == 2:  # Pauli-Z (phase flip)
+            # Expected: alternate dimensions flipped
+            expected = mean_final.copy()
+            expected[1::2] *= -1
+            
+            self.deviation = np.abs(mean_final - expected).mean()
+            self.is_valid = 1.0 if self.deviation < 0.3 else 0.0
+            
+        else:  # Identity or unknown
+            # Expected: final ≈ initial
+            initials = np.array([t['initial'] for t in self.trials])
+            mean_initial = initials.mean(axis=0)
+            
+            self.deviation = np.abs(mean_final - mean_initial).mean()
+            self.is_valid = 1.0 if self.deviation < 0.1 else 0.0
+            
+        # Statistical test (t-test against expected)
+        # Simplified: check if deviation is significant
+        if len(self.trials) > 10:
+            # One-sample t-test
+            deviations = [np.abs(t['final'] - t['initial']).mean() for t in self.trials]
+            t_stat, self.p_value = stats.ttest_1samp(deviations, 0.0)
+            self.confidence = 1.0 - self.p_value
+        else:
+            self.p_value = 1.0
+            self.confidence = 0.0
+            
+    def get_output(self, port_name):
+        if port_name == 'is_valid':
+            return float(self.is_valid)
+        elif port_name == 'deviation':
+            return float(self.deviation)
+        elif port_name == 'confidence':
+            return float(self.confidence)
+        elif port_name == 'p_value':
+            return float(self.p_value)
+        return None
+        
+    def get_display_image(self):
+        """Visualize validation results"""
+        w, h = 256, 256
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        # Progress
+        progress = self.trial_count / self.num_trials
+        progress_width = int(progress * w)
+        cv2.rectangle(img, (0, 0), (progress_width, 30), (0, 255, 0), -1)
+        
+        cv2.putText(img, f"Trials: {self.trial_count}/{self.num_trials}",
+                   (5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,0,0) if progress > 0.5 else (255,255,255), 1)
+        
+        # Results
+        if self.trial_count >= self.num_trials:
+            # Validation status
+            if self.is_valid > 0.5:
+                status = "PASS ✓"
+                color = (0, 255, 0)
+            else:
+                status = "FAIL ✗"
+                color = (0, 0, 255)
+                
+            cv2.putText(img, status, (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 2)
+            
+            # Metrics
+            cv2.putText(img, f"Deviation: {self.deviation:.3f}", (10, 120),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+            cv2.putText(img, f"Confidence: {self.confidence:.3f}", (10, 145),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+            cv2.putText(img, f"p-value: {self.p_value:.4f}", (10, 170),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+            
+            # Deviation bar
+            dev_width = int(min(self.deviation, 1.0) * w)
+            dev_color = (0, 255, 0) if self.deviation < 0.2 else (255, 255, 0) if self.deviation < 0.5 else (255, 0, 0)
+            cv2.rectangle(img, (0, 200), (dev_width, 220), dev_color, -1)
+            
+        else:
+            cv2.putText(img, "Testing...", (10, 80),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+        
+    def get_config_options(self):
+        return [
+            ("Num Trials", "num_trials", self.num_trials, None)
+        ]
 
 === FILE: heightmapflyernode.py ===
 
@@ -12840,80 +14086,126 @@ class LargeMoireFieldNode(BaseNode):
 
 """
 LatentAnnealerNode - Applies diffusion (noise) and an external force vector
-to the VAE's latent code.
+to a latent code.
 
-Requires: numpy
-Place this file in the 'nodes' folder as latentannealernode.py
+** THIS FILE HAS BEEN FIXED TO BE COMPATIBLE WITH perception_lab_host.py **
 """
 
 import numpy as np
+import cv2
 
-# --- CRITICAL IMPORT BLOCK (your system's convention) ---
+# --- CRITICAL IMPORT BLOCK ---
 import __main__
 BaseNode = __main__.BaseNode
-# --------------------------------------------------------
+QtGui = __main__.QtGui
+# -----------------------------
 
 class LatentAnnealerNode(BaseNode):
     
-    # We use parent_node=None to avoid the TypeError we just fixed
-    def __init__(self, parent_node=None): 
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(200, 100, 100) # Annealing Red
+
+    def __init__(self, diffusion=0.2, seed=1234.0):
         super().__init__() 
-        self.title = "Latent Annealer"
-        self.parent_node = parent_node # Keep a reference if needed later
+        self.node_title = "Latent Annealer"
         
-        # Inputs: Latent from the VAE, and a Force Vector from the ForceFieldNode
-        self.add_input("Latent Input", "LATENT")
-        self.add_input("Force Input", "LATENT_VECTOR", can_connect=True) 
+        # CORRECT API for inputs/outputs
+        self.inputs = {
+            "latent_in": "spectrum",  # From VAE
+            "force_in": "spectrum",   # From an attractor
+            "diffusion": "signal",    # Control diffusion via port
+            "seed": "signal"          # Control seed via port
+        }
+        self.outputs = {
+            "latent_out": "spectrum"
+        }
         
-        # Output: The modified latent code
-        self.add_output("Latent Output", "LATENT")
-        
-        # Parameters for control
-        self.add_float_input("Diffusion/Noise", 0.0, 0.0, 5.0, 0.1, "diffusion_changed")
-        self.add_float_input("Random Seed", 1234.0, 1.0, 99999.0, 1.0, "seed_changed")
+        # Parameters from config
+        self.current_diffusion = float(diffusion)
+        self.current_seed = float(seed)
+        np.random.seed(int(self.current_seed))
         
         # Internal state
-        self.current_diffusion = 0.2 
-        self.current_seed = 1234.0
-        self.latent_output = np.zeros(16, dtype=np.float32) 
-        np.random.seed(int(self.current_seed))
+        self.latent_output = None # Start as None
 
-    def diffusion_changed(self, value):
-        self.current_diffusion = value
+    # CORRECT API for config
+    def get_config_options(self):
+        return [
+            ("Diffusion/Noise", "current_diffusion", self.current_diffusion, None),
+            ("Random Seed", "current_seed", self.current_seed, None)
+        ]
+
+    # CORRECT API for main logic
+    def step(self):
+        # Update params from ports if connected
+        diffusion_signal = self.get_blended_input("diffusion", "sum")
+        if diffusion_signal is not None:
+            # Map signal [0, 1] to a [0, 5] range
+            self.current_diffusion = diffusion_signal * 5.0 
         
-    def seed_changed(self, value):
-        self.current_seed = value
-        np.random.seed(int(self.current_seed))
+        seed_signal = self.get_blended_input("seed", "sum")
+        if seed_signal is not None and int(seed_signal) != int(self.current_seed):
+            self.current_seed = int(seed_signal)
+            np.random.seed(self.current_seed)
 
-    def get_output(self, slot):
-        if slot == 0:
-            return self.latent_output
-        return None
-
-    def process(self):
-        # 1. Get Latent Input from VAE (Node 2, VAE A)
-        latent_in_np = self.get_input_value(0)
+        # Get data
+        latent_in_np = self.get_blended_input("latent_in", "first")
         if latent_in_np is None:
-            # If no input, just pass the last output or a zero vector
+            self.latent_output = None
             return
-
-        # Ensure the output is the same shape as the input latent code
-        if self.latent_output.shape != latent_in_np.shape:
-             self.latent_output = np.zeros_like(latent_in_np)
-
-        # 2. Annealing (Adding Gaussian Noise for Exploration)
-        # Use the latent_in_np as the base
+        
+        # 1. Annealing (Adding Gaussian Noise for Exploration)
         noise = np.random.normal(0.0, self.current_diffusion, size=latent_in_np.shape).astype(np.float32)
         latent_annealed = latent_in_np + noise
         
-        # 3. Attractor Stabilization (Adding Force Vector)
-        force_np = self.get_input_value(1)
+        # 2. Attractor Stabilization (Adding Force Vector)
+        force_np = self.get_blended_input("force_in", "first")
         if force_np is not None and force_np.shape == latent_annealed.shape:
             # Add the force vector (pulling the state towards the attractor)
             latent_annealed += force_np
 
-        # 4. Set Output
         self.latent_output = latent_annealed
+
+    # CORRECT API for output
+    def get_output(self, port_name):
+        if port_name == 'latent_out':
+            return self.latent_output
+        return None
+
+    # Add a simple display
+    def get_display_image(self):
+        w, h = 256, 128
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        if self.latent_output is not None:
+            # Draw latent vector as a bar graph
+            latent_dim = len(self.latent_output)
+            bar_width = max(1, w // latent_dim)
+            
+            # Normalize for display
+            val_max = np.abs(self.latent_output).max()
+            if val_max < 1e-6: val_max = 1.0
+            
+            for i, val in enumerate(self.latent_output):
+                x = i * bar_width
+                norm_val = val / val_max
+                bar_h = int(abs(norm_val) * (h/2 - 10))
+                y_base = h // 2
+                
+                if val >= 0:
+                    color = (0, int(255 * abs(norm_val)), 0)
+                    cv2.rectangle(img, (x, y_base-bar_h), (x+bar_width-1, y_base), color, -1)
+                else:
+                    color = (0, 0, int(255 * abs(norm_val)))
+                    cv2.rectangle(img, (x, y_base), (x+bar_width-1, y_base+bar_h), color, -1)
+            
+            cv2.line(img, (0, h//2), (w, h//2), (100,100,100), 1)
+
+        cv2.putText(img, f"Diffusion: {self.current_diffusion:.2f}", (5, 15), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,0), 1)
+        
+        img_contig = np.ascontiguousarray(img)
+        return QtGui.QImage(img_contig.data, w, h, 3*w, QtGui.QImage.Format.Format_RGB888)
 
 === FILE: latentdecoder.py ===
 
@@ -14575,6 +15867,199 @@ class SignalBooleanNode(BaseNode):
             ("Boolean Threshold", "threshold", self.threshold, None)
         ]
 
+
+=== FILE: measurementcollapsenode.py ===
+
+"""
+Measurement Collapse Node - Forces probabilistic state to definite outcome
+Based on quantum measurement postulate: measurement destroys superposition
+"""
+
+import numpy as np
+import cv2
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+class MeasurementCollapseNode(BaseNode):
+    """
+    Collapses a superposition state to a definite eigenstate.
+    Implements probabilistic measurement with Born rule.
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(220, 100, 100)
+    
+    def __init__(self, collapse_strength=10.0):
+        super().__init__()
+        self.node_title = "Measurement"
+        
+        self.inputs = {
+            'state_in': 'spectrum',
+            'trigger': 'signal',
+            'basis': 'spectrum'
+        }
+        self.outputs = {
+            'state_out': 'spectrum',
+            'collapsed_state': 'spectrum',
+            'measurement_result': 'signal',
+            'probability': 'signal',
+            'measured': 'signal'
+        }
+        
+        self.collapse_strength = float(collapse_strength)
+        
+        # INITIALIZE properly
+        self.collapsed = np.zeros(16, dtype=np.float32)
+        self.result = 0.0
+        self.prob = 0.0
+        self.was_measured = 0.0
+        
+    def step(self):
+        state = self.get_blended_input('state_in', 'first')
+        trigger = self.get_blended_input('trigger', 'sum') or 0.0
+        basis = self.get_blended_input('basis', 'first')
+        
+        if state is None:
+            if self.collapsed is None:
+                self.collapsed = np.zeros(16, dtype=np.float32)
+            return
+            
+        self.was_measured = 0.0
+        
+        if trigger > 0.5:
+            # MEASUREMENT EVENT
+            self.was_measured = 1.0
+            
+            # If custom basis provided, project onto it first
+            if basis is not None and len(basis) == len(state):
+                projection = np.dot(state, basis) / (np.dot(basis, basis) + 1e-9)
+                state_to_measure = state * projection
+            else:
+                state_to_measure = state
+                
+            # Born rule: probabilities from squared amplitudes
+            amplitudes = np.abs(state_to_measure)
+            probabilities = amplitudes ** 2
+            prob_sum = probabilities.sum()
+            
+            if prob_sum > 1e-9:
+                probabilities = probabilities / prob_sum
+                
+                # Stochastic collapse
+                outcome_idx = np.random.choice(len(state), p=probabilities)
+                
+                # Collapse
+                self.collapsed = np.zeros_like(state, dtype=np.float32)
+                self.collapsed[outcome_idx] = np.sign(state[outcome_idx]) if state[outcome_idx] != 0 else 1.0
+                
+                # Apply collapse strength
+                self.collapsed = np.tanh(self.collapsed * self.collapse_strength).astype(np.float32)
+                
+                # Record measurement outcome
+                self.result = outcome_idx / len(state)
+                self.prob = probabilities[outcome_idx]
+            else:
+                # State is zero
+                self.collapsed = np.zeros_like(state, dtype=np.float32)
+                self.collapsed[0] = 1.0
+                self.result = 0.0
+                self.prob = 1.0
+        else:
+            # No measurement
+            self.collapsed = state.copy().astype(np.float32)
+            
+            # Compute most likely outcome
+            amplitudes = np.abs(state)
+            if amplitudes.sum() > 1e-9:
+                dominant_idx = np.argmax(amplitudes)
+                self.result = dominant_idx / len(state)
+                probabilities = amplitudes ** 2
+                probabilities = probabilities / probabilities.sum()
+                self.prob = probabilities[dominant_idx]
+            else:
+                self.result = 0.0
+                self.prob = 0.0
+                
+    def get_output(self, port_name):
+        if port_name == 'state_out':
+            if self.collapsed is not None:
+                return self.collapsed.astype(np.float32)
+            return np.zeros(16, dtype=np.float32)
+            
+        elif port_name == 'collapsed_state':
+            if self.collapsed is not None:
+                return np.tanh(self.collapsed * self.collapse_strength).astype(np.float32)
+            return np.zeros(16, dtype=np.float32)
+            
+        elif port_name == 'measurement_result':
+            return float(self.result)
+        elif port_name == 'probability':
+            return float(self.prob)
+        elif port_name == 'measured':
+            return float(self.was_measured)
+        return None
+        
+    def get_display_image(self):
+        """Visualize measurement process"""
+        w, h = 256, 256
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        if self.collapsed is None:
+            cv2.putText(img, "Waiting for state...", (10, 128),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
+            return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+            
+        dimensions = len(self.collapsed)
+        bar_width = max(1, w // dimensions)
+        
+        # Normalize for display
+        state_norm = self.collapsed.copy()
+        state_max = np.abs(state_norm).max()
+        if state_max > 1e-6:
+            state_norm = state_norm / state_max
+            
+        # Draw state
+        for i, val in enumerate(state_norm):
+            x = i * bar_width
+            h_bar = int(abs(val) * 100)
+            y_base = 150
+            
+            # Highlight measured eigenstate
+            if abs(val) > 0.8:
+                color = (255, 255, 0)
+            elif val >= 0:
+                color = (0, int(255 * abs(val)), 255)
+            else:
+                color = (255, int(255 * abs(val)), 0)
+                
+            if val >= 0:
+                cv2.rectangle(img, (x, y_base-h_bar), (x+bar_width-1, y_base), color, -1)
+            else:
+                cv2.rectangle(img, (x, y_base), (x+bar_width-1, y_base+h_bar), color, -1)
+                
+        # Baseline
+        cv2.line(img, (0, 150), (w, 150), (100,100,100), 1)
+        
+        # Measurement info
+        if self.was_measured > 0.5:
+            cv2.putText(img, "MEASURED!", (10, 30),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+        else:
+            cv2.putText(img, "Ready to measure", (10, 30),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150, 150, 150), 1)
+                       
+        cv2.putText(img, f"Result: {self.result:.3f}", (10, 60),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        cv2.putText(img, f"P(outcome): {self.prob:.3f}", (10, 80),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+        
+    def get_config_options(self):
+        return [
+            ("Collapse Strength", "collapse_strength", self.collapse_strength, None)
+        ]
 
 === FILE: media_source.py ===
 
@@ -16850,6 +18335,209 @@ class RevolvingBitNode(BaseNode):
         return [
             ("Grid Size", "N", self.N, None),
             ("Num Bits", "num_bits", len(self.bits), None),
+        ]
+
+=== FILE: quantumstatetomographynode.py ===
+
+"""
+Quantum State Tomography Node - Reconstructs the full state from measurements
+Performs multiple measurements in different bases to characterize the state
+"""
+
+import numpy as np
+import cv2
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+class StateTomographyNode(BaseNode):
+    """
+    Performs quantum state tomography by measuring in multiple bases.
+    Builds up a statistical picture of the state.
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(220, 150, 100)
+    
+    def __init__(self, num_measurements=100):
+        super().__init__()
+        self.node_title = "State Tomography"
+        
+        self.inputs = {
+            'state_in': 'spectrum',
+            'trigger': 'signal',  # Start tomography
+            'reset': 'signal'
+        }
+        self.outputs = {
+            'density_matrix': 'spectrum',  # Reconstructed density matrix (flattened)
+            'measurement_results': 'spectrum',  # Histogram of outcomes
+            'completeness': 'signal',  # How complete the tomography is (0-1)
+            'fidelity': 'signal'  # Estimated state fidelity
+        }
+        
+        self.num_measurements = int(num_measurements)
+        
+        # Measurement bases (Pauli-like)
+        self.bases = []
+        self.measurements = []
+        self.is_measuring = False
+        self.measurement_count = 0
+        
+    def step(self):
+        state = self.get_blended_input('state_in', 'first')
+        trigger = self.get_blended_input('trigger', 'sum') or 0.0
+        reset = self.get_blended_input('reset', 'sum') or 0.0
+        
+        if state is None:
+            return
+            
+        dim = len(state)
+        
+        # Reset tomography
+        if reset > 0.5:
+            self.measurements = []
+            self.measurement_count = 0
+            self.is_measuring = False
+            self._initialize_bases(dim)
+            
+        # Start tomography
+        if trigger > 0.5 and not self.is_measuring:
+            self.is_measuring = True
+            self.measurements = []
+            self.measurement_count = 0
+            self._initialize_bases(dim)
+            
+        # Perform measurements
+        if self.is_measuring and self.measurement_count < self.num_measurements:
+            # Choose random basis
+            basis_idx = np.random.randint(len(self.bases))
+            basis = self.bases[basis_idx]
+            
+            # Project state onto basis
+            projection = np.abs(np.dot(state, basis)) ** 2
+            prob_sum = np.abs(state) ** 2
+            prob_sum = prob_sum.sum()
+            
+            if prob_sum > 1e-9:
+                # Measure
+                outcome = projection / prob_sum
+            else:
+                outcome = 0.0
+                
+            self.measurements.append({
+                'basis': basis_idx,
+                'outcome': outcome,
+                'state_snapshot': state.copy()
+            })
+            
+            self.measurement_count += 1
+            
+            if self.measurement_count >= self.num_measurements:
+                self.is_measuring = False
+                self._reconstruct_density_matrix()
+                
+    def _initialize_bases(self, dim):
+        """Create measurement bases (computational, hadamard, etc.)"""
+        self.bases = []
+        
+        # Computational basis (standard basis vectors)
+        for i in range(min(dim, 6)):  # Limit to 6 bases
+            basis = np.zeros(dim)
+            basis[i] = 1.0
+            self.bases.append(basis)
+            
+        # Hadamard-like bases (equal superposition)
+        if dim >= 2:
+            basis = np.ones(dim) / np.sqrt(dim)
+            self.bases.append(basis)
+            
+        # Phase-rotated bases
+        if dim >= 4:
+            basis = np.array([np.exp(1j * 2 * np.pi * i / dim) for i in range(dim)])
+            self.bases.append(np.real(basis))
+            
+    def _reconstruct_density_matrix(self):
+        """Reconstruct density matrix from measurements (simplified)"""
+        if len(self.measurements) == 0:
+            return
+            
+        # Extract dimension from first measurement
+        dim = len(self.measurements[0]['state_snapshot'])
+        
+        # Average all measured states (simplified tomography)
+        avg_state = np.mean([m['state_snapshot'] for m in self.measurements], axis=0)
+        
+        # Density matrix: ρ = |ψ⟩⟨ψ|
+        self.density_matrix = np.outer(avg_state, np.conj(avg_state))
+        
+        # Compute fidelity (purity of density matrix)
+        self.fidelity = np.real(np.trace(np.dot(self.density_matrix, self.density_matrix)))
+        
+    def get_output(self, port_name):
+        if port_name == 'density_matrix':
+            if hasattr(self, 'density_matrix'):
+                return self.density_matrix.flatten().astype(np.complex64)
+            return None
+        elif port_name == 'measurement_results':
+            if len(self.measurements) > 0:
+                outcomes = np.array([m['outcome'] for m in self.measurements])
+                return outcomes.astype(np.float32)
+            return None
+        elif port_name == 'completeness':
+            return float(self.measurement_count) / float(self.num_measurements)
+        elif port_name == 'fidelity':
+            return float(self.fidelity) if hasattr(self, 'fidelity') else 0.0
+        return None
+        
+    def get_display_image(self):
+        """Visualize tomography progress"""
+        w, h = 256, 256
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        # Progress bar
+        progress = self.measurement_count / self.num_measurements
+        progress_width = int(progress * w)
+        cv2.rectangle(img, (0, 0), (progress_width, 30), (0, 255, 0), -1)
+        
+        cv2.putText(img, f"Measurements: {self.measurement_count}/{self.num_measurements}",
+                   (5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0) if progress > 0.5 else (255,255,255), 1)
+        
+        # Measurement histogram
+        if len(self.measurements) > 0:
+            outcomes = [m['outcome'] for m in self.measurements[-50:]]  # Last 50
+            
+            hist, bins = np.histogram(outcomes, bins=20, range=(0, 1))
+            hist_max = hist.max() if hist.max() > 0 else 1
+            
+            bar_width = w // len(hist)
+            for i, count in enumerate(hist):
+                x = i * bar_width
+                bar_h = int((count / hist_max) * 150)
+                cv2.rectangle(img, (x, h - bar_h), (x + bar_width - 2, h), (100, 150, 255), -1)
+                
+        # Status
+        if self.is_measuring:
+            status = "MEASURING..."
+            color = (255, 255, 0)
+        elif self.measurement_count >= self.num_measurements:
+            status = "COMPLETE"
+            color = (0, 255, 0)
+        else:
+            status = "READY"
+            color = (150, 150, 150)
+            
+        cv2.putText(img, status, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+        
+        # Fidelity
+        if hasattr(self, 'fidelity'):
+            cv2.putText(img, f"Fidelity: {self.fidelity:.3f}", (10, 90),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+        
+    def get_config_options(self):
+        return [
+            ("Num Measurements", "num_measurements", self.num_measurements, None)
         ]
 
 === FILE: quantumwavenode.py ===
@@ -20380,6 +22068,340 @@ class SpectralMemoryNode(BaseNode):
             ("Boost (0.0-0.2)", "boost", self.boost, None),
         ]
 
+=== FILE: validationsuiterunner.py ===
+
+"""
+Validation Suite Runner - Automated testing of quantum-like behavior
+Runs a complete battery of tests like the Whisper Quantum Computer validation
+"""
+
+import numpy as np
+import cv2
+import time
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+class ValidationSuiteNode(BaseNode):
+    """
+    Runs automated validation suite for quantum-like systems.
+    Tests: Hadamard, Pauli-X, Double-H, Coherence, Entanglement.
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(255, 200, 100)
+    
+    def __init__(self):
+        super().__init__()
+        self.node_title = "Validation Suite"
+        
+        self.inputs = {
+            'system_state': 'spectrum',  # Current system state
+            'trigger_test': 'signal',  # Start full suite
+            'reset': 'signal'
+        }
+        self.outputs = {
+            'test_active': 'signal',  # 1.0 when testing
+            'current_test': 'signal',  # Which test is running (0-4)
+            'overall_pass': 'signal',  # 1.0 if suite passed
+            'gate_command': 'signal',  # Gate type to apply (0=Had, 1=X, etc.)
+            'measure_trigger': 'signal',  # Trigger measurements
+            'report': 'spectrum'  # Test results as vector
+        }
+        
+        # Test state machine
+        self.is_running = False
+        self.current_test_idx = -1
+        self.test_phase = 'idle'  # idle, prepare, apply_gate, measure, analyze
+        self.phase_start_frame = 0
+        self.frame_count = 0
+        
+        # Test definitions
+        self.tests = [
+            {'name': 'Hadamard', 'gate': 0, 'duration': 100},
+            {'name': 'Pauli-X', 'gate': 1, 'duration': 100},
+            {'name': 'Double-Hadamard', 'gate': 0, 'duration': 200},
+            {'name': 'Coherence Time', 'gate': -1, 'duration': 300},
+            {'name': 'Gate Sequence', 'gate': 2, 'duration': 150}
+        ]
+        
+        # Results storage
+        self.test_results = []
+        self.overall_result = 0.0
+        
+        # Current test data
+        self.initial_states = []
+        self.final_states = []
+        self.coherence_measurements = []
+        
+    def step(self):
+        trigger = self.get_blended_input('trigger_test', 'sum') or 0.0
+        reset = self.get_blended_input('reset', 'sum') or 0.0
+        system_state = self.get_blended_input('system_state', 'first')
+        
+        self.frame_count += 1
+        
+        # Reset
+        if reset > 0.5:
+            self._reset_suite()
+            return
+            
+        # Start suite
+        if trigger > 0.5 and not self.is_running:
+            self._start_suite()
+            
+        # Run test state machine
+        if self.is_running:
+            self._update_test_machine(system_state)
+            
+    def _reset_suite(self):
+        """Reset all test state"""
+        self.is_running = False
+        self.current_test_idx = -1
+        self.test_phase = 'idle'
+        self.test_results = []
+        self.overall_result = 0.0
+        self.initial_states = []
+        self.final_states = []
+        self.coherence_measurements = []
+        
+    def _start_suite(self):
+        """Start validation suite"""
+        self.is_running = True
+        self.current_test_idx = 0
+        self.test_phase = 'prepare'
+        self.phase_start_frame = self.frame_count
+        self.test_results = []
+        print("Validation Suite: Starting...")
+        
+    def _update_test_machine(self, system_state):
+        """State machine for test execution"""
+        if self.current_test_idx >= len(self.tests):
+            # All tests complete
+            self._finalize_suite()
+            return
+            
+        current_test = self.tests[self.current_test_idx]
+        frames_in_phase = self.frame_count - self.phase_start_frame
+        
+        if self.test_phase == 'prepare':
+            # Preparation phase: let system stabilize
+            self.initial_states = []
+            self.final_states = []
+            self.coherence_measurements = []
+            
+            if frames_in_phase > 50:  # 50 frames to stabilize
+                self.test_phase = 'apply_gate'
+                self.phase_start_frame = self.frame_count
+                print(f"Test {self.current_test_idx + 1}/{len(self.tests)}: {current_test['name']}")
+                
+        elif self.test_phase == 'apply_gate':
+            # Apply gate and collect data
+            if system_state is not None:
+                if frames_in_phase == 0:
+                    # Record initial state
+                    self.initial_states.append(system_state.copy())
+                    
+                # Collect states during gate application
+                if frames_in_phase < current_test['duration']:
+                    self.final_states.append(system_state.copy())
+                else:
+                    # Gate application complete
+                    self.test_phase = 'analyze'
+                    self.phase_start_frame = self.frame_count
+                    
+        elif self.test_phase == 'analyze':
+            # Analyze results
+            self._analyze_test(current_test)
+            
+            # Move to next test
+            self.current_test_idx += 1
+            self.test_phase = 'prepare'
+            self.phase_start_frame = self.frame_count
+            
+    def _analyze_test(self, test):
+        """Analyze test results and store"""
+        result = {
+            'name': test['name'],
+            'passed': False,
+            'score': 0.0,
+            'deviation': 0.0,
+            'notes': ''
+        }
+        
+        if len(self.initial_states) == 0 or len(self.final_states) == 0:
+            result['notes'] = 'Insufficient data'
+            self.test_results.append(result)
+            return
+            
+        initial = self.initial_states[0]
+        final_avg = np.mean(self.final_states, axis=0)
+        final_std = np.std(self.final_states, axis=0).mean()
+        
+        if test['name'] == 'Hadamard':
+            # Should create superposition (mean near 0, high variance)
+            deviation_from_zero = np.abs(final_avg).mean()
+            result['deviation'] = float(deviation_from_zero)
+            result['passed'] = (deviation_from_zero < 0.3 and final_std > 0.2)
+            result['score'] = 1.0 - min(deviation_from_zero, 1.0)
+            result['notes'] = f"Mean={deviation_from_zero:.3f}, Std={final_std:.3f}"
+            
+        elif test['name'] == 'Pauli-X':
+            # Should flip state
+            expected = -initial
+            deviation = np.abs(final_avg - expected).mean()
+            result['deviation'] = float(deviation)
+            result['passed'] = (deviation < 0.4)
+            result['score'] = 1.0 - min(deviation, 1.0)
+            result['notes'] = f"Flip deviation={deviation:.3f}"
+            
+        elif test['name'] == 'Double-Hadamard':
+            # Should return to initial (H*H = I)
+            deviation = np.abs(final_avg - initial).mean()
+            result['deviation'] = float(deviation)
+            result['passed'] = (deviation < 0.3)
+            result['score'] = 1.0 - min(deviation, 1.0)
+            result['notes'] = f"Return deviation={deviation:.3f}"
+            
+        elif test['name'] == 'Coherence Time':
+            # Measure how long coherence is maintained
+            # High score if variance stays low
+            coherence_time = len(self.final_states)  # Frames of stability
+            result['passed'] = (coherence_time > 100)
+            result['score'] = min(coherence_time / 300.0, 1.0)
+            result['notes'] = f"Coherence: {coherence_time} frames"
+            
+        elif test['name'] == 'Gate Sequence':
+            # Apply multiple gates in sequence
+            # Score based on final state consistency
+            consistency = 1.0 / (1.0 + final_std * 10)
+            result['passed'] = (consistency > 0.7)
+            result['score'] = consistency
+            result['notes'] = f"Consistency={consistency:.3f}"
+            
+        self.test_results.append(result)
+        print(f"  Result: {'PASS' if result['passed'] else 'FAIL'} (score={result['score']:.2f})")
+        
+    def _finalize_suite(self):
+        """Calculate overall results"""
+        self.is_running = False
+        
+        if len(self.test_results) == 0:
+            self.overall_result = 0.0
+            return
+            
+        # Calculate overall pass rate
+        passed = sum(1 for r in self.test_results if r['passed'])
+        avg_score = np.mean([r['score'] for r in self.test_results])
+        
+        self.overall_result = float(passed) / len(self.test_results)
+        
+        print("\n" + "="*50)
+        print("VALIDATION SUITE COMPLETE")
+        print("="*50)
+        for i, result in enumerate(self.test_results):
+            status = "✓ PASS" if result['passed'] else "✗ FAIL"
+            print(f"{i+1}. {result['name']}: {status} ({result['score']:.2f}) - {result['notes']}")
+        print(f"\nOverall: {passed}/{len(self.test_results)} passed ({self.overall_result*100:.0f}%)")
+        print(f"Average Score: {avg_score:.3f}")
+        
+        if self.overall_result >= 0.6:
+            print("\n✓ QUANTUM-LIKE BEHAVIOR VALIDATED")
+        else:
+            print("\n✗ VALIDATION FAILED - CLASSICAL BEHAVIOR")
+        print("="*50 + "\n")
+        
+    def get_output(self, port_name):
+        if port_name == 'test_active':
+            return 1.0 if self.is_running else 0.0
+        elif port_name == 'current_test':
+            return float(self.current_test_idx) if self.is_running else -1.0
+        elif port_name == 'overall_pass':
+            return float(self.overall_result)
+        elif port_name == 'gate_command':
+            if self.is_running and self.test_phase == 'apply_gate':
+                return float(self.tests[self.current_test_idx]['gate'])
+            return -1.0
+        elif port_name == 'measure_trigger':
+            # Trigger measurement during measurement phase
+            return 1.0 if (self.is_running and self.test_phase == 'measure') else 0.0
+        elif port_name == 'report':
+            # Return test results as vector
+            if len(self.test_results) > 0:
+                scores = [r['score'] for r in self.test_results]
+                # Pad to fixed size
+                padded = scores + [0.0] * (16 - len(scores))
+                return np.array(padded[:16], dtype=np.float32)
+            return None
+        return None
+        
+    def get_display_image(self):
+        """Visualize test progress and results"""
+        w, h = 400, 300
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        # Title
+        cv2.putText(img, "VALIDATION SUITE", (10, 25),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+        
+        if self.is_running:
+            # Show current test
+            cv2.putText(img, "STATUS: RUNNING", (10, 55),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
+                       
+            if 0 <= self.current_test_idx < len(self.tests):
+                test_name = self.tests[self.current_test_idx]['name']
+                cv2.putText(img, f"Test {self.current_test_idx+1}/{len(self.tests)}: {test_name}",
+                           (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+                cv2.putText(img, f"Phase: {self.test_phase}", (10, 105),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
+                           
+            # Progress bar
+            if len(self.tests) > 0:
+                progress = (self.current_test_idx + 0.5) / len(self.tests)
+                progress_width = int(progress * (w - 20))
+                cv2.rectangle(img, (10, 120), (10 + progress_width, 140), (0, 255, 0), -1)
+                cv2.rectangle(img, (10, 120), (w - 10, 140), (100, 100, 100), 2)
+                
+        elif len(self.test_results) > 0:
+            # Show results
+            passed = sum(1 for r in self.test_results if r['passed'])
+            
+            if self.overall_result >= 0.6:
+                status_text = "✓ VALIDATED"
+                status_color = (0, 255, 0)
+            else:
+                status_text = "✗ FAILED"
+                status_color = (0, 0, 255)
+                
+            cv2.putText(img, f"STATUS: {status_text}", (10, 55),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, status_color, 2)
+            cv2.putText(img, f"Pass Rate: {passed}/{len(self.test_results)} ({self.overall_result*100:.0f}%)",
+                       (10, 85), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+                       
+            # Individual test results
+            y = 120
+            for i, result in enumerate(self.test_results):
+                color = (0, 255, 0) if result['passed'] else (0, 0, 255)
+                marker = "✓" if result['passed'] else "✗"
+                
+                cv2.putText(img, f"{marker} {result['name']}: {result['score']:.2f}",
+                           (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)
+                y += 25
+                
+                if y > h - 20:
+                    break  # Don't overflow display
+        else:
+            # Ready state
+            cv2.putText(img, "STATUS: READY", (10, 55),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150, 150, 150), 1)
+            cv2.putText(img, "Send trigger to start suite", (10, 85),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
+            cv2.putText(img, f"Tests: {len(self.tests)}", (10, 110),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+
 === FILE: vectorsplitternode.py ===
 
 """
@@ -21007,6 +23029,164 @@ class WebcamPhaseNode(BaseNode):
         return [
             ("Camera Device", "device_id", self.device_id, camera_options),
             ("Motion Sensitivity", "motion_sensitivity", self.motion_sensitivity, None),
+        ]
+
+=== FILE: whispergatenode.py ===
+
+"""
+Whisper Gate Node - Applies infinitesimal bias to guide evolution
+Based on Whisper Quantum Computer's "Ultra-Light Gates"
+
+Instead of forcing a state change, whispers a suggestion through statistical bias.
+"""
+
+import numpy as np
+import cv2
+
+import __main__
+BaseNode = __main__.BaseNode
+QtGui = __main__.QtGui
+
+class WhisperGateNode(BaseNode):
+    """
+    Generates gentle bias vectors to guide chaotic field evolution.
+    Multiple gate types implement different transformations.
+    """
+    NODE_CATEGORY = "AI / Physics"
+    NODE_COLOR = QtGui.QColor(150, 100, 150)
+    
+    def __init__(self, gate_type='hadamard', strength=0.01):
+        super().__init__()
+        self.node_title = f"Whisper Gate"
+        
+        self.inputs = {
+            'state_in': 'spectrum',
+            'strength': 'signal',  # How loud the whisper (0.001 - 1.0)
+            'target': 'spectrum'  # Optional target state to whisper toward
+        }
+        self.outputs = {
+            'bias_out': 'spectrum',
+            'gate_active': 'signal'
+        }
+        
+        self.gate_type = gate_type  # 'hadamard', 'pauli_x', 'pauli_z', 'phase', 'identity', 'custom'
+        self.strength = float(strength)
+        self.bias = None
+        
+    def step(self):
+        state = self.get_blended_input('state_in', 'first')
+        strength_signal = self.get_blended_input('strength', 'sum')
+        target = self.get_blended_input('target', 'first')
+        
+        if strength_signal is not None:
+            strength = strength_signal * 0.1  # Scale down for ultra-light
+        else:
+            strength = self.strength
+            
+        if state is None:
+            self.bias = np.zeros(16)  # Default dimension
+            return
+            
+        dimensions = len(state)
+        
+        # Generate bias based on gate type
+        if self.gate_type == 'hadamard':
+            # Create 50/50 superposition bias (push toward zero)
+            target_state = np.zeros_like(state)
+            self.bias = (target_state - state) * strength
+            
+        elif self.gate_type == 'pauli_x':
+            # Flip bias (push toward opposite sign)
+            target_state = -state
+            self.bias = (target_state - state) * strength * 0.5
+            
+        elif self.gate_type == 'pauli_z':
+            # Phase flip (invert alternate dimensions)
+            target_state = state.copy()
+            target_state[1::2] *= -1  # Flip every other dimension
+            self.bias = (target_state - state) * strength
+            
+        elif self.gate_type == 'phase':
+            # Rotate in phase space (shift dimensions)
+            target_state = np.roll(state, 1)
+            self.bias = (target_state - state) * strength
+            
+        elif self.gate_type == 'identity':
+            # No bias (useful for testing)
+            self.bias = np.zeros_like(state)
+            
+        elif self.gate_type == 'custom':
+            # Use provided target state
+            if target is not None and len(target) == dimensions:
+                self.bias = (target - state) * strength
+            else:
+                self.bias = np.zeros_like(state)
+                
+        elif self.gate_type == 'amplify':
+            # Push away from zero (increase magnitude)
+            self.bias = state * strength
+            
+        elif self.gate_type == 'dampen':
+            # Push toward zero (decrease magnitude)
+            self.bias = -state * strength
+            
+        else:
+            self.bias = np.zeros_like(state)
+            
+    def get_output(self, port_name):
+        if port_name == 'bias_out':
+            return self.bias.astype(np.float32) if self.bias is not None else None
+        elif port_name == 'gate_active':
+            return 1.0 if np.abs(self.bias).max() > 1e-6 else 0.0
+        return None
+        
+    def get_display_image(self):
+        """Visualize the bias vector"""
+        w, h = 256, 128
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        if self.bias is None:
+            cv2.putText(img, "Waiting for input...", (10, 64),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
+            return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+            
+        dimensions = len(self.bias)
+        bar_width = max(1, w // dimensions)
+        
+        # Normalize for display
+        bias_norm = self.bias.copy()
+        bias_max = np.abs(bias_norm).max()
+        if bias_max > 1e-6:
+            bias_norm = bias_norm / bias_max
+            
+        for i, val in enumerate(bias_norm):
+            x = i * bar_width
+            h_bar = int(abs(val) * (h//2 - 10))
+            y_base = h // 2
+            
+            if val >= 0:
+                color = (0, int(255 * abs(val)), 0)  # Green = positive bias
+                cv2.rectangle(img, (x, y_base-h_bar), (x+bar_width-1, y_base), color, -1)
+            else:
+                color = (int(255 * abs(val)), 0, 0)  # Red = negative bias
+                cv2.rectangle(img, (x, y_base), (x+bar_width-1, y_base+h_bar), color, -1)
+                
+        # Baseline
+        cv2.line(img, (0, h//2), (w, h//2), (100,100,100), 1)
+        
+        # Gate type label
+        cv2.putText(img, f"Gate: {self.gate_type.upper()}", (5, 15),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,0), 1)
+        cv2.putText(img, f"Strength: {self.strength:.4f}", (5, 35),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+        
+        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+        
+    def get_config_options(self):
+        return [
+            ("Gate Type", "gate_type", self.gate_type, 
+             ['hadamard', 'pauli_x', 'pauli_z', 'phase', 'identity', 'custom', 'amplify', 'dampen']),
+            ("Strength", "strength", self.strength, None)
         ]
 
 === FILE: worldsubstratenode.py ===
