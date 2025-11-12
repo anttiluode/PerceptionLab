@@ -1,0 +1,335 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "CirculatorSwarmNode",
+      "pos_x": -257.0,
+      "pos_y": -152.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "vector_field_in": "image",
+          "repulsion": "signal",
+          "damping": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "Circulator Swarm",
+        "size": 256,
+        "particle_count": 300
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "DistanceFieldNode",
+      "pos_x": -257.0,
+      "pos_y": 72.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "threshold": "signal",
+          "invert": "signal"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "Distance Field",
+        "size": 256
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ImageStylizerNode",
+      "pos_x": -4.0,
+      "pos_y": -253.0,
+      "width": 543.0,
+      "height": 512.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Image Stylizer",
+        "modes": [
+          "Oil Painting",
+          "Pencil Sketch (Color)",
+          "Pencil Sketch (Gray)"
+        ],
+        "mode": "Oil Painting"
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "VoronoiFieldNode",
+      "pos_x": -492.0,
+      "pos_y": -129.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "seed1_x": "signal",
+          "seed1_y": "signal",
+          "seed2_x": "signal",
+          "seed2_y": "signal",
+          "rotation": "signal",
+          "scale": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "edge_density": "signal"
+        },
+        "input_data": {
+          "seed1_x": [
+            2.636422963884594
+          ],
+          "seed1_y": [
+            4.666757933409456
+          ],
+          "seed2_x": [
+            -0.19887673100851402
+          ],
+          "seed2_y": [
+            -0.3318253991356807
+          ],
+          "rotation": [
+            0.7106732253799254
+          ],
+          "scale": [
+            0.6071427972253158
+          ]
+        },
+        "node_title": "Voronoi Field",
+        "size": 256,
+        "num_seeds": 8,
+        "edge_density": 0.0147247314453125
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "ChaoticControlNode",
+      "pos_x": -753.0,
+      "pos_y": -175.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "control_nudge": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "chaos_x": "signal",
+          "chaos_y": "signal",
+          "phase_image": "image"
+        },
+        "input_data": {
+          "control_nudge": [
+            -0.015498332654261482
+          ],
+          "reset": []
+        },
+        "node_title": "Chaotic Control (Lorenz)",
+        "sigma": 10.0,
+        "rho": 28.0,
+        "beta": 2.6666666666666665,
+        "dt": 0.01,
+        "history_len": 1000,
+        "output_x": 2.8360466829547835,
+        "output_y": 4.804787290890129
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "LoopAttractorNode",
+      "pos_x": -499.0,
+      "pos_y": 67.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "perturbation": "signal",
+          "parameter_a": "signal",
+          "parameter_c": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "x_out": "signal",
+          "y_out": "signal",
+          "z_out": "signal",
+          "phase_image": "image",
+          "energy": "signal"
+        },
+        "input_data": {
+          "perturbation": [
+            -0.015498332654261482
+          ],
+          "parameter_a": [
+            -0.015498332654261482
+          ],
+          "parameter_c": [
+            -0.015498332654261482
+          ],
+          "reset": []
+        },
+        "node_title": "Loop Attractor",
+        "dt": 0.01,
+        "a": 9.922508336728693,
+        "b": 2.6666666666666665,
+        "c": 29.845016673457387,
+        "x": -2.1538408945522973,
+        "y": -3.6743329804845133,
+        "z": 17.37652203230918,
+        "history_len": 500,
+        "loop_phase": 6.189029888172424,
+        "loop_amplitude": 1.0,
+        "last_reset": 0.0
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -743.0,
+      "pos_y": 63.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Noise Gen",
+        "w": 160,
+        "h": 120,
+        "noise_type": "white",
+        "speed": 0.1,
+        "signal_value": -0.004558123504458944
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "EEGSimulatorNode",
+      "pos_x": -486.0,
+      "pos_y": -327.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG Simulator",
+        "sample_rate": 250.0,
+        "time": 1.7000000000000013,
+        "channels": [
+          "Fp1",
+          "Fp2",
+          "C3",
+          "C4",
+          "O1",
+          "O2",
+          "T7",
+          "T8"
+        ],
+        "selected_channel": "Fp1",
+        "output_value": 0.05833521934916583
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 2,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "vector_field_in"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "chaos_x",
+      "to_node_id": 3,
+      "to_port": "seed1_x"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "chaos_y",
+      "to_node_id": 3,
+      "to_port": "seed1_y"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "x_out",
+      "to_node_id": 3,
+      "to_port": "seed2_x"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "y_out",
+      "to_node_id": 3,
+      "to_port": "seed2_y"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "z_out",
+      "to_node_id": 3,
+      "to_port": "rotation"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "energy",
+      "to_node_id": 3,
+      "to_port": "scale"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 5,
+      "to_port": "perturbation"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 5,
+      "to_port": "parameter_a"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 4,
+      "to_port": "control_nudge"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 5,
+      "to_port": "parameter_c"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "repulsion"
+    }
+  ]
+}
