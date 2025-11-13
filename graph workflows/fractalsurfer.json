@@ -5,43 +5,6 @@
   "nodes": [
     {
       "id": 0,
-      "class_name": "AutonomousFractalSurferNode",
-      "pos_x": -418.0,
-      "pos_y": -326.0,
-      "width": 744.0,
-      "height": 378.0,
-      "config": {
-        "inputs": {
-          "zoom_speed": "signal",
-          "steer_damp": "signal",
-          "reset": "signal"
-        },
-        "outputs": {
-          "image": "image",
-          "complexity": "signal",
-          "x_pos": "signal",
-          "y_pos": "signal",
-          "zoom": "signal"
-        },
-        "input_data": {
-          "zoom_speed": [
-            0.7
-          ],
-          "steer_damp": [],
-          "reset": []
-        },
-        "node_title": "Fractal Surfer",
-        "resolution": 128,
-        "max_iterations": 50,
-        "center_x": -0.20710786712014848,
-        "center_y": -1.1227570636483095,
-        "zoom": 5.65367860880565e+17,
-        "nudge_x": -1.0,
-        "nudge_y": -1.0
-      }
-    },
-    {
-      "id": 1,
       "class_name": "ConstantSignalNode",
       "pos_x": -694.0,
       "pos_y": -185.0,
@@ -56,13 +19,63 @@
         "node_title": "Constant Signal",
         "value": 1.0
       }
+    },
+    {
+      "id": 1,
+      "class_name": "TrueFractalSurferNode",
+      "pos_x": -431.0,
+      "pos_y": -471.0,
+      "width": 654.0,
+      "height": 475.0,
+      "config": {
+        "inputs": {
+          "zoom_speed": "signal",
+          "steer_damp": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "complexity": "signal",
+          "x_pos": "signal",
+          "y_pos": "signal",
+          "zoom": "signal",
+          "depth": "signal"
+        },
+        "input_data": {
+          "zoom_speed": [
+            0.7
+          ],
+          "steer_damp": [],
+          "reset": []
+        },
+        "node_title": "True Surfer (Async)",
+        "resolution": 128,
+        "base_iterations": 50,
+        "iteration_scale": 10.0,
+        "home_strength": 0.05,
+        "boredom_threshold": 0.1,
+        "home_x": -0.7,
+        "home_y": 0.0,
+        "center_x": -0.16238802424529836,
+        "center_y": -1.0397708484449832,
+        "zoom": 743973.5037275215,
+        "current_max_iter": 8675,
+        "nudge_x": -0.08531971351027877,
+        "nudge_y": -0.2106971299301121,
+        "soma_is_working": false,
+        "job_x": -0.16238802424529836,
+        "job_y": -1.0397708484449832,
+        "job_zoom": 743973.5037275215,
+        "job_max_iter": 8675,
+        "is_running": true
+      }
     }
   ],
   "edges": [
     {
-      "from_node_id": 1,
+      "from_node_id": 0,
       "from_port": "signal",
-      "to_node_id": 0,
+      "to_node_id": 1,
       "to_port": "zoom_speed"
     }
   ]
