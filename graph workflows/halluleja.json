@@ -1,0 +1,139 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "TrueFractalSurferNode",
+      "pos_x": -300.0,
+      "pos_y": 50.0,
+      "width": 300.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "zoom_speed": "signal",
+          "steer_damp": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "complexity": "signal",
+          "x_pos": "signal",
+          "y_pos": "signal",
+          "zoom": "signal",
+          "depth": "signal"
+        },
+        "node_title": "True Surfer (Soma+Dendrite)",
+        "resolution": 128,
+        "base_iterations": 50,
+        "home_strength": 0.05,
+        "boredom_threshold": 0.1,
+        "iteration_scale": 10.0
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -600.0,
+      "pos_y": 50.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "node_title": "Zoom Speed",
+        "value": 0.1
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -600.0,
+      "pos_y": 170.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "node_title": "Steer Damping",
+        "value": 0.1
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "ImageDisplayNode",
+      "pos_x": 50.0,
+      "pos_y": 50.0,
+      "width": 256.0,
+      "height": 256.0,
+      "config": {
+        "inputs": {
+          "image": "image"
+        },
+        "outputs": {},
+        "node_title": "Surfer's View",
+        "w": 256,
+        "h": 256
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 50.0,
+      "pos_y": 330.0,
+      "width": 120.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "node_title": "Complexity"
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 190.0,
+      "pos_y": 330.0,
+      "width": 120.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "node_title": "Calc. Depth"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "zoom_speed"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "steer_damp"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 3,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "complexity",
+      "to_node_id": 4,
+      "to_port": "signal"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "depth",
+      "to_node_id": 5,
+      "to_port": "signal"
+    }
+  ]
+}
