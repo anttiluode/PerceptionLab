@@ -1,23 +1,21 @@
 """
-Autonomous FractalSurferNode (v3)
+TrueFractalSurferNode (v11 - Asynchronous)
 --------------------------------
-A self-contained "consciousness" model that generates its own
-fractal "world" and uses an internal "logic" to surf the
-edge of chaos, seeking maximum complexity.
+This node implements the "two-brain" P-KAS model.
+It fixes the "massive slowth" by moving the "Soma"
+(the deep fractal calculation) onto a separate thread.
 
-This version implements a "two-state logic" inspired by the
-"thin sheet of logic" and "fractal surfer" concepts.
+The "Dendrite" (the main step() function) runs at full
+speed, making steering decisions based on the last
+available "thought" from the Soma.
 
-LOGIC:
-- STATE 1 (SURFING): If complexity is high, steer gently along the edge.
-- STATE 2 (LOST/BORED): If complexity is low (stuck in a solid
-  color void), stop zooming and "kick" back towards the "home"
-  fractal region to find the "shallow water" (the edge) again.
+This enables true, infinite, real-time surfing.
 """
 
 import numpy as np
 import cv2
 import time
+import threading # We need this for the "Soma"
 
 # --- Magic import block ---
 import __main__
@@ -26,28 +24,25 @@ QtGui = __main__.QtGui
 # --------------------------
 
 # --- Numba JIT for high-speed fractal math ---
-# [cite_start]This function is borrowed from your fractal_explorer.py [cite: 6464-6468]
 try:
     from numba import jit
     NUMBA_AVAILABLE = True
 except ImportError:
     NUMBA_AVAILABLE = False
-    print("Warning: AutonomousFractalSurferNode requires 'numba' for speed.")
+    print("Warning: TrueFractalSurferNode requires 'numba' for speed.")
 
 @jit(nopython=True, fastmath=True)
 def compute_mandelbrot_core(width, height, center_x, center_y, zoom, max_iter):
     """
     Fast Numba-compiled Mandelbrot set calculator.
+    This is the "Soma" - it's allowed to be slow.
     """
     result = np.zeros((height, width), dtype=np.float32)
-    
-    # Calculate scale
     scale_x = 3.0 / (width * zoom)
     scale_y = 2.0 / (height * zoom)
     
     for y in range(height):
         for x in range(width):
-            # Map pixel to complex plane
             c_real = center_x + (x - width / 2) * scale_x
             c_imag = center_y + (y - height / 2) * scale_y
             
@@ -55,127 +50,161 @@ def compute_mandelbrot_core(width, height, center_x, center_y, zoom, max_iter):
             z_imag = 0.0
             
             n = 0
-            while n < max_iter:
+            while n < int(max_iter):
                 if z_real * z_real + z_imag * z_imag > 4.0:
                     break
-                
-                # z = z*z + c
                 new_z_real = z_real * z_real - z_imag * z_imag + c_real
                 z_imag = 2.0 * z_real * z_imag + c_imag
                 z_real = new_z_real
-                
                 n += 1
                 
-            result[y, x] = n / max_iter # Normalized iteration count
+            result[y, x] = n / max_iter
             
     return result
 
-class AutonomousFractalSurferNode(BaseNode):
+class TrueFractalSurferNode(BaseNode):
     NODE_CATEGORY = "Source"
     NODE_COLOR = QtGui.QColor(100, 200, 250) # Crystalline Blue
     
-    def __init__(self, resolution=128, max_iterations=50):
+    def __init__(self, resolution=128, base_iterations=50, home_strength=0.05, boredom_threshold=0.1, iteration_scale=10.0):
         super().__init__()
-        self.node_title = "Fractal Surfer"
+        self.node_title = "True Surfer (Async)"
         
         self.inputs = {
-            'zoom_speed': 'signal',   # How fast to zoom (0-1)
-            'steer_damp': 'signal',   # How much to resist steering (0-1)
+            'zoom_speed': 'signal',
+            'steer_damp': 'signal',
             'reset': 'signal'
         }
         self.outputs = {
-            'image': 'image',         # The "Surfer's View"
-            'complexity': 'signal',     # The "Logic" signal (what it feels)
+            'image': 'image',
+            'complexity': 'signal',
             'x_pos': 'signal',
             'y_pos': 'signal',
-            'zoom': 'signal'
+            'zoom': 'signal',
+            'depth': 'signal'
         }
         
         if not NUMBA_AVAILABLE:
             self.node_title = "Surfer (No Numba!)"
         
         self.resolution = int(resolution)
-        self.max_iterations = int(max_iterations)
+        self.base_iterations = int(base_iterations)
+        self.iteration_scale = float(iteration_scale)
+        self.home_strength = float(home_strength) 
+        self.boredom_threshold = float(boredom_threshold)
         
         # --- Internal Surfer State ---
-        self.home_x = -0.7 # The "safe harbor" of the main fractal
-        self.home_y = 0.0
-        self.center_x = self.home_x
-        self.center_y = self.home_y
+        self.home_x, self.home_y = -0.7, 0.0
+        self.center_x, self.center_y = self.home_x, self.home_y
         self.zoom = 1.0
+        self.current_max_iter = self.base_iterations
         
         # --- Internal Logic State ---
-        self.fractal_data = np.zeros((self.resolution, self.resolution), dtype=np.float32)
         self.complexity = 0.0
-        self.is_panicked = False # Our "logic" state flag
+        self.nudge_x, self.nudge_y = 0.0, 0.0
         
-        # Store nudge for smooth steering
-        self.nudge_x = 0.0
-        self.nudge_y = 0.0
+        # --- Asynchronous "Soma" (The Slow Brain) ---
+        self.soma_thread = None
+        self.soma_is_working = False
+        self.soma_lock = threading.Lock() # To safely pass data
         
-        # --- Tunable Parameters ---
-        self.boredom_threshold = 0.05 # How simple the view must be to "panic"
-        self.kick_strength = 0.2      # How hard to "kick" when bored (as a fraction of zoom)
+        # Data to pass to the thread
+        self.job_x = self.center_x
+        self.job_y = self.center_y
+        self.job_zoom = self.zoom
+        self.job_max_iter = self.current_max_iter
+        
+        # Data to get back from the thread
+        self.completed_fractal_data = np.zeros((self.resolution, self.resolution), dtype=np.float32)
+        
+        # Start the "Soma"
+        self.is_running = True
+        self.start_soma_thread()
 
     def randomize(self):
         """Reset to the 'home' position"""
-        self.center_x = self.home_x
-        self.center_y = self.home_y
-        self.zoom = 1.0
-        
+        with self.soma_lock:
+            self.center_x, self.center_y = self.home_x, self.home_y
+            self.zoom = 1.0
+            self.current_max_iter = self.base_iterations
+
     # -----------------------------------------------------------------
-    # --- THIS IS THE FIXED "THIN LOGIC" (v3) ---
+    # --- "THIN LOGIC" (The Fast Brain / Dendrite) ---
     # -----------------------------------------------------------------
-    def _find_steering_vector(self):
+    def _find_steering_vector(self, fractal_data):
         """
         The "Thin Logic" of the surfer.
-        Decides what to do based on the current view.
+        Calculates a steering vector as a blend of two forces.
         """
-        if self.fractal_data.size == 0:
+        if fractal_data.size == 0:
             return 0, 0
             
-        # 1. Measure Overall "Boredom" (The Meta-Logic)
-        # We use Standard Deviation as a robust measure of complexity.
-        self.complexity = np.std(self.fractal_data)
+        self.complexity = np.std(fractal_data)
         
-        # --- THE "THIN LOGIC" RULE ---
-        if self.complexity < self.boredom_threshold:
-            # STATE 1: "PANIC" / SEEK "SHALLOW WATER"
-            # The view is too simple.
-            self.is_panicked = True
-            
-            # Calculate a vector pointing from our current "lost"
-            # position back to the "home" fractal at (-0.7, 0.0).
-            # This is a targeted, intelligent escape, not a random kick.
-            target_nudge_x = self.home_x - self.center_x
-            target_nudge_y = self.home_y - self.center_y
-            
-            # Normalize the vector
-            norm = np.sqrt(target_nudge_x**2 + target_nudge_y**2) + 1e-9
-            target_nudge_x /= norm
-            target_nudge_y /= norm
-            
-            return target_nudge_x, target_nudge_y
+        # "Surf Force" (Steer to complex edge)
+        score_map = fractal_data * (1.0 - fractal_data) * 4.0
+        max_idx = np.argmax(score_map)
+        target_y, target_x = np.unravel_index(max_idx, score_map.shape)
+        
+        center = self.resolution // 2
+        surf_nudge_x = (target_x - center) / center
+        surf_nudge_y = (target_y - center) / center
 
-        else:
-            # STATE 2: "SURF" (The Original Logic)
-            # The view is complex. Find the most "interesting" edge.
-            self.is_panicked = False
-            
-            # Score is high (max 1.0) only when fractal_data is 0.5
-            score_map = self.fractal_data * (1.0 - self.fractal_data) * 4.0
-            
-            max_idx = np.argmax(score_map)
-            target_y, target_x = np.unravel_index(max_idx, score_map.shape)
-            
-            # Calculate Nudge Vector (steer towards most complex point)
-            center = self.resolution // 2
-            nudge_x = (target_x - center) / center # -1 to 1
-            nudge_y = (target_y - center) / center # -1 to 1
-            
-            return nudge_x, nudge_y
+        # "Home Force" (Steer to "shallows")
+        home_nudge_x = self.home_x - self.center_x
+        home_nudge_y = self.home_y - self.center_y
+        
+        norm = np.sqrt(home_nudge_x**2 + home_nudge_y**2) + 1e-9
+        home_nudge_x = (home_nudge_x / norm) * self.home_strength
+        home_nudge_y = (home_nudge_y / norm) * self.home_strength
+        
+        # Logic Blend Weight
+        surf_weight = np.clip(self.complexity / self.boredom_threshold, 0.0, 1.0)
+        home_weight = 1.0 - surf_weight
+        
+        # Combine Forces
+        target_nudge_x = (surf_nudge_x * surf_weight) + (home_nudge_x * home_weight)
+        target_nudge_y = (surf_nudge_y * surf_weight) + (home_nudge_y * home_weight)
+        
+        return target_nudge_x, target_nudge_y
     # -----------------------------------------------------------------
 
+    # -----------------------------------------------------------------
+    # --- "SOMA" THREAD (The Slow Brain) ---
+    # -----------------------------------------------------------------
+    def start_soma_thread(self):
+        """Starts the background calculation thread."""
+        if self.soma_is_working or not self.is_running:
+            return
+            
+        self.soma_is_working = True
+        self.soma_thread = threading.Thread(target=self.soma_worker, daemon=True)
+        self.soma_thread.start()
+
+    def soma_worker(self):
+        """
+        This is the "Soma." It runs in the background.
+        It just does one job: calculate the fractal.
+        """
+        # Get the job parameters
+        with self.soma_lock:
+            x, y, z, i = self.job_x, self.job_y, self.job_zoom, self.job_max_iter
+        
+        # --- THE SLOW, DEEP CALCULATION ---
+        fractal_data = compute_mandelbrot_core(
+            self.resolution, self.resolution,
+            x, y, z, i
+        )
+        # ---------------------------------
+        
+        # Safely pass the result back to the main thread
+        with self.soma_lock:
+            self.completed_fractal_data = fractal_data
+            self.soma_is_working = False
+
+    # -----------------------------------------------------------------
+    # --- "DENDRITE" (The Fast Brain, runs every frame) ---
+    # -----------------------------------------------------------------
     def step(self):
         if not NUMBA_AVAILABLE:
             return
@@ -188,47 +217,46 @@ class AutonomousFractalSurferNode(BaseNode):
         if reset > 0.5:
             self.randomize()
 
-        # 2. Render the "World" from the current position
-        self.fractal_data = compute_mandelbrot_core(
-            self.resolution, self.resolution,
-            self.center_x, self.center_y,
-            self.zoom, self.max_iterations
-        )
+        # 2. Check on the "Soma" (the thread)
+        if not self.soma_is_working:
+            # --- The "Soma" is done! Time to "think" ---
+            
+            # A. Get the "perception" (the finished fractal)
+            with self.soma_lock:
+                fractal_data_to_process = self.completed_fractal_data.copy()
+            
+            # B. Run the "Thin Logic" (Dendrite)
+            target_nudge_x, target_nudge_y = self._find_steering_vector(fractal_data_to_process)
+            
+            # C. Apply Steering (with Damping)
+            smoothing_factor = 1.0 - np.clip(steer_damp, 0.0, 0.95)
+            self.nudge_x = (self.nudge_x * (1.0 - smoothing_factor)) + (target_nudge_x * smoothing_factor)
+            self.nudge_y = (self.nudge_y * (1.0 - smoothing_factor)) + (target_nudge_y * smoothing_factor)
 
-        # 3. "Thin Logic" decides where to go next
-        target_nudge_x, target_nudge_y = self._find_steering_vector()
-        
-        # 4. Apply Steering (with Damping)
-        smoothing_factor = 1.0 - np.clip(steer_damp, 0.0, 0.95)
-        self.nudge_x = (self.nudge_x * (1.0 - smoothing_factor)) + (target_nudge_x * smoothing_factor)
-        self.nudge_y = (self.nudge_y * (1.0 - smoothing_factor)) + (target_nudge_y * smoothing_factor)
-
-        # 5. Act on the "World" (Update State)
-        
-        # --- MODIFIED ACTION BASED ON LOGIC STATE ---
-        if self.is_panicked:
-            # "LOST/BORED" STATE: Stop zooming, kick hard
-            self.zoom *= 0.98 # Back up!
-            
-            # The "kick" is now relative to the *view*, not the zoom
-            # We move 20% of the current view's width/height
-            kick_distance = self.kick_strength / self.zoom 
-            self.center_x += self.nudge_x * kick_distance
-            self.center_y += self.nudge_y * kick_distance
-            
-        else:
-            # "SURFING" STATE: Gentle steering and keep zooming
-            
-            # The nudge is scaled by zoom, so we move precisely
+            # D. Act on the "World" (Update next job's parameters)
             self.center_x += self.nudge_x / (self.zoom * 2.0)
             self.center_y += self.nudge_y / (self.zoom * 2.0)
-            
-            # Apply the endless zoom
             self.zoom *= (1.0 + (zoom_speed * 0.05))
+            
+            # E. Calculate "Depth of Vision" for the *next* frame
+            self.current_max_iter = int(self.base_iterations + np.sqrt(max(1.0, self.zoom)) * self.iteration_scale)
+
+            # F. Give the "Soma" its *new* job
+            with self.soma_lock:
+                self.job_x = self.center_x
+                self.job_y = self.center_y
+                self.job_zoom = self.zoom
+                self.job_max_iter = self.current_max_iter
+                
+            self.start_soma_thread() # Wake up the "Soma"
+
+        # (If the Soma is still working, the Dendrite does nothing
+        #  but wait. It continues to output the *last* frame).
 
     def get_output(self, port_name):
+        # We *always* output the last *completed* data
         if port_name == 'image':
-            return self.fractal_data
+            return self.completed_fractal_data
         elif port_name == 'complexity':
             return self.complexity * 5.0 # Boost signal
         elif port_name == 'x_pos':
@@ -237,32 +265,35 @@ class AutonomousFractalSurferNode(BaseNode):
             return self.center_y
         elif port_name == 'zoom':
             return self.zoom
+        elif port_name == 'depth':
+            return float(self.current_max_iter)
         return None
         
     def get_display_image(self):
-        # Apply a colormap for a nice visual
-        img_u8 = (np.clip(self.fractal_data, 0, 1) * 255).astype(np.uint8)
+        # We *always* display the last *completed* data
+        img_u8 = (np.clip(self.completed_fractal_data, 0, 1) * 255).astype(np.uint8)
         img_color = cv2.applyColorMap(img_u8, cv2.COLORMAP_MAGMA)
         
         # Draw steering vector
         h, w, _ = img_color.shape
         center = (w // 2, h // 2)
         
-        # Scale nudge vector for display
-        if self.is_panicked:
-            # Red, strong arrow pointing "home"
-            display_x = self.nudge_x * (w / 2)
-            display_y = self.nudge_y * (h / 2)
-            arrow_color = (0, 0, 255) # Red for "panic"
-        else:
-            # Green, gentle arrow pointing to edge
-            display_x = self.nudge_x * (w / 2)
-            display_y = self.nudge_y * (h / 2)
-            arrow_color = (0, 255, 0) # Green for "surfing"
+        is_surfing = self.complexity > self.boredom_threshold
+        arrow_color = (0, 255, 0) if is_surfing else (0, 0, 255)
 
-        target_x = int(center[0] + display_x)
-        target_y = int(center[1] + display_y)
+        target_x = int(center[0] + self.nudge_x * w)
+        target_y = int(center[1] + self.nudge_y * h)
+        
         cv2.arrowedLine(img_color, center, (target_x, target_y), arrow_color, 1)
+        
+        # Display the current iteration depth
+        cv2.putText(img_color, f"Depth: {self.current_max_iter}", (5, h - 5), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
+        
+        # --- NEW: Show when the "Soma" (thread) is busy ---
+        if self.soma_is_working:
+            cv2.putText(img_color, "CALCULATING...", (5, 15), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 255), 1)
         
         img_color = np.ascontiguousarray(img_color)
         return QtGui.QImage(img_color.data, w, h, 3*w, QtGui.QImage.Format.Format_BGR888)
@@ -270,7 +301,15 @@ class AutonomousFractalSurferNode(BaseNode):
     def get_config_options(self):
         return [
             ("Resolution", "resolution", self.resolution, None),
-            ("Max Iterations", "max_iterations", self.max_iterations, None),
-            ("Boredom Threshold", "boredom_threshold", self.boredom_threshold, None),
-            ("Panic Kick Strength", "kick_strength", self.kick_strength, None)
+            ("Base Iterations", "base_iterations", self.base_iterations, None),
+            ("Iteration Scale", "iteration_scale", self.iteration_scale, None),
+            ("Home Strength", "home_strength", self.home_strength, None),
+            ("Complexity Sensitivity", "boredom_threshold", self.boredom_threshold, None)
         ]
+        
+    def close(self):
+        # Clean up the thread
+        self.is_running = False
+        if self.soma_thread is not None:
+            self.soma_thread.join(timeout=0.5)
+        super().close()
