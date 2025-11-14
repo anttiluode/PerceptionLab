@@ -221,14 +221,23 @@ class RealVAENode(BaseNode):
         self.model.eval()
         z_to_decode = None
         
+        # --- START OF LOGIC FIX ---
+        # Priority 1: Check for a valid external latent vector
         if has_external_latent:
-            # Priority: Use the external latent vector if plugged in
-            if len(external_latent) == self.latent_dim:
+            # Check if it's a 1D vector and has the correct length
+            if external_latent.ndim == 1 and len(external_latent) == self.latent_dim:
                 z_to_decode = torch.from_numpy(external_latent).float().unsqueeze(0).to(self.device)
-        
-        elif has_image:
-            # Fallback: Use the live latent vector from the image
+            else:
+                # The input is invalid (e.g., a 2D image or wrong length)
+                # In this case, we set z_to_decode to None and let
+                # the next check handle it.
+                pass 
+
+        # Priority 2: If no *valid* external latent was found,
+        # but we have an image, use the image's own latent vector.
+        if z_to_decode is None and has_image:
             z_to_decode = torch.from_numpy(self.current_latent).float().unsqueeze(0).to(self.device)
+        # --- END OF LOGIC FIX ---
             
         # Run decoder
         if z_to_decode is not None:
