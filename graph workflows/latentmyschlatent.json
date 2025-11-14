@@ -23,7 +23,7 @@
         "w": 160,
         "h": 120,
         "sample_rate": 44100,
-        "signal_output": 0.4402595996732026
+        "signal_output": 0.42780126633986926
       }
     },
     {
@@ -123,21 +123,21 @@
           "raw_signal": "signal"
         },
         "input_data": {},
-        "node_title": "EEG (Temporal)",
+        "node_title": "EEG (Occipital)",
         "edf_file_path": "e:\\docshouse\\450\\3.edf",
-        "selected_region": "Temporal",
+        "selected_region": "Occipital",
         "_last_path": "e:\\docshouse\\450\\3.edf",
-        "_last_region": "Temporal",
+        "_last_region": "Occipital",
         "fs": 100.0,
-        "current_time": 105.23333333332992,
+        "current_time": 1.9000000000000026,
         "window_size": 1.0,
         "output_powers": {
-          "delta": 1.3098375990254535e-08,
-          "theta": 3.2296111197378876e-09,
-          "alpha": 5.702666811128037e-10,
-          "beta": 7.660361527497363e-10,
-          "gamma": 1.3722392433276575e-10,
-          "raw_signal": 1.3348170844218822e-08
+          "delta": 6.892197671172759e-10,
+          "theta": 2.362741548892993e-10,
+          "alpha": 8.369580190430741e-10,
+          "beta": 4.506645308718954e-10,
+          "gamma": 1.7308487861646894e-10,
+          "raw_signal": 6.136739850927666e-09
         }
       }
     },
@@ -169,22 +169,22 @@
         },
         "input_data": {
           "delta_in": [
-            1.2789896906904284e-08
+            7.150696691487881e-10
           ],
           "theta_in": [
-            3.179495027849901e-09
+            2.0973034656968486e-10
           ],
           "alpha_in": [
-            4.803839572568052e-10
+            8.515973571988241e-10
           ],
           "beta_in": [
-            7.599408115816999e-10
+            4.388384872461321e-10
           ],
           "gamma_in": [
-            1.3249687931973113e-10
+            1.723893455143094e-10
           ],
           "raw_in": [
-            1.3332897900299502e-08
+            5.763665988026616e-09
           ],
           "scale_mod": []
         },
@@ -215,8 +215,8 @@
     {
       "id": 8,
       "class_name": "RealVAENode",
-      "pos_x": 263.0,
-      "pos_y": 276.0,
+      "pos_x": 265.0,
+      "pos_y": 268.0,
       "width": 200.0,
       "height": 180.0,
       "config": {
@@ -235,8 +235,8 @@
         "latent_dim": 16,
         "img_size": 64,
         "max_buffer_size": 50,
-        "current_loss": 3.017604351043701,
-        "training_steps": 2203
+        "current_loss": 17.852022171020508,
+        "training_steps": 7066
       }
     },
     {
@@ -262,8 +262,8 @@
         "latent_dim": 16,
         "img_size": 64,
         "max_buffer_size": 50,
-        "current_loss": 1.4495545625686646,
-        "training_steps": 803
+        "current_loss": 1.619592308998108,
+        "training_steps": 5666
       }
     },
     {
@@ -298,6 +298,67 @@
         },
         "outputs": {},
         "node_title": "Display"
+      }
+    },
+    {
+      "id": 12,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": 507.0,
+      "pos_y": -141.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "node_title": "Latent Assembler",
+        "latent_dim": 16
+      }
+    },
+    {
+      "id": 13,
+      "class_name": "RealVAENode",
+      "pos_x": 607.0,
+      "pos_y": 75.0,
+      "width": 316.0,
+      "height": 416.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "latent_in": "spectrum",
+          "train": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "latent_out": "spectrum",
+          "loss": "signal"
+        },
+        "node_title": "Real VAE",
+        "latent_dim": 16,
+        "img_size": 64,
+        "max_buffer_size": 50,
+        "current_loss": 3.296220541000366,
+        "training_steps": 869
       }
     }
   ],
@@ -397,6 +458,36 @@
       "from_port": "w_matrix_out",
       "to_node_id": 11,
       "to_port": "image_in"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "latent_out",
+      "to_node_id": 12,
+      "to_port": "latent_base"
+    },
+    {
+      "from_node_id": 12,
+      "from_port": "latent_out",
+      "to_node_id": 13,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "latent_out",
+      "to_node_id": 13,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "image_out",
+      "to_node_id": 13,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 13,
+      "to_port": "train"
     }
   ]
 }
