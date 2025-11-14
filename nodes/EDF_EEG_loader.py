@@ -108,6 +108,10 @@ class EEGFileSourceNode(BaseNode):
             self.load_edf()
 
         if self.raw is None:
+            # If no file is loaded, all outputs will decay to 0
+            for band in self.output_powers:
+                self.output_powers[band] *= 0.95
+            self.history *= 0.95
             return # Do nothing if no data
 
         # Get data for the current time window
@@ -128,10 +132,10 @@ class EEGFileSourceNode(BaseNode):
         if data.size == 0:
             return
             
-        # --- FIX: Calculate and normalize the raw signal output ---
-        # Output the *normalized* instantaneous level
-        self.output_powers['raw_signal'] = np.mean(data) * 5.0 # Scale up for visibility
-        # --- END FIX ---
+        # --- FIX 1: Calculate raw_signal as total log power (not DC offset) ---
+        raw_power = np.log1p(np.mean(data**2))
+        # We give it a boost to make it visible
+        self.output_powers['raw_signal'] = self.output_powers['raw_signal'] * 0.8 + (raw_power * 10.0) * 0.2
 
         # Calculate band powers 
         bands = {
@@ -145,13 +149,19 @@ class EEGFileSourceNode(BaseNode):
             if band in self.outputs:
                 b, a = signal.butter(4, [low/nyq, high/nyq], btype='band')
                 filtered = signal.filtfilt(b, a, data)
-                power = np.log1p(np.mean(filtered**2))
+                
+                # --- FIX 2: Boost the band power *after* log1p ---
+                # This makes it comparable to the raw signal's boost.
+                # You can change 20.0 to a higher/lower number to adjust sensitivity.
+                power = np.log1p(np.mean(filtered**2)) * 20.0 
+                
                 # Smooth the output
                 self.output_powers[band] = self.output_powers[band] * 0.8 + power * 0.2
         
         # Update display history with alpha power
         self.history[:-1] = self.history[1:]
-        self.history[-1] = self.output_powers['alpha'] * 0.5 # Scale for vis
+        # Use the newly scaled power for the display
+        self.history[-1] = self.output_powers['alpha'] 
         
         # Increment time
         self.current_time += (1.0 / 30.0) # Assume ~30fps step rate
