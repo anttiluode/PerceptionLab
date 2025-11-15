@@ -1,0 +1,221 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EEGExperimentNode",
+      "pos_x": -640.0,
+      "pos_y": -99.0,
+      "width": 256.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "fast_stream_out": "spectrum",
+          "slow_stream_out": "spectrum"
+        },
+        "input_data": {},
+        "node_title": "EEG (Occipital)",
+        "edf_file_path": "E:/DocsHouse/450/3.edf",
+        "selected_region": "Occipital",
+        "slow_momentum": 0.6,
+        "fast_stream_source": "theta",
+        "slow_stream_source": "alpha",
+        "latent_dim": 6,
+        "signal_gain": 1000000,
+        "raw_power_scale": 1000000,
+        "band_power_scale": 2000000,
+        "_last_path": "E:/DocsHouse/450/3.edf",
+        "_last_region": "Occipital",
+        "fs": 100.0,
+        "current_time": 35.30000000000056,
+        "window_size": 1.0,
+        "fast_latent_powers": {
+          "delta": 3.1526825474981016e-05,
+          "theta": 1.7108617722644435e-05,
+          "alpha": 7.592078539222649e-05,
+          "beta": 5.4732176910826893e-05,
+          "gamma": 9.298398952393793e-06,
+          "raw_signal": 0.00016253501446946003
+        },
+        "slow_latent_powers": {
+          "delta": 3.207119395734896e-05,
+          "theta": 1.871408973657668e-05,
+          "alpha": 7.543785836197022e-05,
+          "beta": 5.41424003111229e-05,
+          "gamma": 9.413457223312589e-06,
+          "raw_signal": 0.00015852303499322396
+        }
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "QualiaDetectorNode",
+      "pos_x": -266.0,
+      "pos_y": 142.0,
+      "width": 480.0,
+      "height": 345.0,
+      "config": {
+        "inputs": {
+          "fast_latent": "spectrum",
+          "slow_latent": "spectrum"
+        },
+        "outputs": {
+          "qualia_intensity": "signal",
+          "prediction_error": "signal",
+          "error_fd": "signal",
+          "predicted_sensation": "spectrum"
+        },
+        "node_title": "Qualia Detector (Attention)",
+        "history_length": 500,
+        "qualia_intensity": 0.0,
+        "error_fd": 1.0
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "PhaseCouplingNode",
+      "pos_x": -267.0,
+      "pos_y": -273.0,
+      "width": 543.0,
+      "height": 411.0,
+      "config": {
+        "inputs": {
+          "fast_stream": "spectrum",
+          "slow_stream": "spectrum"
+        },
+        "outputs": {
+          "phase_coherence": "signal",
+          "coupling_strength": "signal",
+          "sync_event": "signal",
+          "desync_event": "signal",
+          "dominant_coupling": "signal"
+        },
+        "node_title": "Phase Coupling (Binding)",
+        "history_length": 100,
+        "phase_coherence": 0.9990975856781006,
+        "coupling_strength": 0.9999999461974857,
+        "sync_event": 5e-324,
+        "desync_event": 0.0,
+        "dominant_coupling": 1.0,
+        "prev_coherence": 0.9990975856781006
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "TemporalBlurNode",
+      "pos_x": 382.0,
+      "pos_y": -271.0,
+      "width": 522.0,
+      "height": 518.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Temporal Blur (Ghosting)",
+        "feedback": 0.9
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "RotatingMoireNode",
+      "pos_x": 238.0,
+      "pos_y": 123.0,
+      "width": 307.0,
+      "height": 278.0,
+      "config": {
+        "inputs": {
+          "freq_1": "signal",
+          "freq_2": "signal",
+          "rotation_1": "signal",
+          "rotation_2": "signal",
+          "speed_override_1": "signal",
+          "speed_override_2": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "rotation_1_out": "signal",
+          "rotation_2_out": "signal"
+        },
+        "input_data": {
+          "freq_1": [
+            39.71179542541503
+          ],
+          "freq_2": [
+            0.7
+          ],
+          "rotation_1": [
+            5e-324
+          ],
+          "rotation_2": [],
+          "speed_override_1": [],
+          "speed_override_2": []
+        },
+        "node_title": "Rotating Moir\u00e9",
+        "size": 128,
+        "base_speed_1": 45,
+        "base_speed_2": 90,
+        "freq_scale_1": 20,
+        "freq_scale_2": 20,
+        "rotation_angle_1": 1.5e-323,
+        "rotation_angle_2": 1.2442034446647696
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "fast_stream_out",
+      "to_node_id": 2,
+      "to_port": "fast_stream"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "fast_stream_out",
+      "to_node_id": 1,
+      "to_port": "fast_latent"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "slow_stream_out",
+      "to_node_id": 2,
+      "to_port": "slow_stream"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "slow_stream_out",
+      "to_node_id": 1,
+      "to_port": "slow_latent"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "prediction_error",
+      "to_node_id": 4,
+      "to_port": "freq_1"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "error_fd",
+      "to_node_id": 4,
+      "to_port": "freq_2"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "sync_event",
+      "to_node_id": 4,
+      "to_port": "rotation_1"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "image",
+      "to_node_id": 3,
+      "to_port": "image_in"
+    }
+  ]
+}
