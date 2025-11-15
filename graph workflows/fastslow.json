@@ -1,0 +1,246 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SignalMapperNode",
+      "pos_x": 322.0,
+      "pos_y": -91.0,
+      "width": 339.0,
+      "height": 181.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            0.7
+          ]
+        },
+        "node_title": "Signal Mapper",
+        "input_min": 1.0,
+        "input_max": 2.0,
+        "output_min": 0.001,
+        "output_max": 0.01,
+        "output_value": 0.001
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "TimescaleMismatchNode",
+      "pos_x": 93.0,
+      "pos_y": -93.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "fast_latent": "spectrum",
+          "slow_latent": "spectrum"
+        },
+        "outputs": {
+          "disagreement": "signal",
+          "disagreement_fd": "signal",
+          "phase_alignment": "signal",
+          "surprise_event": "signal"
+        },
+        "node_title": "Timescale Mismatch Analyzer",
+        "history_length": 100,
+        "disagreement_fd": 1.0,
+        "surprise_event": 0.054975581388800036
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "DualTimescaleEncoderNode",
+      "pos_x": -201.0,
+      "pos_y": -90.0,
+      "width": 266.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fast_latent": "spectrum",
+          "slow_latent": "spectrum",
+          "mismatch": "signal",
+          "fast_image": "image",
+          "slow_image": "image"
+        },
+        "node_title": "Dual Timescale Encoder",
+        "fast_dim": 8,
+        "slow_dim": 64,
+        "img_size": 64,
+        "slow_momentum": 0.9
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "MediaSourceNode",
+      "pos_x": -432.0,
+      "pos_y": -86.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.40955698529411766
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "DisplayNode",
+      "pos_x": 434.0,
+      "pos_y": -294.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "HebbianLearner2Node",
+      "pos_x": 695.0,
+      "pos_y": -94.0,
+      "width": 205.0,
+      "height": 189.0,
+      "config": {
+        "inputs": {
+          "latent_in": "spectrum",
+          "learning_rate": "signal",
+          "decay": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "w_matrix_out": "image",
+          "eigenvalues_out": "spectrum",
+          "current_lr": "signal"
+        },
+        "node_title": "Hebbian Learner 2 (Error-Driven)",
+        "base_learning_rate": 0.005,
+        "base_decay": 0.995,
+        "current_dim": 64,
+        "last_reset": 0.0,
+        "actual_learning_rate": 0.0007
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "HebbianLearner2Node",
+      "pos_x": 180.0,
+      "pos_y": -288.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_in": "spectrum",
+          "learning_rate": "signal",
+          "decay": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "w_matrix_out": "image",
+          "eigenvalues_out": "spectrum",
+          "current_lr": "signal"
+        },
+        "node_title": "Hebbian Learner 2 (Error-Driven)",
+        "base_learning_rate": 0.005,
+        "base_decay": 0.995,
+        "current_dim": 8,
+        "last_reset": 0.0,
+        "actual_learning_rate": 0.005
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "DisplayNode",
+      "pos_x": 699.0,
+      "pos_y": -300.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 3,
+      "from_port": "image",
+      "to_node_id": 2,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "fast_latent",
+      "to_node_id": 1,
+      "to_port": "fast_latent"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "slow_latent",
+      "to_node_id": 1,
+      "to_port": "slow_latent"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "disagreement_fd",
+      "to_node_id": 0,
+      "to_port": "signal_in"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "signal_out",
+      "to_node_id": 5,
+      "to_port": "learning_rate"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "fast_latent",
+      "to_node_id": 6,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "w_matrix_out",
+      "to_node_id": 4,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "slow_latent",
+      "to_node_id": 5,
+      "to_port": "latent_in"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "w_matrix_out",
+      "to_node_id": 7,
+      "to_port": "image_in"
+    }
+  ]
+}
