@@ -30,23 +30,23 @@
         "_last_path": "E:/DocsHouse/450/1.edf",
         "_last_region": "All",
         "fs": 100.0,
-        "current_time": 54.666666666666124,
+        "current_time": 4.366666666666661,
         "window_size": 1.0,
         "fast_latent_powers": {
-          "delta": 3.17386981155852e-05,
-          "theta": 7.189515966747258e-06,
-          "alpha": 1.4494723911308186e-05,
-          "beta": 1.6278946996821166e-05,
-          "gamma": 3.061123726899828e-06,
-          "raw_signal": 7.058525286832383e-05
+          "delta": 3.0652166616740794e-05,
+          "theta": 1.8356789460666665e-05,
+          "alpha": 1.8708534329975263e-05,
+          "beta": 9.809666268767356e-06,
+          "gamma": 3.5814279362639505e-06,
+          "raw_signal": 0.00012526958900731364
         },
         "slow_latent_powers": {
-          "delta": 3.2639373605124495e-05,
-          "theta": 1.2383841887177347e-05,
-          "alpha": 1.140903626674543e-05,
-          "beta": 1.7006175935352305e-05,
-          "gamma": 3.1948851931792708e-06,
-          "raw_signal": 6.859496726614805e-05
+          "delta": 3.306726173830565e-05,
+          "theta": 1.3654100430355125e-05,
+          "alpha": 1.5190209207329724e-05,
+          "beta": 1.0841529648623586e-05,
+          "gamma": 2.7341441292656068e-06,
+          "raw_signal": 0.00011800966851849053
         }
       }
     },
@@ -95,19 +95,19 @@
         },
         "node_title": "Phase Coupling (Binding)",
         "history_length": 100,
-        "phase_coherence": 0.9998008608818054,
-        "coupling_strength": 0.9999999996903565,
+        "phase_coherence": 0.9998648762702942,
+        "coupling_strength": 0.9999999981317115,
         "sync_event": 5e-324,
         "desync_event": 0.0,
         "dominant_coupling": 1.0,
-        "prev_coherence": 0.9998008608818054
+        "prev_coherence": 0.9998648762702942
       }
     },
     {
       "id": 3,
       "class_name": "BlochQubitNode",
-      "pos_x": 289.0,
-      "pos_y": 165.0,
+      "pos_x": 250.0,
+      "pos_y": 136.0,
       "width": 200.0,
       "height": 180.0,
       "config": {
@@ -125,7 +125,7 @@
         },
         "input_data": {
           "rx_angle": [
-            0.9168834686279296
+            0.44176728725433345
           ],
           "ry_angle": [
             0.7
@@ -138,6 +138,56 @@
         "node_title": "Bloch Qubit",
         "hbar": 1.0,
         "last_hadamard_trigger": 0.0
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "SignalPlotterNode",
+      "pos_x": 549.0,
+      "pos_y": -72.0,
+      "width": 661.0,
+      "height": 318.0,
+      "config": {
+        "inputs": {
+          "signal_A (Red)": "signal",
+          "signal_B (Green)": "signal",
+          "signal_C (Blue)": "signal"
+        },
+        "outputs": {
+          "plot_image": "image"
+        },
+        "input_data": {
+          "signal_A (Red)": [
+            -0.3742601644251618
+          ],
+          "signal_B (Green)": [
+            0.10379298430800739
+          ],
+          "signal_C (Blue)": [
+            -0.5823713125943695
+          ]
+        },
+        "node_title": "Signal Plotter",
+        "history_size": 500,
+        "colors": {
+          "A": [
+            255,
+            0,
+            0
+          ],
+          "B": [
+            0,
+            255,
+            0
+          ],
+          "C": [
+            0,
+            0,
+            255
+          ]
+        },
+        "min_val": -0.6997091164696041,
+        "max_val": 0.6989230131246428
       }
     }
   ],
@@ -183,6 +233,24 @@
       "from_port": "qualia_intensity",
       "to_node_id": 3,
       "to_port": "rz_angle"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "bloch_x",
+      "to_node_id": 4,
+      "to_port": "signal_A (Red)"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "bloch_y",
+      "to_node_id": 4,
+      "to_port": "signal_B (Green)"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "bloch_z",
+      "to_node_id": 4,
+      "to_port": "signal_C (Blue)"
     }
   ]
 }
