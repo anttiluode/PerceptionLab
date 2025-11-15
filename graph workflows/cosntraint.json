@@ -1,0 +1,201 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "LatentEncoderNode",
+      "pos_x": 559.0,
+      "pos_y": -28.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "latents_out": "image"
+        },
+        "node_title": "Latent Encoder (Image-to-Latent)"
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "RetrocausalConstraintNode",
+      "pos_x": 790.0,
+      "pos_y": -20.0,
+      "width": 284.0,
+      "height": 192.0,
+      "config": {
+        "inputs": {
+          "state_in": "image",
+          "constraint_strength": "signal",
+          "noise_field": "image"
+        },
+        "outputs": {
+          "present_state": "image",
+          "constraint_violation": "signal",
+          "temporal_flow": "image"
+        },
+        "node_title": "Retrocausal Constraint",
+        "buffer_size": 30,
+        "base_constraint_strength": 0.7,
+        "backward_weight": 0.5,
+        "forward_weight": 0.5,
+        "noise_scale": 0.2,
+        "constraint_violation": 0.004210749702467239
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "BoxCountingNode",
+      "pos_x": 1142.0,
+      "pos_y": 3.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fractal_dimension": "signal",
+          "debug_image": "image"
+        },
+        "node_title": "Fractal Dimension (Box Count)",
+        "k_max": 8,
+        "fractal_dimension": 0.005633867977657333
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SignalPlotterNode",
+      "pos_x": 347.0,
+      "pos_y": 210.0,
+      "width": 1002.0,
+      "height": 371.0,
+      "config": {
+        "inputs": {
+          "signal_A (Red)": "signal",
+          "signal_B (Green)": "signal",
+          "signal_C (Blue)": "signal"
+        },
+        "outputs": {
+          "plot_image": "image"
+        },
+        "input_data": {
+          "signal_A (Red)": [
+            0.004303890269818732
+          ],
+          "signal_B (Green)": [
+            0.006462948451910961
+          ],
+          "signal_C (Blue)": []
+        },
+        "node_title": "Signal Plotter (Violation vs. Complexity)",
+        "history_size": 500,
+        "colors": {
+          "A": [
+            255,
+            0,
+            0
+          ],
+          "B": [
+            0,
+            255,
+            0
+          ],
+          "C": [
+            0,
+            0,
+            255
+          ]
+        },
+        "min_val": 0.0009673700418822272,
+        "max_val": 0.008142087118119456
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "MediaSourceNode",
+      "pos_x": 303.0,
+      "pos_y": -11.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.4674820261437908
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 1378.0,
+      "pos_y": -3.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "signal": [
+            0.004303890269818732
+          ]
+        },
+        "node_title": "Signal Display",
+        "current_value": 0.004303890269818732
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "latents_out",
+      "to_node_id": 1,
+      "to_port": "state_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "present_state",
+      "to_node_id": 2,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "constraint_violation",
+      "to_node_id": 3,
+      "to_port": "signal_A (Red)"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "fractal_dimension",
+      "to_node_id": 3,
+      "to_port": "signal_B (Green)"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "constraint_violation",
+      "to_node_id": 5,
+      "to_port": "signal"
+    }
+  ]
+}
