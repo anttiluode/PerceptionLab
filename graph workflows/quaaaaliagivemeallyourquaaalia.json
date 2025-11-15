@@ -1,0 +1,188 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EEGExperimentNode",
+      "pos_x": -640.0,
+      "pos_y": -99.0,
+      "width": 256.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "fast_stream_out": "spectrum",
+          "slow_stream_out": "spectrum"
+        },
+        "input_data": {},
+        "node_title": "EEG (All)",
+        "edf_file_path": "E:/DocsHouse/450/1.edf",
+        "selected_region": "All",
+        "slow_momentum": 0.95,
+        "fast_stream_source": "beta",
+        "slow_stream_source": "gamma",
+        "latent_dim": 6,
+        "signal_gain": 100000,
+        "raw_power_scale": 100000,
+        "band_power_scale": 200000,
+        "_last_path": "E:/DocsHouse/450/1.edf",
+        "_last_region": "All",
+        "fs": 100.0,
+        "current_time": 54.666666666666124,
+        "window_size": 1.0,
+        "fast_latent_powers": {
+          "delta": 3.17386981155852e-05,
+          "theta": 7.189515966747258e-06,
+          "alpha": 1.4494723911308186e-05,
+          "beta": 1.6278946996821166e-05,
+          "gamma": 3.061123726899828e-06,
+          "raw_signal": 7.058525286832383e-05
+        },
+        "slow_latent_powers": {
+          "delta": 3.2639373605124495e-05,
+          "theta": 1.2383841887177347e-05,
+          "alpha": 1.140903626674543e-05,
+          "beta": 1.7006175935352305e-05,
+          "gamma": 3.1948851931792708e-06,
+          "raw_signal": 6.859496726614805e-05
+        }
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "QualiaDetectorNode",
+      "pos_x": -266.0,
+      "pos_y": 142.0,
+      "width": 480.0,
+      "height": 345.0,
+      "config": {
+        "inputs": {
+          "fast_latent": "spectrum",
+          "slow_latent": "spectrum"
+        },
+        "outputs": {
+          "qualia_intensity": "signal",
+          "prediction_error": "signal",
+          "error_fd": "signal",
+          "predicted_sensation": "spectrum"
+        },
+        "node_title": "Qualia Detector (Attention)",
+        "history_length": 50,
+        "qualia_intensity": 0.0,
+        "error_fd": 1.0
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "PhaseCouplingNode",
+      "pos_x": -267.0,
+      "pos_y": -273.0,
+      "width": 543.0,
+      "height": 411.0,
+      "config": {
+        "inputs": {
+          "fast_stream": "spectrum",
+          "slow_stream": "spectrum"
+        },
+        "outputs": {
+          "phase_coherence": "signal",
+          "coupling_strength": "signal",
+          "sync_event": "signal",
+          "desync_event": "signal",
+          "dominant_coupling": "signal"
+        },
+        "node_title": "Phase Coupling (Binding)",
+        "history_length": 100,
+        "phase_coherence": 0.9998008608818054,
+        "coupling_strength": 0.9999999996903565,
+        "sync_event": 5e-324,
+        "desync_event": 0.0,
+        "dominant_coupling": 1.0,
+        "prev_coherence": 0.9998008608818054
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "BlochQubitNode",
+      "pos_x": 289.0,
+      "pos_y": 165.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "rx_angle": "signal",
+          "ry_angle": "signal",
+          "rz_angle": "signal",
+          "hadamard_trigger": "signal"
+        },
+        "outputs": {
+          "bloch_x": "signal",
+          "bloch_y": "signal",
+          "bloch_z": "signal",
+          "prob_0": "signal"
+        },
+        "input_data": {
+          "rx_angle": [
+            0.9168834686279296
+          ],
+          "ry_angle": [
+            0.7
+          ],
+          "rz_angle": [
+            0.0
+          ],
+          "hadamard_trigger": []
+        },
+        "node_title": "Bloch Qubit",
+        "hbar": 1.0,
+        "last_hadamard_trigger": 0.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "fast_stream_out",
+      "to_node_id": 2,
+      "to_port": "fast_stream"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "fast_stream_out",
+      "to_node_id": 1,
+      "to_port": "fast_latent"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "slow_stream_out",
+      "to_node_id": 2,
+      "to_port": "slow_stream"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "slow_stream_out",
+      "to_node_id": 1,
+      "to_port": "slow_latent"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "prediction_error",
+      "to_node_id": 3,
+      "to_port": "rx_angle"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "error_fd",
+      "to_node_id": 3,
+      "to_port": "ry_angle"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "qualia_intensity",
+      "to_node_id": 3,
+      "to_port": "rz_angle"
+    }
+  ]
+}
