@@ -1,0 +1,175 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": -828.0,
+      "pos_y": -150.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "raw_signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG (Occipital)",
+        "edf_file_path": "e:\\docshouse\\450\\3.edf",
+        "selected_region": "Occipital",
+        "_last_path": "e:\\docshouse\\450\\3.edf",
+        "_last_region": "Occipital",
+        "fs": 100.0,
+        "current_time": 23.633333333333667,
+        "window_size": 1.0,
+        "output_powers": {
+          "delta": 2.83063914167717e-260,
+          "theta": 4.4652680926982735e-261,
+          "alpha": 4.528254758528758e-261,
+          "beta": 9.725395051326923e-261,
+          "gamma": 4.897558645414518e-261,
+          "raw_signal": 1.1396881960057107e-259
+        }
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "QuantumWaveNode",
+      "pos_x": -492.0,
+      "pos_y": -230.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "momentum_x": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "total_prob": "signal"
+        },
+        "input_data": {
+          "momentum_x": [
+            8.397702496884185e-260
+          ],
+          "reset": []
+        },
+        "node_title": "Quantum Wave",
+        "Nx": 128,
+        "Ny": 128,
+        "k0x": 3.0823658591202065e-136,
+        "k0y": 0.0,
+        "steps_per_frame": 10,
+        "dx": 0.078125,
+        "dy": 0.078125,
+        "total_probability": 0.9999998807907104
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "NestedOscillatorNode",
+      "pos_x": -243.0,
+      "pos_y": -322.0,
+      "width": 556.0,
+      "height": 513.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal"
+        },
+        "outputs": {
+          "coupling_map": "image",
+          "radar_viz": "image",
+          "phase_structure": "image",
+          "constraint_field": "image"
+        },
+        "node_title": "Nested Oscillator",
+        "mode": "image",
+        "resolution": 256,
+        "n_bands": 5,
+        "coupling_threshold": 0.3,
+        "bands": {
+          "delta": [
+            0.5,
+            4
+          ],
+          "theta": [
+            4,
+            8
+          ],
+          "alpha": [
+            8,
+            13
+          ],
+          "beta": [
+            13,
+            30
+          ],
+          "gamma": [
+            30,
+            100
+          ]
+        },
+        "time": 908,
+        "phase_history": [],
+        "amp_history": [],
+        "history_length": 100
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "raw_signal",
+      "to_node_id": 1,
+      "to_port": "momentum_x"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 2,
+      "to_port": "image"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "delta",
+      "to_node_id": 2,
+      "to_port": "delta"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta",
+      "to_node_id": 2,
+      "to_port": "theta"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha",
+      "to_node_id": 2,
+      "to_port": "alpha"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta",
+      "to_node_id": 2,
+      "to_port": "beta"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma",
+      "to_node_id": 2,
+      "to_port": "gamma"
+    }
+  ]
+}
