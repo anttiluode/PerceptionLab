@@ -1,20 +1,18 @@
 """
-Eigenmode Resonance Node - Analyzes live EEG against cortical eigenmode theory
--------------------------------------------------------------------------------
+Eigenmode Resonance Node v3 - FIXED VERSION
+--------------------------------------------
 Takes EEG frequency bands and determines which brain eigenmodes are active
+
+FIXES in v3:
+- 100x stronger normalization (was killing signal)
+- Temporal stability resonance (instead of spatial structure)
+- Contrast enhancement (makes variations visible)
+- Configurable sensitivity
 
 Theory:
 1. Different EEG frequencies correspond to different eigenmode numbers
-   - Delta/Theta → low-order modes (n=1,2) - large-scale coherence
-   - Alpha → intermediate modes (n=2,3) - idling/default mode
-   - Beta/Gamma → higher-order modes (n=3,4,5) - focused processing
-   
 2. Active eigenmodes create spatial activation patterns (lobes)
-
-3. Resonance = how well current EEG matches eigenmode structure
-   - High resonance = stable conscious state
-   - Low resonance = transitioning between states
-   
+3. Resonance = temporal stability of eigenmode pattern
 4. Output shows which brain regions should be active given the EEG
 """
 
@@ -31,9 +29,10 @@ class EigenmodeResonanceNode(BaseNode):
     NODE_CATEGORY = "Analysis"
     NODE_COLOR = QtGui.QColor(80, 60, 140)  # Deep purple - consciousness analysis
     
-    def __init__(self, aspect_ratio=2.0, resolution=256, resonance_threshold=0.3):
+    def __init__(self, aspect_ratio=2.0, resolution=256, resonance_threshold=0.3, 
+                 sensitivity=1.0, contrast_boost=2.0):
         super().__init__()
-        self.node_title = "EEG Eigenmode Analyzer"
+        self.node_title = "EEG Eigenmode Analyzer v3"
         
         self.inputs = {
             'delta': 'signal',   # 1-4 Hz
@@ -47,7 +46,7 @@ class EigenmodeResonanceNode(BaseNode):
         self.outputs = {
             'eigenmode_activation': 'image',  # Which modes are active
             'lobe_activation_map': 'image',   # Spatial activation pattern
-            'resonance_score': 'signal',      # How coherent (0-1)
+            'resonance_score': 'signal',      # How stable (0-1)
             'dominant_mode_n': 'signal',      # Which radial mode is strongest
             'dominant_mode_m': 'signal',      # Which angular mode is strongest
             'total_activation': 'signal',     # Overall brain activity
@@ -57,9 +56,10 @@ class EigenmodeResonanceNode(BaseNode):
         self.aspect_ratio = float(aspect_ratio)
         self.resolution = int(resolution)
         self.resonance_threshold = float(resonance_threshold)
+        self.sensitivity = float(sensitivity)  # NEW: adjustable sensitivity
+        self.contrast_boost = float(contrast_boost)  # NEW: contrast enhancement
         
         # Eigenmode-frequency mapping
-        # Each frequency band activates certain (n,m) modes
         self.frequency_to_modes = {
             'delta': [(1, 0), (1, 1)],           # Slow, global modes
             'theta': [(2, 0), (2, 1)],           # Low-order modes
@@ -71,6 +71,7 @@ class EigenmodeResonanceNode(BaseNode):
         # State
         self.eigenmode_activation = np.zeros((self.resolution, self.resolution), dtype=np.float32)
         self.lobe_activation_map = np.zeros((self.resolution, self.resolution), dtype=np.float32)
+        self.previous_activation_map = np.zeros((self.resolution, self.resolution), dtype=np.float32)  # NEW
         self.resonance_score = 0.0
         self.dominant_mode_n = 0
         self.dominant_mode_m = 0
@@ -143,25 +144,37 @@ class EigenmodeResonanceNode(BaseNode):
     
     def _compute_resonance(self, activation_map):
         """
-        Compute resonance score - how well does the activation match eigenmode structure?
-        High resonance = stable coherent state
-        Low resonance = noisy/transitioning
+        NEW RESONANCE METRIC: Temporal stability + single-mode dominance
+        
+        Old metric measured spatial structure (always high for eigenmodes)
+        New metric measures:
+        1. How stable the pattern is over time (temporal coherence)
+        2. How much one mode dominates (vs mixed/noisy state)
         """
-        # Resonance is measured by spatial coherence
-        # High eigenmode activation should have clear spatial structure
+        # Method 1: Temporal stability (70%)
+        # How similar is current map to previous frame?
+        if self.previous_activation_map.max() > 0:
+            # Normalize both to compare shape, not amplitude
+            curr_norm = activation_map / (np.max(activation_map) + 1e-9)
+            prev_norm = self.previous_activation_map / (np.max(self.previous_activation_map) + 1e-9)
+            
+            # Similarity = 1 - difference
+            difference = np.mean(np.abs(curr_norm - prev_norm))
+            temporal_stability = 1.0 - np.clip(difference, 0, 1)
+        else:
+            temporal_stability = 0.5  # Neutral on first frame
         
-        # Method 1: Spatial autocorrelation
-        # Strong eigenmodes have high autocorrelation
-        activation_norm = activation_map - activation_map.mean()
-        autocorr = np.correlate(activation_norm.flatten(), activation_norm.flatten(), mode='valid')[0]
-        autocorr = autocorr / (np.std(activation_norm) ** 2 * activation_norm.size + 1e-9)
-        
-        # Method 2: Edge density (eigenmodes have clear boundaries)
-        edges = ndimage.sobel(activation_map)
-        edge_density = np.mean(np.abs(edges))
+        # Method 2: Pattern strength (30%)
+        # How strong is the activation vs noise?
+        if activation_map.max() > 0:
+            # Ratio of peak to mean (higher = more focused pattern)
+            peak_to_mean = activation_map.max() / (np.mean(activation_map) + 1e-9)
+            pattern_strength = np.clip(peak_to_mean / 10.0, 0, 1)  # Normalize
+        else:
+            pattern_strength = 0.0
         
         # Combine metrics
-        resonance = (autocorr * 0.7 + edge_density * 0.3)
+        resonance = (temporal_stability * 0.7 + pattern_strength * 0.3)
         resonance = np.clip(resonance, 0, 1)
         
         return resonance
@@ -182,16 +195,17 @@ class EigenmodeResonanceNode(BaseNode):
         
         # For each frequency band, activate corresponding eigenmodes
         for band, power in eeg_bands.items():
-            if power > 0.00001:  # Very low threshold to catch even tiny signals
+            if power > 0.00001:  # Very low threshold to catch tiny signals
                 mode_list = self.frequency_to_modes[band]
                 
                 for n, m in mode_list:
                     key = (n, m)
                     eigenmode = self.eigenmode_cache[key]
                     
-                    # Weight eigenmode by band power
-                    # Scale power to 0-1 range (EEG values after boost typically 0-100+)
-                    normalized_power = np.clip(power * 0.01, 0, 1)
+                    # FIXED NORMALIZATION - 100x stronger!
+                    # With 1B boost giving 0.42, this gives: 0.42 * 1.0 * sensitivity = 0.42
+                    # Which is MUCH better than the old 0.42 * 0.01 = 0.004!
+                    normalized_power = np.clip(power * 1.0 * self.sensitivity, 0, 2.0)
                     
                     activation_map += eigenmode * normalized_power
                     
@@ -203,9 +217,16 @@ class EigenmodeResonanceNode(BaseNode):
         # Apply mask
         activation_map = activation_map * self.mask
         
-        # Normalize activation map
+        # CONTRAST ENHANCEMENT - makes variations visible!
         if activation_map.max() > 0:
-            activation_map = activation_map / activation_map.max()
+            # Subtract minimum to remove baseline
+            activation_map = activation_map - activation_map.min()
+            
+            # Apply contrast boost (power function)
+            activation_map = np.power(activation_map / activation_map.max(), 1.0 / self.contrast_boost)
+            
+            # Renormalize
+            activation_map = activation_map / (activation_map.max() + 1e-9)
         
         # Clip to ensure positive values (eigenmodes can be negative)
         activation_map = np.clip(activation_map, 0, 1)
@@ -225,14 +246,16 @@ class EigenmodeResonanceNode(BaseNode):
             self.dominant_mode_n = 0
             self.dominant_mode_m = 0
         
-        # Compute resonance score
+        # Compute resonance score (NEW: temporal stability)
         self.resonance_score = self._compute_resonance(activation_map)
+        
+        # Store current as previous for next frame
+        self.previous_activation_map = activation_map.copy()
         
         # Total activation (use absolute value to avoid negatives)
         self.total_activation = np.mean(np.abs(activation_map))
         
         # Create eigenmode activation visualization
-        # Show which modes are currently active
         self.eigenmode_activation = self._create_mode_activation_viz(mode_activations)
         
     def _create_mode_activation_viz(self, mode_activations):
@@ -330,12 +353,12 @@ class EigenmodeResonanceNode(BaseNode):
         # Bottom info
         info_text = f'Total Act={self.total_activation:.3f} | Coherent: {"YES" if self.resonance_score > self.resonance_threshold else "NO"}'
         cv2.putText(display, info_text, 
-                   (10, display_h - 10), font, 0.35, (0, 255, 255), 1, cv2.LINE_AA)
+                   (10, display_h - 30), font, 0.35, (0, 255, 255), 1, cv2.LINE_AA)
         
         # Debug: Show actual incoming values
         debug_text = f'IN: D={self.eeg_bands.get("delta", 0):.2f} T={self.eeg_bands.get("theta", 0):.2f} A={self.eeg_bands.get("alpha", 0):.2f} B={self.eeg_bands.get("beta", 0):.2f} G={self.eeg_bands.get("gamma", 0):.2f}'
         cv2.putText(display, debug_text,
-                   (10, display_h - 30), font, 0.3, (255, 255, 0), 1, cv2.LINE_AA)
+                   (10, display_h - 10), font, 0.3, (255, 255, 0), 1, cv2.LINE_AA)
         
         display = np.ascontiguousarray(display)
         return QtGui.QImage(display.data, display_w, display_h, 3*display_w, QtGui.QImage.Format.Format_RGB888)
@@ -345,4 +368,6 @@ class EigenmodeResonanceNode(BaseNode):
             ("Aspect Ratio", "aspect_ratio", self.aspect_ratio, None),
             ("Resolution", "resolution", self.resolution, None),
             ("Resonance Threshold", "resonance_threshold", self.resonance_threshold, None),
+            ("Sensitivity (0.1-10)", "sensitivity", self.sensitivity, None),
+            ("Contrast Boost (1-5)", "contrast_boost", self.contrast_boost, None),
         ]
