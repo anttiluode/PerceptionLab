@@ -1,0 +1,463 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EigenmodeResonanceNode",
+      "pos_x": -753.0,
+      "pos_y": -451.0,
+      "width": 200.0,
+      "height": 198.0,
+      "config": {
+        "inputs": {
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "raw_signal": "signal"
+        },
+        "outputs": {
+          "eigenmode_activation": "image",
+          "lobe_activation_map": "image",
+          "resonance_score": "signal",
+          "dominant_mode_n": "signal",
+          "dominant_mode_m": "signal",
+          "total_activation": "signal"
+        },
+        "input_data": {
+          "delta": [
+            2.7480138925494093
+          ],
+          "theta": [
+            1.0719704275122863
+          ],
+          "alpha": [
+            1.7247447684825123
+          ],
+          "beta": [
+            3.057096615272534
+          ],
+          "gamma": [
+            1.8427749226286867
+          ],
+          "raw_signal": []
+        },
+        "node_title": "EEG Eigenmode Analyzer v3",
+        "aspect_ratio": 2.0,
+        "resolution": 256,
+        "resonance_threshold": 0.3,
+        "sensitivity": 1.0,
+        "contrast_boost": 2.0,
+        "frequency_to_modes": {
+          "delta": [
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "theta": [
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "alpha": [
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ]
+          ],
+          "beta": [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "gamma": [
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              4,
+              3
+            ]
+          ]
+        },
+        "resonance_score": 0.0,
+        "dominant_mode_n": 1,
+        "dominant_mode_m": 0,
+        "total_activation": 0.0,
+        "eeg_bands": {
+          "delta": 2.7480138925494093,
+          "theta": 1.0719704275122863,
+          "alpha": 1.7247447684825123,
+          "beta": 3.057096615272534,
+          "gamma": 1.8427749226286867
+        }
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "HighResCorticalFoldingNode",
+      "pos_x": 1828.0,
+      "pos_y": -521.0,
+      "width": 682.0,
+      "height": 624.0,
+      "config": {
+        "inputs": {
+          "lobe_activation": "image",
+          "growth_rate": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "thickness_map": "image",
+          "structure_3d": "image",
+          "fold_density": "signal",
+          "fractal_estimate": "signal",
+          "surface_area": "signal",
+          "morph_signal": "signal",
+          "dominant_mode_power": "signal"
+        },
+        "input_data": {},
+        "node_title": "HighRes Cortical Folding",
+        "resolution": 512,
+        "base_growth": 0.1,
+        "dt": 1.0,
+        "fold_threshold": 0.7,
+        "compression_strength": 0.3,
+        "diffusion_sigma": 0.1,
+        "max_thickness": 12,
+        "min_thickness": 0.1,
+        "spectral_window": 32,
+        "smooth_output": 1.0,
+        "scale_display": 1.0,
+        "time_step": 2092,
+        "area_history": [],
+        "fold_density_value": 22.492908477783203,
+        "surface_area_value": 1190556.0,
+        "fractal_dim_value": 1.3509045952728203,
+        "morph_signal_value": 0.5615956701300906,
+        "dominant_mode_power": 0.26895585656166077
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "TurbulenceEnhancedGrowthNode",
+      "pos_x": 981.0,
+      "pos_y": -518.0,
+      "width": 828.0,
+      "height": 621.0,
+      "config": {
+        "inputs": {
+          "lobe_activation": "image",
+          "growth_rate": "signal",
+          "turbulence_signal": "signal",
+          "turbulence_field": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "thickness_map": "image",
+          "fold_density": "signal",
+          "surface_area": "signal",
+          "fractal_estimate": "signal",
+          "structure_3d": "image",
+          "turbulence_response": "signal"
+        },
+        "input_data": {},
+        "node_title": "Turbulence Growth",
+        "resolution": 128,
+        "dt": 0.01,
+        "base_growth": 0.5,
+        "fold_threshold": 0.005,
+        "compression_strength": 3,
+        "diffusion": 0.1,
+        "turbulence_amplification": 2,
+        "turbulence_mode": "signal",
+        "time_step": 1964,
+        "turbulence_response_value": 0.0,
+        "area_history": [],
+        "fold_density_value": 0.0,
+        "surface_area_value": 0.0,
+        "fractal_dim_value": 1.7823946181848738
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "Cortical3DGrowthNode",
+      "pos_x": 168.0,
+      "pos_y": -513.0,
+      "width": 794.0,
+      "height": 617.0,
+      "config": {
+        "inputs": {
+          "lobe_activation": "image",
+          "growth_rate": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "thickness_map": "image",
+          "fold_density": "signal",
+          "surface_area": "signal",
+          "fractal_estimate": "signal",
+          "structure_3d": "image"
+        },
+        "input_data": {},
+        "node_title": "3D Cortical Growth",
+        "resolution": 128,
+        "dt": 0.01,
+        "base_growth": 0.1,
+        "fold_threshold": 0.7,
+        "compression_strength": 0.3,
+        "diffusion": 0.1,
+        "time_step": 183,
+        "area_history": [],
+        "fold_density_value": 0.0,
+        "surface_area_value": 0.0,
+        "fractal_dim_value": 1.4212938794914682
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "ResonanceMorphogenesisNode",
+      "pos_x": -496.0,
+      "pos_y": -520.0,
+      "width": 642.0,
+      "height": 633.0,
+      "config": {
+        "inputs": {
+          "lobe_activation": "image",
+          "growth_rate": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "resonance_map": "image",
+          "consistency_map": "image",
+          "thickness_map": "image",
+          "structure_3d": "image",
+          "fold_density": "signal",
+          "fractal_estimate": "signal",
+          "surface_area": "signal",
+          "morph_signal": "signal",
+          "dominant_mode_power": "signal"
+        },
+        "input_data": {},
+        "node_title": "Resonance Morphogenesis",
+        "resolution": 512,
+        "base_growth": 0.8,
+        "dt": 0.01,
+        "fold_threshold": 0.2,
+        "compression_strength": 0.45,
+        "diffusion_sigma": 0.1,
+        "max_thickness": 12,
+        "min_thickness": 0.1,
+        "spectral_window": 32,
+        "smooth_output": 1.0,
+        "scale_display": 1.0,
+        "temporal_window": 100,
+        "resonance_amplification": 30,
+        "stability_threshold": 4,
+        "time_step": 168,
+        "area_history": [],
+        "fold_density_value": 0.11503162235021591,
+        "surface_area_value": 262870.5,
+        "fractal_dim_value": 1.5309756628387725,
+        "morph_signal_value": 0.2801400567341531,
+        "dominant_mode_power": 0.26895585656166077
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -1092.0,
+      "pos_y": -516.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Noise Gen",
+        "w": 160,
+        "h": 120,
+        "noise_type": "white",
+        "speed": 0.1,
+        "signal_value": 0.0
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -1070.0,
+      "pos_y": -364.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Noise Gen",
+        "w": 160,
+        "h": 120,
+        "noise_type": "brown",
+        "speed": 0.8,
+        "signal_value": 0.0
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -1079.0,
+      "pos_y": -199.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Noise Gen",
+        "w": 160,
+        "h": 120,
+        "noise_type": "perlin",
+        "speed": 0.9,
+        "signal_value": 0.0
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -1089.0,
+      "pos_y": -50.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Noise Gen",
+        "w": 160,
+        "h": 120,
+        "noise_type": "quantum",
+        "speed": 3,
+        "signal_value": 0.0
+      }
+    },
+    {
+      "id": 9,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -825.0,
+      "pos_y": -78.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Noise Gen",
+        "w": 160,
+        "h": 120,
+        "noise_type": "white",
+        "speed": 0.01,
+        "signal_value": 0.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "lobe_activation_map",
+      "to_node_id": 1,
+      "to_port": "lobe_activation"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "lobe_activation_map",
+      "to_node_id": 2,
+      "to_port": "lobe_activation"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "lobe_activation_map",
+      "to_node_id": 3,
+      "to_port": "lobe_activation"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "lobe_activation_map",
+      "to_node_id": 4,
+      "to_port": "lobe_activation"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "gamma"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "beta"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "alpha"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "theta"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "delta"
+    }
+  ]
+}
