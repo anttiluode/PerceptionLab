@@ -1,0 +1,98 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EcosystemNode",
+      "pos_x": -418.0,
+      "pos_y": -175.0,
+      "width": 796.0,
+      "height": 658.0,
+      "config": {
+        "inputs": {
+          "field_input": "image",
+          "global_stress": "signal"
+        },
+        "outputs": {
+          "population_view": "image",
+          "total_biomass": "signal",
+          "avg_surprise": "signal"
+        },
+        "node_title": "Ecosystem: Eigenmode Life",
+        "width": 512,
+        "height": 512,
+        "num_agents": 64,
+        "biomass": 4.191833635265937,
+        "avg_error": 0.616836743157997
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "QuantumSubstrateNode",
+      "pos_x": -648.0,
+      "pos_y": 18.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "perturbation": "image",
+          "time_scale": "signal"
+        },
+        "outputs": {
+          "field_image": "image",
+          "field_energy": "signal",
+          "entropy": "signal"
+        },
+        "input_data": {
+          "perturbation": [],
+          "time_scale": []
+        },
+        "node_title": "Quantum Substrate",
+        "size": 64,
+        "dt": 0.1,
+        "alpha": 0.5,
+        "beta": 2.0,
+        "diffusion": 0.5,
+        "field_energy_val": 10.486592054367065,
+        "entropy_val": 0.04685325175523758
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 436.0,
+      "pos_y": -88.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "signal": [
+            0.44684389135561453
+          ]
+        },
+        "node_title": "Signal Display",
+        "current_value": 0.44684389135561453
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "field_image",
+      "to_node_id": 0,
+      "to_port": "field_input"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "avg_surprise",
+      "to_node_id": 2,
+      "to_port": "signal"
+    }
+  ]
+}
