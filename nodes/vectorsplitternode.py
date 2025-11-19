@@ -1,21 +1,29 @@
 """
-Vector Splitter Node - ENHANCED
-Splits latent vectors with scaling and visualization improvements
+Vector Splitter Node - ENHANCED (v2)
+------------------------------------
+Splits a high-dimensional vector (Spectrum) into individual signals.
+Crucial for connecting:
+- VAE Latent Space -> Eigenmode Generator
+- Inverse Scanner DNA -> Eigenmode Generator
+- Hyper-Signal -> Anything
+
+Features:
+- Visual Bar Graph of the vector.
+- Dynamic scaling.
+- Robust input handling.
 """
 
 import numpy as np
 import cv2
-
 import __main__
 BaseNode = __main__.BaseNode
 QtGui = __main__.QtGui
 
 class VectorSplitterNode(BaseNode):
-    """Splits a spectrum into N signal outputs with optional scaling"""
     NODE_CATEGORY = "Utility"
-    NODE_COLOR = QtGui.QColor(150, 150, 150)
+    NODE_COLOR = QtGui.QColor(150, 150, 150) # Gray
     
-    def __init__(self, num_outputs=16, scale=1.0):  # Default 16 for VAE
+    def __init__(self, num_outputs=16, scale=1.0):
         super().__init__()
         self.node_title = "Vector Splitter"
         
@@ -23,88 +31,101 @@ class VectorSplitterNode(BaseNode):
         self.scale = float(scale)
         
         self.inputs = {
-            'spectrum_in': 'spectrum',
-            'scale': 'signal'  # Optional dynamic scaling
+            'spectrum_in': 'spectrum', # The Vector (DNA or Latent)
+            'scale_mod': 'signal'      # Dynamic scaling (optional)
         }
         
+        # Create N outputs
         self.outputs = {}
         for i in range(self.num_outputs):
             self.outputs[f'out_{i}'] = 'signal'
         
-        self.output_values = np.zeros(self.num_outputs, dtype=np.float32)
-    
+        # Internal state
+        self.current_vector = np.zeros(self.num_outputs, dtype=np.float32)
+        self.display_img = np.zeros((100, 200, 3), dtype=np.uint8)
+
     def step(self):
+        # 1. Get Input
         vector = self.get_blended_input('spectrum_in', 'first')
-        scale_signal = self.get_blended_input('scale', 'sum')
+        mod = self.get_blended_input('scale_mod', 'sum')
         
-        if scale_signal is not None:
-            scale = scale_signal
-        else:
-            scale = self.scale
-        
+        # Determine final scale
+        current_scale = self.scale
+        if mod is not None:
+            current_scale *= (1.0 + mod)
+            
         if vector is None:
-            self.output_values.fill(0.0)
+            self.current_vector[:] = 0
             return
+
+        # 2. Process Vector
+        # Handle different input types (list, array)
+        if isinstance(vector, list):
+            vector = np.array(vector, dtype=np.float32)
+            
+        # Resize if mismatch
+        if len(vector) != self.num_outputs:
+            # If input is smaller, pad with zeros
+            # If input is larger, truncate
+            new_vec = np.zeros(self.num_outputs, dtype=np.float32)
+            limit = min(len(vector), self.num_outputs)
+            new_vec[:limit] = vector[:limit]
+            vector = new_vec
+            
+        # Apply scale
+        self.current_vector = vector * current_scale
         
-        if vector.ndim > 1:
-            vector = vector.flatten()
-        
+        # 3. Set Outputs
         for i in range(self.num_outputs):
-            if i < len(vector):
-                self.output_values[i] = float(vector[i]) * scale
-            else:
-                self.output_values[i] = 0.0
-    
-    def get_output(self, port_name):
-        if port_name.startswith('out_'):
-            try:
-                index = int(port_name.split('_')[1])
-                if 0 <= index < self.num_outputs:
-                    return self.output_values[index]
-            except (ValueError, IndexError):
-                pass
-        return None
-    
-    def get_display_image(self):
-        w, h = 256, 128  # Bigger display
+            # Store each channel so get_output can find it
+            setattr(self, f'out_{i}_val',float(self.current_vector[i]))
+
+        # 4. Visualization (The DNA Barcode)
+        w, h = 200, 100
         img = np.zeros((h, w, 3), dtype=np.uint8)
         
-        if self.output_values.size == 0:
-            return QtGui.QImage(img.data, w, h, 3*w, QtGui.QImage.Format.Format_RGB888)
-        
-        bar_width = max(1, w // self.num_outputs)
-        
-        val_max = np.abs(self.output_values).max()
-        if val_max < 1e-6: 
-            val_max = 1.0
-        
-        for i, val in enumerate(self.output_values):
-            x = i * bar_width
-            norm_val = val / val_max
-            bar_h = int(abs(norm_val) * (h/2 - 10))
-            y_base = h // 2
+        if self.num_outputs > 0:
+            bar_w = w / self.num_outputs
+            max_val = np.max(np.abs(self.current_vector)) + 1e-9
             
-            if val >= 0:
-                color = (0, int(255 * abs(norm_val)), 0)
-                cv2.rectangle(img, (x, y_base-bar_h), (x+bar_width-1, y_base), color, -1)
-            else:
-                color = (0, 0, int(255 * abs(norm_val)))
-                cv2.rectangle(img, (x, y_base), (x+bar_width-1, y_base+bar_h), color, -1)
-            
-            # Label every 4th output
-            if i % 4 == 0:
-                cv2.putText(img, str(i), (x+2, h-5), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255,255,255), 1)
+            for i in range(self.num_outputs):
+                val = self.current_vector[i]
+                
+                # Normalize height relative to max in this frame (auto-gain view)
+                # or relative to fixed 1.0? Let's use fixed 1.0 for stability
+                norm_h = np.clip(val, -1, 1) 
+                
+                # Map -1..1 to pixels
+                px_h = int(abs(norm_h) * (h/2 - 5))
+                x = int(i * bar_w)
+                
+                # Center line is h/2
+                y_base = h // 2
+                
+                if norm_h > 0:
+                    # Green bars up
+                    cv2.rectangle(img, (x, y_base - px_h), (int(x + bar_w - 1), y_base), (0, 255, 0), -1)
+                else:
+                    # Red bars down
+                    cv2.rectangle(img, (x, y_base), (int(x + bar_w - 1), y_base + px_h), (0, 0, 255), -1)
+                    
+                # Grid lines
+                if i % 4 == 0:
+                    cv2.line(img, (x, 0), (x, h), (50, 50, 50), 1)
+
+        self.display_img = img
+
+    def get_output(self, port_name):
+        # Dynamic retrieval of outputs out_0, out_1...
+        if port_name.startswith('out_'):
+            if hasattr(self, f'{port_name}_val'):
+                return getattr(self, f'{port_name}_val')
+            return 0.0
+        return None
+
+    def get_display_image(self):
+        return QtGui.QImage(self.display_img.data, 200, 100, 600, QtGui.QImage.Format.Format_RGB888)
         
-        # Baseline
-        cv2.line(img, (0, h//2), (w, h//2), (100,100,100), 1)
-        
-        # Show scale
-        cv2.putText(img, f"x{self.scale:.2f}", (5, 15), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,0), 1)
-        
-        return QtGui.QImage(img.data, w, h, 3*w, QtGui.QImage.Format.Format_RGB888)
-    
     def get_config_options(self):
         return [
             ("Num Outputs", "num_outputs", self.num_outputs, None),
