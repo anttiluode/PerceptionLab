@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 """
-Antti's Perception Laboratory - Host v5.1 (Bulletproof & Enhanced Edition)
+Antti's Perception Laboratory - Host v6 (Max Compatibility & Bulletproof)
 -----------------------------------------------------------------
-[V5 CORE] Robust NaN/Inf handling throughout the system to prevent UI crashes.
-[V5 CORE] Improved wire connection: click output port, then click input port to connect.
-[V5 CORE] Enhanced visual feedback during wire connection with animated preview.
-[V5.1 ENHANCEMENT] Integrated node resize handle and 'R'/'+/-' action buttons (from v4).
-[V5.1 ENHANCEMENT] Integrated 'file_open' configuration option with a browse button (from v4).
-[V5.1 FIX] Corrected the 'AttributeError: NoneType object has no attribute' crash in the Scene's mouse handler.
-
-The "Clean Death" bug is fixed: NaN/Inf values in nodes no longer crash the UI.
+[V6 CORE] Maximized compatibility with old nodes using the 'import __main__' structure.
+[V6 CORE] Fixes the 'AttributeError: NoneType object' crash in the UI layer.
+[V5 CORE] Robust NaN/Inf handling throughout the system.
+[V5.1 ENHANCEMENT] Integrated v4 visual elements (R/+/- buttons, resize handle).
 """
 
 import sys
@@ -173,6 +169,12 @@ def load_nodes_from_folder(folder_path):
             
     found_nodes = {}
     
+    # Inject BaseNode and PA_INSTANCE into the __main__ module for compatibility
+    # This is the key change for backward compatibility with old nodes' imports
+    main_module = sys.modules['__main__']
+    setattr(main_module, 'BaseNode', BaseNode)
+    setattr(main_module, 'PA_INSTANCE', PA_INSTANCE)
+    
     for filename in os.listdir(folder_path):
         if filename.endswith(".py") and filename != "__init__.py":
             module_name = filename[:-3]
@@ -181,7 +183,9 @@ def load_nodes_from_folder(folder_path):
             try:
                 spec = importlib.util.spec_from_file_location(module_name, file_path)
                 module = importlib.util.module_from_spec(spec)
-                module.__dict__['__main__'] = sys.modules['__main__']
+                
+                # V6 Compatibility: Ensure module can resolve __main__ imports
+                module.__dict__['__main__'] = main_module
                 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
                 spec.loader.exec_module(module)
                 
@@ -572,16 +576,29 @@ class NodeConfigDialog(QtWidgets.QDialog):
                 
             elif isinstance(widget_type, list):
                 combo = QtWidgets.QComboBox()
+                
+                # V6 Compatibility: Handle tuple/list options (name, value) or simple values
                 for option in widget_type:
-                    combo.addItem(str(option))
+                    if isinstance(option, (list, tuple)) and len(option) == 2:
+                        name, value = option
+                        combo.addItem(str(name), userData=value)
+                    else:
+                        name = str(option)
+                        value = option
+                        combo.addItem(name, userData=value)
+                
                 try:
-                    idx = widget_type.index(current_value)
-                    combo.setCurrentIndex(idx)
+                    # Try to find index by current value data
+                    current_data_index = combo.findData(current_value)
+                    if current_data_index != -1:
+                        combo.setCurrentIndex(current_data_index)
+                    else:
+                         # If value wasn't explicitly defined in the list, add it if it's an ID/number
+                         combo.addItem(f"Current ID ({current_value})", userData=current_value)
+                         combo.setCurrentIndex(combo.count() - 1)
+                        
                 except ValueError:
-                    # Handle cases where current_value might be a device ID not in the list
-                    if combo.findText(str(current_value)) == -1:
-                        combo.addItem(str(current_value))
-                        combo.setCurrentIndex(combo.count() - 1)
+                    pass
                         
                 form.addRow(label_text + ":", combo)
                 self.widgets_map[attr_name] = ('combo', combo, widget_type)
@@ -637,7 +654,6 @@ class NodeConfigDialog(QtWidgets.QDialog):
         
     # --- [V5.1 ENHANCEMENT] Helper method for file dialog ---
     def open_file_dialog(self, key, line_edit_widget):
-        # NOTE: This only opens files, not folders. For folders, use QFileDialog.getExistingDirectory
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, "Select File", "", "All Files (*)")
         
@@ -657,26 +673,16 @@ class NodeConfigDialog(QtWidgets.QDialog):
         config = {}
         for attr_name, (w_type, widget, options) in self.widgets_map.items():
             if w_type == 'combo':
+                # Grab the data stored in the combo box item
                 config[attr_name] = widget.currentData()
-                try:
-                    # Attempt to convert to int/float if appropriate
-                    text = widget.currentText()
-                    fval = float(text)
-                    if fval.is_integer():
-                         config[attr_name] = int(fval)
-                    else:
-                         config[attr_name] = fval
-                except ValueError:
-                    pass
-                
             elif w_type == 'int':
                 config[attr_name] = widget.value()
             elif w_type == 'float':
                 config[attr_name] = widget.value()
             elif w_type == 'bool':
                 config[attr_name] = widget.isChecked()
-            elif w_type == 'text':
-                text = widget.text()
+            elif w_type == 'text' or w_type == 'text_multi':
+                text = widget.text() if w_type == 'text' else widget.toPlainText()
                 try:
                     # Attempt to convert to int/float
                     fval = float(text)
@@ -686,8 +692,6 @@ class NodeConfigDialog(QtWidgets.QDialog):
                         config[attr_name] = fval
                 except ValueError:
                     config[attr_name] = text
-            elif w_type == 'text_multi':
-                config[attr_name] = widget.toPlainText()
         return config
 
 # ==================== MAIN SCENE ====================
@@ -708,7 +712,7 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
         node_item.setPos(x, y)
         self.addItem(node_item)
         self.nodes.append(node_item)
-        node_item.update_display()
+        node_item.update_display() 
         return node_item
         
     def remove_node(self, node_item):
@@ -737,9 +741,8 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
     
     def mousePressEvent(self, ev):
         """
-        [v5.1 FIX] The crash on line 780 in the traceback is handled by allowing 
-        NodeItem.mousePressEvent to handle itself via super().mousePressEvent.
-        The complex button logic is now self-contained in NodeItem.
+        [v6 FIX]: The button/handle interaction logic is entirely handled by
+        NodeItem.mousePressEvent, preventing the crash when 'item' is None.
         """
         if ev.button() != QtCore.Qt.MouseButton.LeftButton:
             super().mousePressEvent(ev)
@@ -776,8 +779,6 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
                 ev.accept()
                 return
         
-        # If item is None (clicked empty space) or is a NodeItem, proceed to default handling.
-        # NodeItem's mousePressEvent handles its internal buttons and resizing.
         else:
             if self.connection_start_port is not None:
                 self.cancel_connection()
@@ -786,7 +787,6 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
     def mouseMoveEvent(self, ev):
         """[v5 ENHANCED] Animate preview wire during connection"""
         if self.temp_edge and self.connection_start_port:
-            # Create temporary target for preview
             class TempTarget:
                 def __init__(self, pos): self._pos = pos
                 def scenePos(self): return self._pos
@@ -813,7 +813,7 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
 class PerceptionLab(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Antti's Perception Laboratory v5.1 - Bulletproof & Enhanced Edition 🛡️")
+        self.setWindowTitle("Antti's Perception Laboratory v6 - Max Compatibility Edition 🛡️")
         self.resize(1400, 800)
         
         self.scene = PerceptionScene()
@@ -897,7 +897,7 @@ class PerceptionLab(QtWidgets.QWidget):
         status_layout.addWidget(self.status)
         status_layout.addStretch()
         
-        version_label = QtWidgets.QLabel("v5.1 - Enhanced Bulletproof Edition 🛡️")
+        version_label = QtWidgets.QLabel("v6 - Max Compatibility Edition 🛡️")
         version_label.setStyleSheet("color: #6495ed; font-size: 10px; font-weight: bold;")
         status_layout.addWidget(version_label)
         
@@ -937,7 +937,6 @@ class PerceptionLab(QtWidgets.QWidget):
         center = self.view.mapToScene(self.view.viewport().rect().center())
         
         # Check if node has w/h attributes to set initial size from config
-        # We instantiate a temporary node to check defaults safely
         temp_node_instance = node_class()
         w = getattr(temp_node_instance, 'w', NODE_W) if hasattr(temp_node_instance, 'w') else NODE_W
         h = getattr(temp_node_instance, 'h', NODE_H) if hasattr(temp_node_instance, 'h') else NODE_H
@@ -985,11 +984,40 @@ class PerceptionLab(QtWidgets.QWidget):
         else:
             # Add Node menu
             add_menu = self.show_add_node_menu() # Get the menu structure
-            menu.addMenu(add_menu)
-
+            # Re-implementing the add node menu logic to be a submenu instead of recursive action
+            categories = {}
+            for name, info in self.NODE_CLASS_MAP.items():
+                cat = info.get('category', 'Uncategorized')
+                if cat not in categories:
+                    categories[cat] = []
+                categories[cat].append((name, info['class']))
+            
+            for cat in sorted(categories.keys()):
+                submenu = menu.addMenu(cat)
+                for name, cls in sorted(categories[cat], key=lambda x: x[0]):
+                    action = submenu.addAction(name)
+                    action.triggered.connect(lambda checked, nc=cls, sp=scene_pos: self.add_node_at_pos(nc, sp))
+            
+            
         global_pos = self.view.mapToGlobal(pos)
         menu.exec(global_pos)
-    
+
+    def add_node_at_pos(self, node_class, scene_pos):
+        # Check if node has w/h attributes to set initial size from config
+        temp_node_instance = node_class()
+        w = getattr(temp_node_instance, 'w', NODE_W) if hasattr(temp_node_instance, 'w') else NODE_W
+        h = getattr(temp_node_instance, 'h', NODE_H) if hasattr(temp_node_instance, 'h') else NODE_H
+        del temp_node_instance
+        
+        node = self.scene.add_node(node_class, scene_pos.x() - w/2, scene_pos.y() - h/2, w=w, h=h)
+        
+        if hasattr(node.sim, 'open_stream'):
+            node.sim.open_stream()
+        if hasattr(node.sim, 'setup_source'):
+            node.sim.setup_source()
+            
+        self.status.setText(f"✓ Added {node.sim.node_title}")
+        
     def delete_selected_nodes(self):
         selected_nodes = [i for i in self.scene.selectedItems() if isinstance(i, NodeItem)]
         for node in selected_nodes:
@@ -1017,7 +1045,6 @@ class PerceptionLab(QtWidgets.QWidget):
             if hasattr(node_item.sim, 'setup_source'):
                 node_item.sim.setup_source()
             
-            # Update display and port positions to reflect potential size/config changes
             node_item.update_display()
             node_item.update_port_positions()
             self.status.setText(f"✓ Configured {node_item.sim.node_title}")
