@@ -1,0 +1,166 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "LoadImageNode",
+      "pos_x": -1300.0,
+      "pos_y": -250.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "REALITY (Source Image)"
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "CabbageScannerNode",
+      "pos_x": -1050.0,
+      "pos_y": -250.0,
+      "width": 220.0,
+      "height": 220.0,
+      "config": {
+        "node_title": "Scanner A (Reality)"
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "VectorSplitterNode",
+      "pos_x": -800.0,
+      "pos_y": -350.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "node_title": "DNA Translator",
+        "num_outputs": 16,
+        "scale": 1.0
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "EigenmodeResonanceNode",
+      "pos_x": -550.0,
+      "pos_y": -350.0,
+      "width": 250.0,
+      "height": 250.0,
+      "config": {
+        "node_title": "Eigenmode Geometry",
+        "resolution": 256,
+        "sensitivity": 1.0,
+        "resonance_threshold": 0.3
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "CabbageBodyNode",
+      "pos_x": -250.0,
+      "pos_y": -150.0,
+      "width": 400.0,
+      "height": 400.0,
+      "config": {
+        "node_title": "THE BODY (Simulation)",
+        "resolution": 512
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "CabbageScannerNode",
+      "pos_x": 200.0,
+      "pos_y": -150.0,
+      "width": 220.0,
+      "height": 220.0,
+      "config": {
+        "node_title": "Scanner B (Dream)"
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "CabbageObserverNode",
+      "pos_x": -550.0,
+      "pos_y": 150.0,
+      "width": 250.0,
+      "height": 250.0,
+      "config": {
+        "node_title": "THE OBSERVER",
+        "latent_dim": 55,
+        "sensitivity": 50.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image_out",
+      "to_node_id": 1,
+      "to_port": "target_image"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "dna_55",
+      "to_node_id": 2,
+      "to_port": "spectrum_in"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "dna_55",
+      "to_node_id": 6,
+      "to_port": "reality_dna"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "out_0",
+      "to_node_id": 3,
+      "to_port": "delta"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "out_1",
+      "to_node_id": 3,
+      "to_port": "theta"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "out_2",
+      "to_node_id": 3,
+      "to_port": "alpha"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "out_3",
+      "to_node_id": 3,
+      "to_port": "beta"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "out_4",
+      "to_node_id": 3,
+      "to_port": "gamma"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "lobe_activation_map",
+      "to_node_id": 4,
+      "to_port": "lobe_activation"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "structure_3d",
+      "to_node_id": 5,
+      "to_port": "target_image"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "dna_55",
+      "to_node_id": 6,
+      "to_port": "dream_dna"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "growth_drive",
+      "to_node_id": 4,
+      "to_port": "growth_rate"
+    }
+  ]
+}
