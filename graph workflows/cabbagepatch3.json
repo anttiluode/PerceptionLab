@@ -1,0 +1,361 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "CabbageScannerNode",
+      "pos_x": -1315.0,
+      "pos_y": -98.0,
+      "width": 220.0,
+      "height": 220.0,
+      "config": {
+        "inputs": {
+          "target_image": "image"
+        },
+        "outputs": {
+          "dna_55": "spectrum",
+          "reconstruction": "image",
+          "error": "signal"
+        },
+        "node_title": "Scanner A (Reality)",
+        "resolution": 128,
+        "max_n": 5,
+        "max_m": 5
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "VectorSplitterNode",
+      "pos_x": -1070.0,
+      "pos_y": -304.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "spectrum_in": "spectrum",
+          "scale_mod": "signal"
+        },
+        "outputs": {
+          "out_0": "signal",
+          "out_1": "signal",
+          "out_2": "signal",
+          "out_3": "signal",
+          "out_4": "signal",
+          "out_5": "signal",
+          "out_6": "signal",
+          "out_7": "signal",
+          "out_8": "signal",
+          "out_9": "signal",
+          "out_10": "signal",
+          "out_11": "signal",
+          "out_12": "signal",
+          "out_13": "signal",
+          "out_14": "signal",
+          "out_15": "signal"
+        },
+        "node_title": "DNA Translator",
+        "num_outputs": 16,
+        "scale": 1.0,
+        "out_0_val": 28.38585090637207,
+        "out_1_val": 9.79587173461914,
+        "out_2_val": -16.114057540893555,
+        "out_3_val": 4.937801361083984,
+        "out_4_val": 8.587540626525879,
+        "out_5_val": 8.62508773803711,
+        "out_6_val": 3.4493842124938965,
+        "out_7_val": 2.0359902381896973,
+        "out_8_val": -5.58862829208374,
+        "out_9_val": -6.184460639953613,
+        "out_10_val": -3.0413455963134766,
+        "out_11_val": -25.064590454101562,
+        "out_12_val": -5.79139518737793,
+        "out_13_val": 7.476478576660156,
+        "out_14_val": -5.191833019256592,
+        "out_15_val": -6.952049732208252
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "EigenmodeResonanceNode",
+      "pos_x": -1061.0,
+      "pos_y": -89.0,
+      "width": 206.0,
+      "height": 209.0,
+      "config": {
+        "inputs": {
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "raw_signal": "signal"
+        },
+        "outputs": {
+          "eigenmode_activation": "image",
+          "lobe_activation_map": "image",
+          "resonance_score": "signal",
+          "dominant_mode_n": "signal",
+          "dominant_mode_m": "signal",
+          "total_activation": "signal"
+        },
+        "input_data": {
+          "delta": [
+            19.81882743835449
+          ],
+          "theta": [
+            6.8573285102844235
+          ],
+          "alpha": [
+            -11.26487464904785
+          ],
+          "beta": [
+            3.460839223861694
+          ],
+          "gamma": [
+            5.992310714721679
+          ],
+          "raw_signal": []
+        },
+        "node_title": "Eigenmode Geometry",
+        "aspect_ratio": 2.0,
+        "resolution": 256,
+        "resonance_threshold": 0.3,
+        "sensitivity": 1.0,
+        "contrast_boost": 2.0,
+        "frequency_to_modes": {
+          "delta": [
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "theta": [
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "alpha": [
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ]
+          ],
+          "beta": [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "gamma": [
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              4,
+              3
+            ]
+          ]
+        },
+        "dominant_mode_n": 1,
+        "dominant_mode_m": 0,
+        "eeg_bands": {
+          "delta": 19.81882743835449,
+          "theta": 6.8573285102844235,
+          "alpha": -11.26487464904785,
+          "beta": 3.460839223861694,
+          "gamma": 5.992310714721679
+        }
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "CabbageBodyNode",
+      "pos_x": -803.0,
+      "pos_y": -67.0,
+      "width": 245.0,
+      "height": 226.0,
+      "config": {
+        "inputs": {
+          "lobe_activation": "image",
+          "growth_rate": "signal"
+        },
+        "outputs": {
+          "structure_3d": "image",
+          "thickness": "image"
+        },
+        "node_title": "THE BODY (Simulation)",
+        "res": 512
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "CabbageScannerNode",
+      "pos_x": -474.0,
+      "pos_y": -314.0,
+      "width": 388.0,
+      "height": 450.0,
+      "config": {
+        "inputs": {
+          "target_image": "image"
+        },
+        "outputs": {
+          "dna_55": "spectrum",
+          "reconstruction": "image",
+          "error": "signal"
+        },
+        "node_title": "Scanner B (Dream)",
+        "resolution": 128,
+        "max_n": 5,
+        "max_m": 5
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "CabbageObserverNode",
+      "pos_x": -819.0,
+      "pos_y": -321.0,
+      "width": 250.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "reality_dna": "spectrum",
+          "dream_dna": "spectrum"
+        },
+        "outputs": {
+          "growth_drive": "signal",
+          "attention_map": "image"
+        },
+        "node_title": "THE OBSERVER",
+        "latent_dim": 55,
+        "sensitivity": 50.0,
+        "h": 50,
+        "w": 550
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "MediaSourceNode",
+      "pos_x": -1309.0,
+      "pos_y": -444.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.43548733660130723
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "dna_55",
+      "to_node_id": 1,
+      "to_port": "spectrum_in"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "dna_55",
+      "to_node_id": 5,
+      "to_port": "reality_dna"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "out_0",
+      "to_node_id": 2,
+      "to_port": "delta"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "out_1",
+      "to_node_id": 2,
+      "to_port": "theta"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "out_2",
+      "to_node_id": 2,
+      "to_port": "alpha"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "out_3",
+      "to_node_id": 2,
+      "to_port": "beta"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "out_4",
+      "to_node_id": 2,
+      "to_port": "gamma"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "lobe_activation_map",
+      "to_node_id": 3,
+      "to_port": "lobe_activation"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "structure_3d",
+      "to_node_id": 4,
+      "to_port": "target_image"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "dna_55",
+      "to_node_id": 5,
+      "to_port": "dream_dna"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "growth_drive",
+      "to_node_id": 3,
+      "to_port": "growth_rate"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "target_image"
+    }
+  ]
+}
