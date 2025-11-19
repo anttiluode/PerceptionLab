@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Antti's Perception Laboratory - Host v5 (Bulletproof + Enhanced)
+Antti's Perception Laboratory - Host v5.1 (Bulletproof & Enhanced Edition)
 -----------------------------------------------------------------
-[NEW v5] Added robust NaN/Inf handling throughout the system to prevent UI crashes
-[NEW v5] Improved wire connection: click output port, then click input port to connect
-[NEW v5] Enhanced visual feedback during wire connection with animated preview
-[V4 ENHANCEMENT] Integrated node resize handle and 'R'/'+/-' action buttons for visual feedback.
-[V4 ENHANCEMENT] Integrated 'file_open' configuration option with a browse button.
+[V5 CORE] Robust NaN/Inf handling throughout the system to prevent UI crashes.
+[V5 CORE] Improved wire connection: click output port, then click input port to connect.
+[V5 CORE] Enhanced visual feedback during wire connection with animated preview.
+[V5.1 ENHANCEMENT] Integrated node resize handle and 'R'/'+/-' action buttons (from v4).
+[V5.1 ENHANCEMENT] Integrated 'file_open' configuration option with a browse button (from v4).
+[V5.1 FIX] Corrected the 'AttributeError: NoneType object has no attribute' crash in the Scene's mouse handler.
 
 The "Clean Death" bug is fixed: NaN/Inf values in nodes no longer crash the UI.
-When bad math happens, wires turn gray instead of killing the laboratory.
 """
 
 import sys
@@ -290,7 +290,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.rect = QtCore.QRectF(0, 0, w, h)
         self.display_pix = None
         
-        # --- [V4 ENHANCEMENT] Resize and Button setup ---
+        # --- [V5.1 ENHANCEMENT] Resize and Button setup ---
         self.resize_handle_size = 15
         self.resize_handle = QtCore.QRectF(
             self.rect.width() - self.resize_handle_size,
@@ -308,10 +308,9 @@ class NodeItem(QtWidgets.QGraphicsItem):
         if hasattr(self.sim, 'randomize'):
             self.random_btn_rect = QtCore.QRectF(self.rect.width() - 18, 4, 14, 14)
         if hasattr(self.sim, 'zoom_factor'):
-            # The v4 code had them reversed. Let's make '-' be zoom in and '+' be zoom out
             self.zoom_in_rect = QtCore.QRectF(self.rect.width() - 38, 4, 14, 14) 
             self.zoom_out_rect = QtCore.QRectF(self.rect.width() - 18, 4, 14, 14) 
-        # --- END V4 ENHANCEMENT ---
+        # --- END V5.1 ENHANCEMENT ---
         
         self.init_ports()
         self.setZValue(2)
@@ -334,7 +333,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         for name, port in self.out_ports.items():
             port.setPos(self.rect.width(), port.y())
             
-        # --- [V4 ENHANCEMENT] Update button/handle positions ---
+        # --- [V5.1 ENHANCEMENT] Update button/handle positions ---
         if self.random_btn_rect:
             self.random_btn_rect.moveTopRight(self.rect.topRight() + QtCore.QPointF(-4, 4))
         if self.zoom_in_rect and self.zoom_out_rect:
@@ -342,7 +341,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
             self.zoom_out_rect.moveTopRight(self.rect.topRight() + QtCore.QPointF(-4, 4))
             
         self.resize_handle.moveBottomRight(self.rect.bottomRight())
-        # --- END V4 ENHANCEMENT ---
+        # --- END V5.1 ENHANCEMENT ---
         
         if self.scene():
             for edge in self.scene().edges:
@@ -361,7 +360,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         super().hoverLeaveEvent(ev)
 
     def mousePressEvent(self, ev):
-        # --- [V4 ENHANCEMENT] Handle resizing via handle ---
+        # --- [V5.1 ENHANCEMENT] Handle resizing via handle ---
         if self.resize_handle.contains(ev.pos()) and ev.button() == QtCore.Qt.MouseButton.LeftButton:
             self.is_resizing = True
             self.resize_start_pos = ev.pos()
@@ -369,7 +368,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
             ev.accept()
             return
 
-        # --- [V4 ENHANCEMENT] Handle R/Zoom buttons ---
+        # --- [V5.1 ENHANCEMENT] Handle R/Zoom buttons ---
         if self.random_btn_rect and self.random_btn_rect.contains(ev.pos()):
             if hasattr(self.sim, 'randomize'):
                 self.sim.randomize()
@@ -395,7 +394,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         super().mousePressEvent(ev)
         
     def mouseMoveEvent(self, ev):
-        # --- [V4 ENHANCEMENT] Handle resizing via handle ---
+        # --- [V5.1 ENHANCEMENT] Handle resizing via handle ---
         if self.is_resizing:
             delta = ev.pos() - self.resize_start_pos
             new_w = max(self.min_w, self.resize_start_rect.width() + delta.x())
@@ -439,7 +438,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         painter.setPen(QtGui.QPen(QtGui.QColor(60, 60, 60), 2))
         painter.drawRoundedRect(self.rect, 10, 10)
         
-        # --- [V4 ENHANCEMENT] Better title/category rendering ---
+        # --- [V5.1 ENHANCEMENT] Better title/category rendering ---
         title_rect = QtCore.QRectF(8, 6, self.rect.width() - 24, 22)
         painter.setPen(QtGui.QColor(255, 255, 255))
         font = QtGui.QFont("Segoe UI", 11, QtGui.QFont.Weight.Bold)
@@ -456,7 +455,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         painter.drawText(category_rect, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter,
                         self.sim.NODE_CATEGORY)
         
-        # IMPROVED: Better port labels
+        # Better port labels
         port_font = QtGui.QFont("Segoe UI", 8)
         port_font.setHintingPreference(QtGui.QFont.HintingPreference.PreferFullHinting)
         painter.setFont(port_font)
@@ -468,7 +467,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         for name, port in self.out_ports.items():
             w_text = painter.fontMetrics().boundingRect(name).width()
             painter.drawText(port.pos() + QtCore.QPointF(-w_text - 12, 4), name)
-        # --- END V4 ENHANCEMENT ---
+        # --- END V5.1 ENHANCEMENT ---
         
         if self.display_pix:
             img_h = self.rect.height() - 60
@@ -489,7 +488,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
                     QtCore.QRectF(scaled.rect())
                 )
         
-        # --- [V4 ENHANCEMENT] Draw R/Zoom buttons and resize handle ---
+        # --- [V5.1 ENHANCEMENT] Draw R/Zoom buttons and resize handle ---
         if self.random_btn_rect:
             painter.setBrush(QtGui.QColor(255, 200, 60))
             painter.setPen(QtGui.QColor(40, 40, 40))
@@ -513,7 +512,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 80), 1))
         painter.drawLine(int(p.x() - 12), int(p.y() - 4), int(p.x() - 4), int(p.y() - 12))
         painter.drawLine(int(p.x() - 8), int(p.y() - 4), int(p.x() - 4), int(p.y() - 8))
-        # --- END V4 ENHANCEMENT ---
+        # --- END V5.1 ENHANCEMENT ---
 
     def update_display(self):
         """[v5 FIX] Now uses numpy_to_qimage which has NaN protection"""
@@ -554,7 +553,7 @@ class NodeConfigDialog(QtWidgets.QDialog):
             label_text, attr_name, current_value, widget_type = item
             
             if widget_type == 'file_open':
-                # --- [V4 ENHANCEMENT] File browser logic ---
+                # --- [V5.1 ENHANCEMENT] File browser logic ---
                 h_layout = QtWidgets.QHBoxLayout()
                 line = QtWidgets.QLineEdit(str(current_value))
                 browse_btn = QtWidgets.QPushButton("Browse...")
@@ -568,8 +567,8 @@ class NodeConfigDialog(QtWidgets.QDialog):
                 widget = QtWidgets.QWidget()
                 widget.setLayout(h_layout)
                 form.addRow(label_text + ":", widget)
-                self.widgets_map[attr_name] = ('text', line, None) # Treat as text for config return
-                # --- END V4 ENHANCEMENT ---
+                self.widgets_map[attr_name] = ('text', line, None) 
+                # --- END V5.1 ENHANCEMENT ---
                 
             elif isinstance(widget_type, list):
                 combo = QtWidgets.QComboBox()
@@ -636,8 +635,9 @@ class NodeConfigDialog(QtWidgets.QDialog):
         btn_box.rejected.connect(self.reject)
         layout.addWidget(btn_box)
         
-    # --- [V4 ENHANCEMENT] Helper method for file dialog ---
+    # --- [V5.1 ENHANCEMENT] Helper method for file dialog ---
     def open_file_dialog(self, key, line_edit_widget):
+        # NOTE: This only opens files, not folders. For folders, use QFileDialog.getExistingDirectory
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, "Select File", "", "All Files (*)")
         
@@ -651,13 +651,13 @@ class NodeConfigDialog(QtWidgets.QDialog):
                  self.sim_node.setup_source()
             if hasattr(self.sim_node, 'update'):
                  self.sim_node.update()
-    # --- END V4 ENHANCEMENT ---
+    # --- END V5.1 ENHANCEMENT ---
     
     def get_config_dict(self):
         config = {}
         for attr_name, (w_type, widget, options) in self.widgets_map.items():
             if w_type == 'combo':
-                config[attr_name] = widget.currentText() if isinstance(widget.currentData(), str) and widget.currentData() == widget.currentText() else widget.currentData()
+                config[attr_name] = widget.currentData()
                 try:
                     # Attempt to convert to int/float if appropriate
                     text = widget.currentText()
@@ -699,7 +699,6 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
         self.nodes = []
         self.edges = []
         
-        # [v5 ENHANCED] Improved wire connection state
         self.temp_edge = None
         self.connection_start_port = None
         
@@ -709,7 +708,7 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
         node_item.setPos(x, y)
         self.addItem(node_item)
         self.nodes.append(node_item)
-        node_item.update_display() # Added from v4 to ensure initial image is displayed
+        node_item.update_display()
         return node_item
         
     def remove_node(self, node_item):
@@ -737,7 +736,11 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
             self.remove_edge(edge)
     
     def mousePressEvent(self, ev):
-        """[v5 ENHANCED] Improved click-to-wire: click output, then click input"""
+        """
+        [v5.1 FIX] The crash on line 780 in the traceback is handled by allowing 
+        NodeItem.mousePressEvent to handle itself via super().mousePressEvent.
+        The complex button logic is now self-contained in NodeItem.
+        """
         if ev.button() != QtCore.Qt.MouseButton.LeftButton:
             super().mousePressEvent(ev)
             return
@@ -772,16 +775,11 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
                 self.cancel_connection()
                 ev.accept()
                 return
+        
+        # If item is None (clicked empty space) or is a NodeItem, proceed to default handling.
+        # NodeItem's mousePressEvent handles its internal buttons and resizing.
         else:
-            # Clicked on a NodeItem handle/button
-            if isinstance(item, NodeItem) and item.is_resizing:
-                 # Let the NodeItem handle the move event for resizing
-                 pass 
-            elif isinstance(item, NodeItem) and (item.random_btn_rect and item.random_btn_rect.contains(item.mapFromScene(ev.scenePos()))) or (item.zoom_in_rect and item.zoom_in_rect.contains(item.mapFromScene(ev.scenePos()))) or (item.zoom_out_rect and item.zoom_out_rect.contains(item.mapFromScene(ev.scenePos()))):
-                 # Let the NodeItem handle the click for buttons
-                 pass
-            # Clicked on empty space - cancel connection if active
-            elif self.connection_start_port is not None:
+            if self.connection_start_port is not None:
                 self.cancel_connection()
             super().mousePressEvent(ev)
     
@@ -815,7 +813,7 @@ class PerceptionScene(QtWidgets.QGraphicsScene):
 class PerceptionLab(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Antti's Perception Laboratory v5 - Bulletproof & Enhanced Edition 🛡️")
+        self.setWindowTitle("Antti's Perception Laboratory v5.1 - Bulletproof & Enhanced Edition 🛡️")
         self.resize(1400, 800)
         
         self.scene = PerceptionScene()
@@ -939,8 +937,11 @@ class PerceptionLab(QtWidgets.QWidget):
         center = self.view.mapToScene(self.view.viewport().rect().center())
         
         # Check if node has w/h attributes to set initial size from config
-        w = getattr(node_class(), 'w', NODE_W) if hasattr(node_class(), 'w') else NODE_W
-        h = getattr(node_class(), 'h', NODE_H) if hasattr(node_class(), 'h') else NODE_H
+        # We instantiate a temporary node to check defaults safely
+        temp_node_instance = node_class()
+        w = getattr(temp_node_instance, 'w', NODE_W) if hasattr(temp_node_instance, 'w') else NODE_W
+        h = getattr(temp_node_instance, 'h', NODE_H) if hasattr(temp_node_instance, 'h') else NODE_H
+        del temp_node_instance
         
         node = self.scene.add_node(node_class, center.x() - w/2, center.y() - h/2, w=w, h=h)
         
@@ -983,8 +984,8 @@ class PerceptionLab(QtWidgets.QWidget):
                 
         else:
             # Add Node menu
-            add_menu_action = menu.addAction("➕ Add Node...")
-            add_menu_action.triggered.connect(lambda: self.show_add_node_menu().exec(QtGui.QCursor.pos()))
+            add_menu = self.show_add_node_menu() # Get the menu structure
+            menu.addMenu(add_menu)
 
         global_pos = self.view.mapToGlobal(pos)
         menu.exec(global_pos)
@@ -1008,8 +1009,6 @@ class PerceptionLab(QtWidgets.QWidget):
         if dialog.exec():
             config = dialog.get_config_dict()
             for key, val in config.items():
-                # Node will have already been updated if it was a file browse, 
-                # but this handles all other standard options.
                 setattr(node_item.sim, key, val)
             
             # Re-run setup/open if configuration changes require it
@@ -1018,7 +1017,9 @@ class PerceptionLab(QtWidgets.QWidget):
             if hasattr(node_item.sim, 'setup_source'):
                 node_item.sim.setup_source()
             
+            # Update display and port positions to reflect potential size/config changes
             node_item.update_display()
+            node_item.update_port_positions()
             self.status.setText(f"✓ Configured {node_item.sim.node_title}")
     
     def delete_edge(self, edge):
@@ -1042,7 +1043,6 @@ class PerceptionLab(QtWidgets.QWidget):
             self.btn_run.setText("⏸ Stop")
             self.btn_run.setStyleSheet("padding: 6px 12px; font-weight: bold; background: #5a2a2a; color: white; border-radius: 5px;")
             self.status.setText("▶ Simulation running...")
-            # Initialize FPS tracking (copied from v4)
             self.last_time = QtCore.QTime.currentTime()
             self.frame_count = 0
         else:
@@ -1108,7 +1108,7 @@ class PerceptionLab(QtWidgets.QWidget):
                 # Optionally show error state in node
                 continue
         
-        # Step 4: Update FPS (copied from v4)
+        # Step 4: Update FPS
         if hasattr(self, 'frame_count'):
             self.frame_count += 1
             if self.frame_count % 30 == 0:
