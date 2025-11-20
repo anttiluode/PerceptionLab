@@ -1,0 +1,345 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NoiseGeneratorSuperNode",
+      "pos_x": -250.0,
+      "pos_y": -200.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "array": "image"
+        },
+        "input_data": {},
+        "node_title": "Bio-Matter (Pink Noise)",
+        "noise_type": "pink",
+        "dimension": "1D",
+        "amplitude": 1.0,
+        "sample_rate": 44100,
+        "buffer_size": 1024,
+        "width": 256,
+        "height": 256,
+        "pink_rows": 16,
+        "_pink_index": 0,
+        "_brown_value": 0.0,
+        "_blue_prev": 0.0,
+        "_violet_prev1": 0.0,
+        "_violet_prev2": 0.0,
+        "perlin_scale": 0.1,
+        "perlin_octaves": 4,
+        "perlin_persistence": 0.5,
+        "perlin_offset_x": 0.0,
+        "perlin_offset_y": 0.0,
+        "quantum_coherence": 0.5,
+        "quantum_phase": 0.0,
+        "fractal_octaves": 6,
+        "current_signal": 0.01824009045958519
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "SignalOscillatorNode",
+      "pos_x": -600.0,
+      "pos_y": 400.0,
+      "width": 200.0,
+      "height": 150.0,
+      "config": {
+        "inputs": {
+          "freq_mod": "signal",
+          "amp_mod": "signal"
+        },
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {
+          "freq_mod": [],
+          "amp_mod": []
+        },
+        "node_title": "Theta Rhythm (8Hz)",
+        "base_frequency": 8,
+        "base_amplitude": 1,
+        "wave_type": "sine",
+        "current_frequency": 8.0,
+        "current_amplitude": 1,
+        "phase": 2.5132741228690394,
+        "output_value": 0.5877852522947344
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ThetaSweepNode",
+      "pos_x": -300.0,
+      "pos_y": 50.0,
+      "width": 220.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "input_a": "image",
+          "input_b": "image",
+          "theta_drive": "signal"
+        },
+        "outputs": {
+          "swept_output": "image",
+          "current_phase": "signal"
+        },
+        "node_title": "The Commutator",
+        "theta_hz": 8.0,
+        "phase": 0.0,
+        "last_time": 1763636358.2996905,
+        "current_phase_val": 1.0,
+        "active_channel": "A (Positive)"
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "EEGExperimentNode",
+      "pos_x": -1131.0,
+      "pos_y": 18.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "fast_stream_out": "spectrum",
+          "slow_stream_out": "spectrum"
+        },
+        "input_data": {},
+        "node_title": "EEG (Occipital)",
+        "edf_file_path": "E:\\docshouse\\450\\1.edf",
+        "selected_region": "Occipital",
+        "slow_momentum": 0.9,
+        "fast_stream_source": "fast_latent_full",
+        "slow_stream_source": "slow_latent_full",
+        "latent_dim": 6,
+        "signal_gain": 100,
+        "raw_power_scale": 10,
+        "band_power_scale": 20,
+        "_last_path": "E:\\docshouse\\450\\1.edf",
+        "_last_region": "Occipital",
+        "fs": 100.0,
+        "current_time": 58.166666666665925,
+        "window_size": 1.0,
+        "fast_latent_powers": {
+          "delta": 1.7489659399020473e-08,
+          "theta": 2.451702187048631e-09,
+          "alpha": 4.466910124872358e-09,
+          "beta": 2.7037316457233487e-09,
+          "gamma": 2.7940458300132106e-10,
+          "raw_signal": 1.4673450754840248e-08
+        },
+        "slow_latent_powers": {
+          "delta": 1.6718670904159377e-08,
+          "theta": 3.0085338507022695e-09,
+          "alpha": 3.829197299981239e-09,
+          "beta": 3.1403605507979214e-09,
+          "gamma": 2.5955020406043117e-10,
+          "raw_signal": 1.5500789328356137e-08
+        }
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "Eigen55RotNode",
+      "pos_x": -632.0,
+      "pos_y": -59.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "dna_55": "spectrum",
+          "rotation_hz": "signal"
+        },
+        "outputs": {
+          "rotated_map": "image",
+          "dominant_mode_power": "signal",
+          "rotation_angle": "signal"
+        },
+        "node_title": "Eigen 55 Rotator",
+        "resolution": 256,
+        "max_n": 5,
+        "max_m": 5,
+        "num_modes": 55,
+        "rotation_hz": 0.5,
+        "current_angle": 342.12485790252686,
+        "last_time": 1763636358.3079123,
+        "basis_indices": [
+          [
+            1,
+            0,
+            "cos"
+          ],
+          [
+            2,
+            0,
+            "cos"
+          ],
+          [
+            3,
+            0,
+            "cos"
+          ],
+          [
+            4,
+            0,
+            "cos"
+          ],
+          [
+            5,
+            0,
+            "cos"
+          ]
+        ],
+        "dominant_mode_power": 1.7010469264278072e-06,
+        "dominant_mode_n": 0.0
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "Eigen55RotNode",
+      "pos_x": -633.0,
+      "pos_y": 134.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "dna_55": "spectrum",
+          "rotation_hz": "signal"
+        },
+        "outputs": {
+          "rotated_map": "image",
+          "dominant_mode_power": "signal",
+          "rotation_angle": "signal"
+        },
+        "node_title": "Eigen 55 Rotator",
+        "resolution": 256,
+        "max_n": 5,
+        "max_m": 5,
+        "num_modes": 55,
+        "rotation_hz": 0.5,
+        "current_angle": 128.8099765777588,
+        "last_time": 1763636358.3138676,
+        "basis_indices": [
+          [
+            1,
+            0,
+            "cos"
+          ],
+          [
+            2,
+            0,
+            "cos"
+          ],
+          [
+            3,
+            0,
+            "cos"
+          ],
+          [
+            4,
+            0,
+            "cos"
+          ],
+          [
+            5,
+            0,
+            "cos"
+          ]
+        ],
+        "dominant_mode_power": 1.6633006225674762e-06,
+        "dominant_mode_n": 0.0
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "ResonanceMorphogenesisNode",
+      "pos_x": 40.0,
+      "pos_y": -167.0,
+      "width": 723.0,
+      "height": 638.0,
+      "config": {
+        "inputs": {
+          "lobe_activation": "image",
+          "growth_rate": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "resonance_map": "image",
+          "consistency_map": "image",
+          "thickness_map": "image",
+          "structure_3d": "image",
+          "fold_density": "signal",
+          "fractal_estimate": "signal",
+          "surface_area": "signal",
+          "morph_signal": "signal",
+          "dominant_mode_power": "signal"
+        },
+        "node_title": "Resonance Morphogenesis",
+        "resolution": 512,
+        "base_growth": 0.01,
+        "dt": 0.01,
+        "fold_threshold": 0.07,
+        "compression_strength": 5,
+        "diffusion_sigma": 1,
+        "max_thickness": 12,
+        "min_thickness": 0.1,
+        "spectral_window": 32,
+        "smooth_output": 1.0,
+        "scale_display": 1.0,
+        "temporal_window": 100,
+        "resonance_amplification": 30,
+        "stability_threshold": 4,
+        "time_step": 963,
+        "area_history": [],
+        "fold_density_value": 0.006324149202555418,
+        "surface_area_value": 262144.0,
+        "fractal_dim_value": 1.2166975051076843,
+        "morph_signal_value": 0.28715834084363095,
+        "dominant_mode_power": 0.31509456038475037
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "theta_drive"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "rotated_map",
+      "to_node_id": 2,
+      "to_port": "input_b"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "rotated_map",
+      "to_node_id": 2,
+      "to_port": "input_a"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "fast_stream_out",
+      "to_node_id": 4,
+      "to_port": "dna_55"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "slow_stream_out",
+      "to_node_id": 5,
+      "to_port": "dna_55"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "swept_output",
+      "to_node_id": 6,
+      "to_port": "lobe_activation"
+    }
+  ]
+}
