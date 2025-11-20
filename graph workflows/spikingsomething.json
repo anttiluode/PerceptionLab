@@ -1,0 +1,473 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": -765.0,
+      "pos_y": -418.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "input_data": {
+          "latent_base": [],
+          "in_0": [],
+          "in_1": [
+            0.0665170343241912
+          ],
+          "in_2": [],
+          "in_3": [
+            0.8578046045253476
+          ],
+          "in_4": [
+            0.6126893249903897
+          ],
+          "in_5": [
+            -0.9509990490066018
+          ],
+          "in_6": [],
+          "in_7": [],
+          "in_8": [],
+          "in_9": [
+            -0.18390592064933875
+          ],
+          "in_10": [],
+          "in_11": [],
+          "in_12": [
+            0.9757180265020502
+          ],
+          "in_13": [],
+          "in_14": [],
+          "in_15": []
+        },
+        "node_title": "Latent Assembler",
+        "latent_dim": 16
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "ResonanceMorphogenesisNode",
+      "pos_x": -216.0,
+      "pos_y": -404.0,
+      "width": 608.0,
+      "height": 615.0,
+      "config": {
+        "inputs": {
+          "lobe_activation": "image",
+          "growth_rate": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "resonance_map": "image",
+          "consistency_map": "image",
+          "thickness_map": "image",
+          "structure_3d": "image",
+          "fold_density": "signal",
+          "fractal_estimate": "signal",
+          "surface_area": "signal",
+          "morph_signal": "signal",
+          "dominant_mode_power": "signal"
+        },
+        "node_title": "Resonance Morphogenesis",
+        "resolution": 512,
+        "base_growth": 30,
+        "dt": 0.01,
+        "fold_threshold": 2e-05,
+        "compression_strength": 30,
+        "diffusion_sigma": 0.1,
+        "max_thickness": 12,
+        "min_thickness": 0.1,
+        "spectral_window": 32,
+        "smooth_output": 1.0,
+        "scale_display": 1.0,
+        "temporal_window": 100,
+        "resonance_amplification": 30,
+        "stability_threshold": 4,
+        "time_step": 4700,
+        "area_history": [],
+        "fold_density_value": 5493.443359375,
+        "surface_area_value": 329679584.0,
+        "fractal_dim_value": 1.497509817623946,
+        "morph_signal_value": 0.47799010425806043,
+        "dominant_mode_power": 0.13023509085178375
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "SpikingEigenmodeNode",
+      "pos_x": -522.0,
+      "pos_y": -286.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "dna_current": "spectrum",
+          "inhibition": "signal"
+        },
+        "outputs": {
+          "drum_surface": "image",
+          "spike_activity": "spectrum",
+          "total_energy": "signal"
+        },
+        "node_title": "Spiking Eigenmodes (The Drum)",
+        "resolution": 256,
+        "decay": 0.01,
+        "threshold": 0.3,
+        "num_modes": 55
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "NoiseGeneratorSuperNode",
+      "pos_x": -1149.0,
+      "pos_y": -317.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "array": "image"
+        },
+        "input_data": {},
+        "node_title": "Noise Generator Super",
+        "noise_type": "white",
+        "dimension": "1D",
+        "amplitude": 1.0,
+        "sample_rate": 44100,
+        "buffer_size": 1024,
+        "width": 256,
+        "height": 256,
+        "pink_rows": 16,
+        "_pink_index": 0,
+        "_brown_value": 0.0,
+        "_blue_prev": 0.0,
+        "_violet_prev1": 0.0,
+        "_violet_prev2": 0.0,
+        "perlin_scale": 0.05,
+        "perlin_octaves": 4,
+        "perlin_persistence": 0.5,
+        "perlin_offset_x": 0.0,
+        "perlin_offset_y": 0.0,
+        "quantum_coherence": 0.5,
+        "quantum_phase": 0.0,
+        "fractal_octaves": 6,
+        "current_signal": -0.10887587863744441
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "NoiseGeneratorSuperNode",
+      "pos_x": -1422.0,
+      "pos_y": -298.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "array": "image"
+        },
+        "input_data": {},
+        "node_title": "Noise Generator Super",
+        "noise_type": "fractal",
+        "dimension": "1D",
+        "amplitude": 1.0,
+        "sample_rate": 44100,
+        "buffer_size": 1024,
+        "width": 256,
+        "height": 256,
+        "pink_rows": 16,
+        "_pink_index": 0,
+        "_brown_value": 0.0,
+        "_blue_prev": 0.0,
+        "_violet_prev1": 0.0,
+        "_violet_prev2": 0.0,
+        "perlin_scale": 0.05,
+        "perlin_octaves": 4,
+        "perlin_persistence": 0.5,
+        "perlin_offset_x": 0.0,
+        "perlin_offset_y": 0.0,
+        "quantum_coherence": 0.5,
+        "quantum_phase": 0.0,
+        "fractal_octaves": 6,
+        "current_signal": -0.633807892319564
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "NoiseGeneratorSuperNode",
+      "pos_x": -1048.0,
+      "pos_y": -113.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "array": "image"
+        },
+        "input_data": {},
+        "node_title": "Noise Generator Super",
+        "noise_type": "fractal",
+        "dimension": "1D",
+        "amplitude": 1.0,
+        "sample_rate": 44100,
+        "buffer_size": 1024,
+        "width": 256,
+        "height": 256,
+        "pink_rows": 16,
+        "_pink_index": 0,
+        "_brown_value": 0.0,
+        "_blue_prev": 0.0,
+        "_violet_prev1": 0.0,
+        "_violet_prev2": 0.0,
+        "perlin_scale": 0.05,
+        "perlin_octaves": 4,
+        "perlin_persistence": 0.5,
+        "perlin_offset_x": 0.0,
+        "perlin_offset_y": 0.0,
+        "quantum_coherence": 0.5,
+        "quantum_phase": 0.0,
+        "fractal_octaves": 6,
+        "current_signal": -0.0601075150521484
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "NoiseGeneratorSuperNode",
+      "pos_x": -1045.0,
+      "pos_y": 16.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "array": "image"
+        },
+        "input_data": {},
+        "node_title": "Noise Generator Super",
+        "noise_type": "fractal",
+        "dimension": "1D",
+        "amplitude": 1.0,
+        "sample_rate": 44100,
+        "buffer_size": 1024,
+        "width": 256,
+        "height": 256,
+        "pink_rows": 16,
+        "_pink_index": 0,
+        "_brown_value": 0.0,
+        "_blue_prev": 0.0,
+        "_violet_prev1": 0.0,
+        "_violet_prev2": 0.0,
+        "perlin_scale": 0.05,
+        "perlin_octaves": 4,
+        "perlin_persistence": 0.5,
+        "perlin_offset_x": 0.0,
+        "perlin_offset_y": 0.0,
+        "quantum_coherence": 0.5,
+        "quantum_phase": 0.0,
+        "fractal_octaves": 6,
+        "current_signal": 0.7243412841733454
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "NoiseGeneratorSuperNode",
+      "pos_x": -1216.0,
+      "pos_y": -495.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "array": "image"
+        },
+        "input_data": {},
+        "node_title": "Noise Generator Super",
+        "noise_type": "fractal",
+        "dimension": "1D",
+        "amplitude": 1.0,
+        "sample_rate": 44100,
+        "buffer_size": 1024,
+        "width": 256,
+        "height": 256,
+        "pink_rows": 16,
+        "_pink_index": 0,
+        "_brown_value": 0.0,
+        "_blue_prev": 0.0,
+        "_violet_prev1": 0.0,
+        "_violet_prev2": 0.0,
+        "perlin_scale": 0.05,
+        "perlin_octaves": 4,
+        "perlin_persistence": 0.5,
+        "perlin_offset_x": 0.0,
+        "perlin_offset_y": 0.0,
+        "quantum_coherence": 0.5,
+        "quantum_phase": 0.0,
+        "fractal_octaves": 6,
+        "current_signal": 0.40723405141531144
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "NoiseGeneratorSuperNode",
+      "pos_x": -1467.0,
+      "pos_y": -85.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "array": "image"
+        },
+        "input_data": {},
+        "node_title": "Noise Generator Super",
+        "noise_type": "fractal",
+        "dimension": "1D",
+        "amplitude": 1.0,
+        "sample_rate": 44100,
+        "buffer_size": 1024,
+        "width": 256,
+        "height": 256,
+        "pink_rows": 16,
+        "_pink_index": 0,
+        "_brown_value": 0.0,
+        "_blue_prev": 0.0,
+        "_violet_prev1": 0.0,
+        "_violet_prev2": 0.0,
+        "perlin_scale": 0.05,
+        "perlin_octaves": 4,
+        "perlin_persistence": 0.5,
+        "perlin_offset_x": 0.0,
+        "perlin_offset_y": 0.0,
+        "quantum_coherence": 0.5,
+        "quantum_phase": 0.0,
+        "fractal_octaves": 6,
+        "current_signal": -0.1255243387001579
+      }
+    },
+    {
+      "id": 9,
+      "class_name": "NoiseGeneratorSuperNode",
+      "pos_x": -1437.0,
+      "pos_y": -496.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "array": "image"
+        },
+        "input_data": {},
+        "node_title": "Noise Generator Super",
+        "noise_type": "fractal",
+        "dimension": "1D",
+        "amplitude": 1.0,
+        "sample_rate": 44100,
+        "buffer_size": 1024,
+        "width": 256,
+        "height": 256,
+        "pink_rows": 16,
+        "_pink_index": 0,
+        "_brown_value": 0.0,
+        "_blue_prev": 0.0,
+        "_violet_prev1": 0.0,
+        "_violet_prev2": 0.0,
+        "perlin_scale": 0.05,
+        "perlin_octaves": 4,
+        "perlin_persistence": 0.5,
+        "perlin_offset_x": 0.0,
+        "perlin_offset_y": 0.0,
+        "quantum_coherence": 0.5,
+        "quantum_phase": 0.0,
+        "fractal_octaves": 6,
+        "current_signal": -0.8412410699734103
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 2,
+      "from_port": "drum_surface",
+      "to_node_id": 1,
+      "to_port": "lobe_activation"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "latent_out",
+      "to_node_id": 2,
+      "to_port": "dna_current"
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "in_1"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "in_5"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "in_3"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "in_4"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "in_12"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "in_9"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "in_7"
+    }
+  ]
+}
