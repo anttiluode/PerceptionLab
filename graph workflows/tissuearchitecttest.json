@@ -1,0 +1,109 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 1,
+      "class_name": "NoiseGeneratorSuperNode",
+      "pos_x": -600,
+      "pos_y": -150,
+      "width": 200,
+      "height": 200,
+      "config": {
+        "node_title": "Raw Matter (Pink Noise)",
+        "noise_type": "pink",
+        "perlin_scale": 0.1
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "SignalOscillatorNode",
+      "pos_x": -600,
+      "pos_y": 100,
+      "width": 200,
+      "height": 150,
+      "config": {
+        "node_title": "The Pulse",
+        "frequency": 10.0,
+        "waveform": "sine"
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SpikingEigenmodeNode",
+      "pos_x": -350,
+      "pos_y": 100,
+      "width": 220,
+      "height": 250,
+      "config": {
+        "node_title": "The Blueprint (Anatomy)",
+        "decay": 0.05,
+        "threshold": 0.2
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "TissueArchitectNode",
+      "pos_x": -50,
+      "pos_y": -50,
+      "width": 250,
+      "height": 250,
+      "config": {
+        "node_title": "Leggett Assembler",
+        "growth_rate": 0.2,
+        "decay_rate": 0.05,
+        "jamming_threshold": 0.9
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": -350,
+      "pos_y": 400,
+      "width": 200,
+      "height": 150,
+      "config": {
+        "node_title": "Current Injection"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "array",
+      "to_node_id": 4,
+      "to_port": "bio_matter"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 5,
+      "to_port": "in_0"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 5,
+      "to_port": "in_1"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 5,
+      "to_port": "in_3"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "latent_out",
+      "to_node_id": 3,
+      "to_port": "dna_current"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "drum_surface",
+      "to_node_id": 4,
+      "to_port": "anatomy_mask"
+    }
+  ]
+}
