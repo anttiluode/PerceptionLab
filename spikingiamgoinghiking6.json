@@ -1,0 +1,436 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": -1476.0,
+      "pos_y": -261.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "raw_signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG (All)",
+        "edf_file_path": "e:\\docshouse\\450\\3.edf",
+        "selected_region": "All",
+        "_last_path": "e:\\docshouse\\450\\3.edf",
+        "_last_region": "All",
+        "fs": 100.0,
+        "current_time": 23.700000000000337,
+        "window_size": 1.0,
+        "output_powers": {
+          "delta": 1.223068818570295e-09,
+          "theta": 1.8003141839592535e-10,
+          "alpha": 2.5078838222319647e-10,
+          "beta": 2.936227649399957e-10,
+          "gamma": 1.4066521946010087e-10,
+          "raw_signal": 4.471995281681449e-09
+        }
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": -765.0,
+      "pos_y": -418.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "input_data": {
+          "latent_base": [],
+          "in_0": [],
+          "in_1": [
+            0.117329934674826
+          ],
+          "in_2": [
+            0.02155479349498293
+          ],
+          "in_3": [
+            0.02357639780894032
+          ],
+          "in_4": [
+            0.02357639780894032
+          ],
+          "in_5": [
+            0.02357639780894032
+          ],
+          "in_6": [
+            0.02357639780894032
+          ],
+          "in_7": [
+            0.028743103440329643
+          ],
+          "in_8": [
+            0.028743103440329643
+          ],
+          "in_9": [
+            0.028743103440329643
+          ],
+          "in_10": [
+            0.014070928759122003
+          ],
+          "in_11": [
+            0.014070928759122003
+          ],
+          "in_12": [
+            0.014070928759122003
+          ],
+          "in_13": [
+            0.014070928759122003
+          ],
+          "in_14": [],
+          "in_15": []
+        },
+        "node_title": "Latent Assembler",
+        "latent_dim": 16
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "SignalAmplifierNode",
+      "pos_x": -1256.0,
+      "pos_y": -469.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            1.9990349021903478e-10
+          ]
+        },
+        "node_title": "Signal Amplifier",
+        "gain": 100000000,
+        "output_value": 0.019990349021903477
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SignalAmplifierNode",
+      "pos_x": -1474.0,
+      "pos_y": -461.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            1.260312768320897e-09
+          ]
+        },
+        "node_title": "Signal Amplifier",
+        "gain": 100000000,
+        "output_value": 0.1260312768320897
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "SignalAmplifierNode",
+      "pos_x": -1234.0,
+      "pos_y": -271.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            2.370749724635555e-10
+          ]
+        },
+        "node_title": "Signal Amplifier",
+        "gain": 100000000,
+        "output_value": 0.02370749724635555
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "SignalAmplifierNode",
+      "pos_x": -1207.0,
+      "pos_y": -61.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            2.887856764772852e-10
+          ]
+        },
+        "node_title": "Signal Amplifier",
+        "gain": 100000000,
+        "output_value": 0.028878567647728517
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "SignalAmplifierNode",
+      "pos_x": -1498.0,
+      "pos_y": 3.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            1.413292212458745e-10
+          ]
+        },
+        "node_title": "Signal Amplifier",
+        "gain": 100000000,
+        "output_value": 0.01413292212458745
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "ResonanceMorphogenesisNode",
+      "pos_x": -216.0,
+      "pos_y": -404.0,
+      "width": 608.0,
+      "height": 615.0,
+      "config": {
+        "inputs": {
+          "lobe_activation": "image",
+          "growth_rate": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "resonance_map": "image",
+          "consistency_map": "image",
+          "thickness_map": "image",
+          "structure_3d": "image",
+          "fold_density": "signal",
+          "fractal_estimate": "signal",
+          "surface_area": "signal",
+          "morph_signal": "signal",
+          "dominant_mode_power": "signal"
+        },
+        "node_title": "Resonance Morphogenesis",
+        "resolution": 512,
+        "base_growth": 30,
+        "dt": 0.01,
+        "fold_threshold": 2e-05,
+        "compression_strength": 30,
+        "diffusion_sigma": 0.1,
+        "max_thickness": 12,
+        "min_thickness": 0.1,
+        "spectral_window": 32,
+        "smooth_output": 1.0,
+        "scale_display": 1.0,
+        "temporal_window": 100,
+        "resonance_amplification": 30,
+        "stability_threshold": 4,
+        "time_step": 4271,
+        "area_history": [],
+        "fold_density_value": 5867.13671875,
+        "surface_area_value": 306640032.0,
+        "fractal_dim_value": 1.472730706997973,
+        "morph_signal_value": 0.4777354206889868,
+        "dominant_mode_power": 0.12956000864505768
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "SpikingEigenmodeNode",
+      "pos_x": -480.0,
+      "pos_y": -52.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "dna_current": "spectrum",
+          "inhibition": "signal"
+        },
+        "outputs": {
+          "drum_surface": "image",
+          "spike_activity": "spectrum",
+          "total_energy": "signal"
+        },
+        "node_title": "Spiking Eigenmodes (The Drum)",
+        "resolution": 256,
+        "decay": 0.01,
+        "threshold": 0.3,
+        "num_modes": 55
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "delta",
+      "to_node_id": 3,
+      "to_port": "signal_in"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta",
+      "to_node_id": 2,
+      "to_port": "signal_in"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha",
+      "to_node_id": 4,
+      "to_port": "signal_in"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta",
+      "to_node_id": 5,
+      "to_port": "signal_in"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma",
+      "to_node_id": 6,
+      "to_port": "signal_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_1"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_2"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_3"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_4"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_5"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_6"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_7"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_8"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_9"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_10"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_11"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_12"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "in_13"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "drum_surface",
+      "to_node_id": 7,
+      "to_port": "lobe_activation"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "latent_out",
+      "to_node_id": 8,
+      "to_port": "dna_current"
+    }
+  ]
+}
