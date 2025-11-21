@@ -1,0 +1,149 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "WebcamPhaseNode",
+      "pos_x": -650,
+      "pos_y": -50,
+      "config": {
+        "device_id": 0,
+        "motion_sensitivity": 2.0
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "EphapticPerturbationNode",
+      "pos_x": -400,
+      "pos_y": -50,
+      "config": {
+        "perturbation_strength": 2.0,
+        "spatial_scale": 32.0,
+        "temporal_smoothing": 0.9
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ResonanceMorphogenesisNode",
+      "pos_x": -100,
+      "pos_y": -200,
+      "config": {
+        "resolution": 512,
+        "base_growth": 0.05,
+        "fold_threshold": 2.0,
+        "temporal_window": 50
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SelfOrganizingObserverNode",
+      "pos_x": 500,
+      "pos_y": -200,
+      "config": {
+        "latent_dim": 16,
+        "growth_sensitivity": 20.0,
+        "entropy_weight": 0.2
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "HumanAttractorNode",
+      "pos_x": 500,
+      "pos_y": 150,
+      "config": {
+        "learning_rate": 0.05,
+        "pain_sensitivity": 1.5
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "SystemOptimizerNode",
+      "pos_x": 850,
+      "pos_y": 0,
+      "config": {
+        "learning_rate": 0.1,
+        "prune_threshold": 0.15
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "NoiseGeneratorSuperNode",
+      "pos_x": -650,
+      "pos_y": 200,
+      "config": {
+        "noise_type": "pink",
+        "amplitude": 0.2,
+        "width": 256,
+        "height": 256,
+        "dimension": "2D"
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "ImageToVectorNode",
+      "pos_x": 250,
+      "pos_y": -200,
+      "config": {
+        "output_dim": 16
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "motion_image",
+      "to_node_id": 1,
+      "to_port": "source_image"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "array",
+      "to_node_id": 1,
+      "to_port": "noise_field"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "perturbed_field",
+      "to_node_id": 2,
+      "to_port": "lobe_activation"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "thickness_map",
+      "to_node_id": 8,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "vector_out",
+      "to_node_id": 3,
+      "to_port": "sensation"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "free_energy",
+      "to_node_id": 4,
+      "to_port": "pain_stimulus"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "morph_signal",
+      "to_node_id": 4,
+      "to_port": "dopamine"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "morph_signal",
+      "to_node_id": 5,
+      "to_port": "global_reward"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "consciousness",
+      "to_node_id": 2,
+      "to_port": "growth_rate"
+    }
+  ]
+}
