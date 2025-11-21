@@ -1,0 +1,60 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SignalOscillatorNode",
+      "pos_x": -800.0,
+      "pos_y": 0.0,
+      "width": 200.0,
+      "height": 150.0,
+      "config": {
+        "node_title": "Intent (Injection)",
+        "base_frequency": 1.0,
+        "base_amplitude": 2.0
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "EphapticFieldNode",
+      "pos_x": -400.0,
+      "pos_y": 0.0,
+      "width": 250.0,
+      "height": 250.0,
+      "config": {
+        "node_title": "The Field (Substrate)",
+        "diffusion": 0.15,
+        "decay": 0.92
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "PKASNode",
+      "pos_x": 0.0,
+      "pos_y": 0.0,
+      "width": 250.0,
+      "height": 250.0,
+      "config": {
+        "node_title": "P-KAS Solver (Reality)",
+        "num_oscillators": 12,
+        "coupling_strength": 2.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "input_vector"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "order_parameter",
+      "to_node_id": 2,
+      "to_port": "input_energy"
+    }
+  ]
+}
