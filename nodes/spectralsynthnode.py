@@ -6,12 +6,15 @@ A high-performance audio node that takes the 55-dimensional
 Eigenmode vector and synthesizes a continuous, organic soundscape 
 using PyAudio.
 
+Updated with internal FFT visualization and fixed time_counter bug.
+
 Requires: pip install pyaudio
 """
 
 import numpy as np
 import cv2
 import math
+from scipy.fft import rfft
 import __main__
 BaseNode = __main__.BaseNode
 QtGui = __main__.QtGui
@@ -38,7 +41,10 @@ class SpectralSynthesizerNode(BaseNode):
         }
         
         self.outputs = {
-            'visualizer': 'image'   # Audio visualization
+            'visualizer': 'image',      # Audio visualization
+            'audio_signal': 'signal',   # Output for FFTCochlea
+            'spectrum': 'spectrum',     # FFT spectrum output
+            'fft_image': 'image'        # FFT visualization
         }
         
         self.base_freq = float(base_freq)
@@ -57,6 +63,15 @@ class SpectralSynthesizerNode(BaseNode):
         
         # Phase tracking for 55 oscillators
         self.phases = np.zeros(self.num_modes, dtype=np.float32)
+        
+        # TIME COUNTER - FIX FOR THE BUG
+        self.time_counter = 0.0
+        
+        # FFT Buffer for analysis
+        self.fft_buffer_size = 2048
+        self.fft_buffer = np.zeros(self.fft_buffer_size, dtype=np.float32)
+        self.spectrum_data = None
+        self.fft_display = np.zeros((64, 64), dtype=np.uint8)
         
         # Bessel Ratios (The "Drum" Tuning)
         self.ratios = np.array([
@@ -92,28 +107,14 @@ class SpectralSynthesizerNode(BaseNode):
         # This runs on a separate high-priority thread
         
         # 1. Smoothing: Move current amplitudes towards targets
-        # Simple linear interpolation for this chunk
         lerp_factor = 0.1
         self.current_amps = self.current_amps * (1 - lerp_factor) + self.target_amps * lerp_factor
         
         # 2. Generate Silence
         output = np.zeros(frame_count, dtype=np.float32)
         
-        # 3. Time steps for this chunk
-        # t = np.arange(frame_count) / self.sample_rate
-        # To maintain continuity, we use phase accumulation
-        
-        # 4. Synthesize Active Modes (Optimization)
-        # Only synthesize modes with audible energy (> 0.01)
+        # 3. Synthesize Active Modes (Optimization)
         active_indices = np.where(self.current_amps > 0.001)[0]
-        
-        # Precompute phase steps: 2 * pi * freq / sr
-        phase_increments = (2 * np.pi * self.freqs[active_indices]) / self.sample_rate
-        
-        # Generate samples
-        # This vectorization is complex for phase continuity, doing simple loop for stability
-        # Note: For true high-performance, we'd use C++/NumPy buffers more cleverly.
-        # Here we stick to a simplified additive synthesis loop.
         
         buffer_indices = np.arange(frame_count, dtype=np.float32)
         
@@ -123,7 +124,6 @@ class SpectralSynthesizerNode(BaseNode):
             current_phase = self.phases[i]
             
             # Wave = amp * sin(2pi*f*t + phase)
-            # Increment phase for next chunk
             phase_step = 2 * np.pi * freq / self.sample_rate
             chunk_phases = current_phase + buffer_indices * phase_step
             
@@ -132,7 +132,7 @@ class SpectralSynthesizerNode(BaseNode):
             # Update stored phase
             self.phases[i] = (current_phase + frame_count * phase_step) % (2 * np.pi)
 
-        # 5. Master Gain & Clipping
+        # 4. Master Gain & Clipping
         output *= self.master_gain * 0.1 # Scale down to avoid clipping sum
         output = np.clip(output, -1.0, 1.0)
         
@@ -146,52 +146,128 @@ class SpectralSynthesizerNode(BaseNode):
         if gain_in is not None:
             self.master_gain = np.clip(gain_in, 0.0, 2.0)
             
+        # --- Audio Thread Logic (Amplitudes) ---
         if coeffs is not None:
             # Update the targets for the audio thread
-            # Take magnitude (energy) of coefficients
-            # Ensure length match
             n = min(len(coeffs), self.num_modes)
             new_amps = np.abs(coeffs[:n])
             
             # Apply a slight curve so low modes are louder (Bass)
-            # and high modes are quieter (Texture)
             new_amps = new_amps * (1.0 / (1.0 + np.arange(n) * 0.1))
             
-            # Update safely
             self.target_amps[:n] = new_amps
             self.target_amps[n:] = 0.0
         else:
             self.target_amps[:] = 0.0
 
+        # --- Node Logic (Instantaneous Signal) ---
+        # Synthesize a single sample for the node graph
+        dt = 1.0 / 60.0 # Assuming 60Hz simulation step
+        self.time_counter += dt
+        
+        mix_sample = 0.0
+        total_energy = 0.0
+        
+        # Using current smoothed amplitudes
+        for i in range(self.num_modes):
+            amplitude = self.current_amps[i]
+            if amplitude < 0.001: 
+                continue 
+            
+            freq = self.freqs[i]
+            osc_val = amplitude * math.sin(2 * math.pi * freq * self.time_counter)
+            
+            mix_sample += osc_val
+            total_energy += amplitude
+            
+        if total_energy > 1.0:
+            mix_sample /= total_energy
+            
+        mix_sample *= self.master_gain
+
+        # --- Push to FFT Buffer ---
+        self.fft_buffer[:-1] = self.fft_buffer[1:]
+        self.fft_buffer[-1] = mix_sample
+        
+        # --- Compute FFT Spectrum ---
+        self.compute_fft_spectrum()
+
+        # --- Set Outputs ---
+        self.set_output('audio_signal', float(mix_sample))
+
+        # --- Visualization (Amplitude bars) ---
+        spectro_vis = np.zeros((55, 20), dtype=np.float32)
+        for i in range(min(self.num_modes, 55)):
+            amplitude = self.current_amps[i]
+            if amplitude > 0:
+                spectro_vis[55-i-1:55, :] += amplitude
+
+        spectro_img = cv2.applyColorMap(
+            (np.clip(spectro_vis, 0, 1) * 255).astype(np.uint8), 
+            cv2.COLORMAP_MAGMA
+        )
+        spectro_img = cv2.resize(spectro_img, (256, 256), interpolation=cv2.INTER_NEAREST)
+        self.set_output('visualizer', spectro_img)
+
+    def compute_fft_spectrum(self):
+        """Compute FFT spectrum from the audio buffer - EXACT FFT Cochlea style"""
+        # Perform FFT (using fftshift like FFT Cochlea)
+        f = np.fft.fft(self.fft_buffer)
+        fsh = np.fft.fftshift(f)
+        mag = np.abs(fsh)
+        
+        # Extract centered spectrum
+        center = len(mag) // 2
+        half = 32  # 64 bins total (32 on each side)
+        spec = mag[center - half:center + half]
+        
+        # Store raw spectrum
+        self.spectrum_data = spec.copy()
+        
+        # Create visualization EXACTLY like FFT Cochlea
+        arr = np.log1p(spec)
+        arr = (arr - arr.min()) / (arr.max() - arr.min() + 1e-9)
+        
+        w, h = 64, 64
+        self.fft_display = np.zeros((h, w), dtype=np.uint8)
+        
+        # Draw bars from bottom up, white on black
+        for i in range(min(len(arr), w)):
+            v = int(255 * arr[i])
+            self.fft_display[h - v:, i] = 255
+        
+        # Flip to match FFT Cochlea orientation
+        self.fft_display = np.flipud(self.fft_display)
+        
+        self.set_output('fft_image', self.fft_display)
+
     def get_output(self, port_name):
+        if port_name == 'spectrum':
+            return self.spectrum_data
+        elif port_name == 'audio_signal':
+            if hasattr(self, 'outputs_data'):
+                return self.outputs_data.get('audio_signal', None)
+        elif port_name == 'fft_image':
+            if hasattr(self, 'outputs_data'):
+                return self.outputs_data.get('fft_image', None)
+        elif port_name == 'visualizer':
+            if hasattr(self, 'outputs_data'):
+                return self.outputs_data.get('visualizer', None)
         return None
 
+    def set_output(self, name, val):
+        if not hasattr(self, 'outputs_data'): 
+            self.outputs_data = {}
+        self.outputs_data[name] = val
+
     def get_display_image(self):
-        # Visualizer: Draw the current amplitudes as a bar graph
-        h, w = 128, 256
-        img = np.zeros((h, w, 3), dtype=np.uint8)
-        
-        if self.active:
-            # Draw bars
-            num_bars = min(self.num_modes, 55)
-            bar_w = w // num_bars
-            
-            for i in range(num_bars):
-                amp = self.current_amps[i]
-                bar_h = int(np.clip(amp * 1000, 0, h))
-                
-                # Color gradient from Bass (Red) to Treble (Blue)
-                color = (255 - i*4, i*4, 100)
-                
-                cv2.rectangle(img, (i*bar_w, h-bar_h), ((i+1)*bar_w - 1, h), color, -1)
-                
-            if not PYAUDIO_AVAILABLE:
-                cv2.putText(img, "PyAudio Not Found", (10, 64), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1)
-        
-        return QtGui.QImage(img.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
+        """Show the FFT spectrum EXACTLY like FFT Cochlea - clean white on black"""
+        img = np.ascontiguousarray(self.fft_display)
+        h, w = img.shape
+        return QtGui.QImage(img.data, w, h, w, QtGui.QImage.Format.Format_Grayscale8)
 
     def close(self):
-        # Cleanup PyAudio
+        """Cleanup PyAudio"""
         if self.active:
             self.stream.stop_stream()
             self.stream.close()
