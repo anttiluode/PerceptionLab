@@ -11,7 +11,7 @@
       "width": 200.0,
       "height": 180.0,
       "config": {
-        "node_title": "EDF Source (Brain)",
+        "node_title": "EDF Source (Raw)",
         "window_ms": 100.0,
         "speed": 1.0
       }
@@ -20,57 +20,45 @@
       "id": 1,
       "class_name": "VectorSplitterNode",
       "pos_x": -900.0,
-      "pos_y": 0.0,
+      "pos_y": -200.0,
       "width": 200.0,
       "height": 180.0,
       "config": {
         "node_title": "Channel Splitter",
         "num_outputs": 8,
-        "scale": 1.0
+        "scale": 5.0
       }
     },
     {
       "id": 2,
       "class_name": "HolographicInterferenceNode",
-      "pos_x": -600.0,
-      "pos_y": -200.0,
+      "pos_x": -500.0,
+      "pos_y": -300.0,
       "width": 250.0,
       "height": 250.0,
       "config": {
-        "node_title": "Holographic Coherence",
+        "node_title": "Holographic Binding",
         "window_size": 128
       }
     },
     {
       "id": 3,
-      "class_name": "DecisionGateNode",
-      "pos_x": -300.0,
-      "pos_y": -200.0,
-      "width": 200.0,
-      "height": 180.0,
-      "config": {
-        "node_title": "The Threshold (Decision)",
-        "rule": "A > C",
-        "constant": 0.8
-      }
-    },
-    {
-      "id": 4,
-      "class_name": "EigenSpatialProjectorNode",
-      "pos_x": 0.0,
+      "class_name": "PACSurfaceNode",
+      "pos_x": -500.0,
       "pos_y": 0.0,
       "width": 250.0,
       "height": 250.0,
       "config": {
-        "node_title": "Global Workspace (Action)",
-        "resolution": 128
+        "node_title": "Neural Syntax (PAC)",
+        "phase_bins": 36,
+        "history_len": 500
       }
     },
     {
-      "id": 5,
+      "id": 4,
       "class_name": "SpectrumAnalyzerNode",
-      "pos_x": -600.0,
-      "pos_y": 200.0,
+      "pos_x": -900.0,
+      "pos_y": 300.0,
       "width": 200.0,
       "height": 180.0,
       "config": {
@@ -80,15 +68,15 @@
       }
     },
     {
-      "id": 6,
-      "class_name": "SignalPlotterNode",
-      "pos_x": 0.0,
-      "pos_y": -300.0,
-      "width": 300.0,
-      "height": 200.0,
+      "id": 5,
+      "class_name": "EigenSpatialProjectorNode",
+      "pos_x": -500.0,
+      "pos_y": 300.0,
+      "width": 250.0,
+      "height": 250.0,
       "config": {
-        "node_title": "Timing Analyzer",
-        "history_size": 500
+        "node_title": "Global Workspace (3D)",
+        "resolution": 128
       }
     }
   ],
@@ -97,6 +85,12 @@
       "from_node_id": 0,
       "from_port": "signal",
       "to_node_id": 1,
+      "to_port": "spectrum_in"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 4,
       "to_port": "spectrum_in"
     },
     {
@@ -112,63 +106,39 @@
       "to_port": "object_signal"
     },
     {
-      "from_node_id": 2,
-      "from_port": "coherence",
-      "to_node_id": 3,
-      "to_port": "signal_in_a"
-    },
-    {
-      "from_node_id": 2,
-      "from_port": "coherence",
-      "to_node_id": 6,
-      "to_port": "signal_A (Red)"
-    },
-    {
-      "from_node_id": 3,
-      "from_port": "signal_out",
-      "to_node_id": 6,
-      "to_port": "signal_B (Green)"
-    },
-    {
       "from_node_id": 1,
-      "from_port": "out_1",
-      "to_node_id": 5,
-      "to_port": "spectrum_in"
+      "from_port": "out_2",
+      "to_node_id": 3,
+      "to_port": "raw_eeg"
     },
     {
-      "from_node_id": 5,
+      "from_node_id": 4,
       "from_port": "bass",
-      "to_node_id": 4,
+      "to_node_id": 5,
       "to_port": "delta"
     },
     {
-      "from_node_id": 5,
+      "from_node_id": 4,
       "from_port": "bass",
-      "to_node_id": 4,
+      "to_node_id": 5,
       "to_port": "theta"
     },
     {
-      "from_node_id": 5,
+      "from_node_id": 4,
       "from_port": "mids",
-      "to_node_id": 4,
+      "to_node_id": 5,
       "to_port": "alpha"
     },
     {
-      "from_node_id": 5,
+      "from_node_id": 4,
       "from_port": "mids",
-      "to_node_id": 4,
+      "to_node_id": 5,
       "to_port": "beta"
     },
     {
-      "from_node_id": 5,
+      "from_node_id": 4,
       "from_port": "high",
-      "to_node_id": 4,
-      "to_port": "gamma"
-    },
-    {
-      "from_node_id": 3,
-      "from_port": "signal_out",
-      "to_node_id": 4,
+      "to_node_id": 5,
       "to_port": "gamma"
     }
   ]
