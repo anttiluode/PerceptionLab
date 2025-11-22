@@ -1,0 +1,203 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SignalOscillatorNode",
+      "pos_x": -600.0,
+      "pos_y": -200.0,
+      "width": 220.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "GOOD SIGNAL (Target)",
+        "wave_type": "sine",
+        "base_frequency": 0.2,
+        "inputs": {},
+        "outputs": {"signal": "signal"},
+        "input_data": {}
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "SignalOscillatorNode",
+      "pos_x": -600.0,
+      "pos_y": 0.0,
+      "width": 220.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "NOISE 1 (Fast Sine)",
+        "wave_type": "sine",
+        "base_frequency": 2.5,
+        "inputs": {},
+        "outputs": {"signal": "signal"},
+        "input_data": {}
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "SignalOscillatorNode",
+      "pos_x": -600.0,
+      "pos_y": 200.0,
+      "width": 220.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "NOISE 2 (Square)",
+        "wave_type": "square",
+        "base_frequency": 0.3,
+        "inputs": {},
+        "outputs": {"signal": "signal"},
+        "input_data": {}
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "SignalMathNode",
+      "pos_x": -200.0,
+      "pos_y": 0.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "THE MIXER",
+        "operation": "add",
+        "inputs": {"A": "signal", "B": "signal", "C": "signal"},
+        "outputs": {"result": "signal"},
+        "input_data": {}
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "SignalOscillatorNode",
+      "pos_x": 100.0,
+      "pos_y": -250.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "REFERENCE TARGET",
+        "wave_type": "sine",
+        "base_frequency": 0.2,
+        "inputs": {},
+        "outputs": {"signal": "signal"},
+        "input_data": {}
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "SignalMathNode",
+      "pos_x": 100.0,
+      "pos_y": 0.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "Difference (Error)",
+        "operation": "subtract",
+        "inputs": {"A": "signal", "B": "signal"},
+        "outputs": {"result": "signal"},
+        "input_data": {}
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "SignalProcessorNode",
+      "pos_x": 350.0,
+      "pos_y": 0.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "Absolute Error",
+        "processing_mode": "full_wave_rectify",
+        "factor": 1.0,
+        "inputs": {"input_signal": "signal"},
+        "outputs": {"output_signal": "signal"},
+        "input_data": {}
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 350.0,
+      "pos_y": -150.0,
+      "width": 180.0,
+      "height": 120.0,
+      "config": {
+        "node_title": "Max Reward",
+        "value": 1.0,
+        "outputs": {"signal": "signal"},
+        "inputs": {},
+        "input_data": {}
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "SignalMathNode",
+      "pos_x": 600.0,
+      "pos_y": 0.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "Reward Calculation",
+        "operation": "subtract",
+        "inputs": {"A": "signal", "B": "signal"},
+        "outputs": {"result": "signal"},
+        "input_data": {}
+      }
+    },
+    {
+      "id": 9,
+      "class_name": "SystemOptimizerNode",
+      "pos_x": 850.0,
+      "pos_y": 0.0,
+      "width": 220.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "The Gardener",
+        "learning_rate": 0.2,
+        "prune_threshold": 0.1,
+        "inputs": {"global_reward": "signal", "reset": "signal"},
+        "outputs": {
+          "network_state": "image",
+          "active_connections": "signal",
+          "system_entropy": "signal"
+        },
+        "input_data": {}
+      }
+    },
+    {
+      "id": 10,
+      "class_name": "LogicTruthTableNode",
+      "pos_x": 100.0,
+      "pos_y": 250.0,
+      "width": 220.0,
+      "height": 200.0,
+      "config": {
+        "node_title": "Signal Visualizer",
+        "inputs": {
+          "input_a": "signal", 
+          "input_b": "signal", 
+          "prediction": "signal"
+        },
+        "outputs": {"table_image": "image"},
+        "input_data": {}
+      }
+    }
+  ],
+  "edges": [
+    {"from_node_id": 0, "from_port": "signal", "to_node_id": 3, "to_port": "A"},
+    {"from_node_id": 1, "from_port": "signal", "to_node_id": 3, "to_port": "B"},
+    {"from_node_id": 2, "from_port": "signal", "to_node_id": 3, "to_port": "A"},
+    
+    {"from_node_id": 4, "from_port": "signal", "to_node_id": 5, "to_port": "A"},
+    {"from_node_id": 3, "from_port": "result", "to_node_id": 5, "to_port": "B"},
+    
+    {"from_node_id": 5, "from_port": "result", "to_node_id": 6, "to_port": "input_signal"},
+    
+    {"from_node_id": 7, "from_port": "signal", "to_node_id": 8, "to_port": "A"},
+    {"from_node_id": 6, "from_port": "output_signal", "to_node_id": 8, "to_port": "B"},
+    
+    {"from_node_id": 8, "from_port": "result", "to_node_id": 9, "to_port": "global_reward"},
+    
+    {"from_node_id": 4, "from_port": "signal", "to_node_id": 10, "to_port": "input_a"},
+    {"from_node_id": 3, "from_port": "result", "to_node_id": 10, "to_port": "prediction"}
+  ]
+}
