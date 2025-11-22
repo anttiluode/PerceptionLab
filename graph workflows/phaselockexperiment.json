@@ -1,0 +1,124 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "WebcamPhaseNode",
+      "pos_x": -659.0,
+      "pos_y": 29.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "phase_x": "signal",
+          "phase_y": "signal",
+          "phase_z": "signal",
+          "motion_image": "image",
+          "energy": "signal"
+        },
+        "input_data": {},
+        "node_title": "Webcam Phase (0)",
+        "device_id": 0,
+        "motion_sensitivity": 1.0,
+        "history_idx": 24,
+        "lk_params": {
+          "winSize": [
+            15,
+            15
+          ],
+          "maxLevel": 2,
+          "criteria": [
+            3,
+            10,
+            0.03
+          ]
+        },
+        "feature_params": {
+          "maxCorners": 50,
+          "qualityLevel": 0.3,
+          "minDistance": 7,
+          "blockSize": 7
+        }
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "PhaseLockLoopNode",
+      "pos_x": -296.0,
+      "pos_y": 120.0,
+      "width": 250.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "phase_a": "image",
+          "phase_b": "image"
+        },
+        "outputs": {
+          "lock_error": "signal",
+          "error_map": "image"
+        },
+        "node_title": "The Comparator (PLL)",
+        "sensitivity": 2.0,
+        "error_metric": 0.11011111238214653
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "WebcamPhaseNode",
+      "pos_x": -679.0,
+      "pos_y": 263.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "phase_x": "signal",
+          "phase_y": "signal",
+          "phase_z": "signal",
+          "motion_image": "image",
+          "energy": "signal"
+        },
+        "input_data": {},
+        "node_title": "Webcam Phase (0)",
+        "device_id": 0,
+        "motion_sensitivity": 1.0,
+        "history_idx": 17,
+        "lk_params": {
+          "winSize": [
+            15,
+            15
+          ],
+          "maxLevel": 2,
+          "criteria": [
+            3,
+            10,
+            0.03
+          ]
+        },
+        "feature_params": {
+          "maxCorners": 50,
+          "qualityLevel": 0.3,
+          "minDistance": 7,
+          "blockSize": 7
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "motion_image",
+      "to_node_id": 1,
+      "to_port": "phase_a"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "motion_image",
+      "to_node_id": 1,
+      "to_port": "phase_b"
+    }
+  ]
+}
