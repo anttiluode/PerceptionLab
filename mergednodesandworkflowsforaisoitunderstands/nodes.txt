@@ -9323,6 +9323,207 @@ class Cortical3DGrowthNode(BaseNode):
             ("Resolution", "resolution", self.resolution, None),
         ]
 
+=== FILE: dataprobenode.py ===
+
+"""
+Data Probe Node - Visualizes signal data over time.
+Acts as an oscilloscope to debug signal flows.
+"""
+
+import numpy as np
+import cv2
+from collections import deque
+from PyQt6 import QtGui  # ✅ FIXED: Direct import instead of from __main__
+import __main__
+
+BaseNode = __main__.BaseNode
+
+class DataProbeNode(BaseNode):
+    NODE_CATEGORY = "Analysis"
+    NODE_COLOR = QtGui.QColor(50, 50, 200) # Probe Blue
+    
+    def __init__(self, history_length=100):
+        super().__init__()
+        self.node_title = "Data Probe"
+        
+        self.inputs = {
+            'signal_in': 'signal'
+        }
+        
+        self.outputs = {
+            'visual_plot': 'image'
+        }
+        
+        self.history_length = int(history_length)
+        self.data_buffer = deque(maxlen=self.history_length)
+        
+        # Initialize buffer with zeros
+        for _ in range(self.history_length):
+            self.data_buffer.append(0.0)
+            
+        self.display_img = np.zeros((128, 256, 3), dtype=np.uint8)
+        self.min_val = -1.0
+        self.max_val = 1.0
+
+    def step(self):
+        # Get input signal
+        val = self.get_blended_input('signal_in', 'sum')
+        
+        if val is None:
+            val = 0.0
+            
+        self.data_buffer.append(float(val))
+        
+        # Render the plot
+        self._render_plot()
+        
+    def _render_plot(self):
+        # Clear image
+        self.display_img.fill(20) # Dark gray background
+        
+        h, w, _ = self.display_img.shape
+        
+        # Convert buffer to numpy array
+        data = np.array(self.data_buffer)
+        
+        # Dynamic scaling (optional, keeps the wave centered)
+        current_min = np.min(data)
+        current_max = np.max(data)
+        
+        # Smoothly adjust display range
+        self.min_val = self.min_val * 0.95 + current_min * 0.05
+        self.max_val = self.max_val * 0.95 + current_max * 0.05
+        
+        # Avoid division by zero
+        if abs(self.max_val - self.min_val) < 0.001:
+            scale = 1.0
+        else:
+            scale = (h - 20) / (self.max_val - self.min_val)
+            
+        # Map data to screen coordinates
+        # Y-axis is inverted (0 is top)
+        y_coords = h/2 - (data - (self.max_val + self.min_val)/2) * scale
+        x_coords = np.linspace(0, w, len(data))
+        
+        # Create points for polylines
+        points = np.column_stack((x_coords, y_coords)).astype(np.int32)
+        
+        # Draw the line
+        cv2.polylines(self.display_img, [points], False, (0, 255, 255), 2)
+        
+        # Draw zero line
+        zero_y = int(h/2 + (self.max_val + self.min_val)/2 * scale)
+        if 0 <= zero_y < h:
+            cv2.line(self.display_img, (0, zero_y), (w, zero_y), (100, 100, 100), 1)
+            
+        # Add text labels
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(self.display_img, f"Max: {self.max_val:.2f}", (5, 20), font, 0.5, (200, 200, 200), 1)
+        cv2.putText(self.display_img, f"Min: {self.min_val:.2f}", (5, h-10), font, 0.5, (200, 200, 200), 1)
+        cv2.putText(self.display_img, f"Cur: {data[-1]:.4f}", (w-100, 20), font, 0.5, (0, 255, 0), 1)
+
+    def get_output(self, port_name):
+        if port_name == 'visual_plot':
+            return self.display_img.astype(np.float32) / 255.0
+        return None
+        
+    def get_display_image(self):
+        return QtGui.QImage(self.display_img.data, 256, 128, 256*3, QtGui.QImage.Format.Format_RGB888)
+    
+    def get_config_options(self):
+        return [
+            ("History Length", "history_length", self.history_length, None)
+        ]
+
+=== FILE: debugdataexporternode.py ===
+
+"""
+Debug Data Exporter
+-------------------
+Records signals to a CSV file for analysis.
+Columns: Time, InputA, InputB, Target, Prediction
+"""
+
+import numpy as np
+import cv2
+import csv
+import time
+import os
+from PyQt6 import QtGui  # ✅ FIXED
+import __main__
+
+BaseNode = __main__.BaseNode
+
+class DebugDataExporterNode(BaseNode):
+    NODE_CATEGORY = "Output"
+    NODE_COLOR = QtGui.QColor(200, 50, 50) # Red
+    
+    def __init__(self):
+        super().__init__()
+        self.node_title = "Data Exporter (CSV)"
+        
+        self.inputs = {
+            'input_a': 'signal',
+            'input_b': 'signal',
+            'target': 'signal',
+            'prediction': 'signal',
+            'save_trigger': 'signal'
+        }
+        self.outputs = {}
+        
+        self.data_buffer = []
+        self.max_buffer = 1000
+        self.start_time = time.time()
+        self.last_trigger = 0.0
+        
+        # Make file path explicit and visible
+        self.output_path = os.path.join(os.getcwd(), "debug_data.csv")
+        
+    def step(self):
+        # Collect
+        a = self.get_blended_input('input_a', 'sum') or 0.0
+        b = self.get_blended_input('input_b', 'sum') or 0.0
+        tgt = self.get_blended_input('target', 'sum') or 0.0
+        pred = self.get_blended_input('prediction', 'sum') or 0.0
+        trig = self.get_blended_input('save_trigger', 'sum') or 0.0
+        
+        t = time.time() - self.start_time
+        
+        # Record row
+        self.data_buffer.append([t, a, b, tgt, pred])
+        if len(self.data_buffer) > self.max_buffer:
+            self.data_buffer.pop(0)
+            
+        # Save on trigger (rising edge detection)
+        if trig > 0.5 and self.last_trigger <= 0.5:
+            self.save_to_csv()
+            
+        self.last_trigger = trig
+        
+    def save_to_csv(self):
+        try:
+            with open(self.output_path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(["Time", "InputA", "InputB", "Target", "Prediction"])
+                writer.writerows(self.data_buffer)
+            print(f"✅ Saved {len(self.data_buffer)} rows to: {self.output_path}")
+        except Exception as e:
+            print(f"❌ Export failed: {e}")
+            print(f"   Attempted path: {self.output_path}")
+            
+    def get_display_image(self):
+        # Simple status display
+        img = np.zeros((64, 128, 3), dtype=np.uint8)
+        msg = f"Rows: {len(self.data_buffer)}"
+        cv2.putText(img, msg, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        return QtGui.QImage(img.data, 128, 64, 128*3, QtGui.QImage.Format.Format_RGB888)
+    
+    def get_config_options(self):
+        """Allow user to see/change output path"""
+        return [
+            ("Output Path", "output_path", self.output_path, None)
+        ]
+
 === FILE: decisiongatenode.py ===
 
 import __main__
@@ -25567,6 +25768,134 @@ class EigenmodeLobeNode(BaseNode):
             ("Peak Threshold", "peak_threshold", self.peak_threshold, None),
         ]
 
+=== FILE: logictruthtablenode.py ===
+
+"""
+Logic Truth Table Node
+----------------------
+Visualizes the learned logic of your network.
+It monitors Input A and Input B, categorizes the state (00, 01, 10, 11),
+and records the average 'Prediction' value for that state.
+
+This stabilizes the view: instead of watching cycling numbers, you see
+the stable "Logic Table" the network has learned.
+"""
+
+import numpy as np
+import cv2
+from PyQt6 import QtGui  # ✅ FIXED: Direct import instead of from __main__
+import __main__
+
+BaseNode = __main__.BaseNode
+
+class LogicTruthTableNode(BaseNode):
+    NODE_CATEGORY = "Analysis"
+    NODE_COLOR = QtGui.QColor(0, 150, 150) # Teal
+    
+    def __init__(self):
+        super().__init__()
+        self.node_title = "Logic Truth Table"
+        
+        self.inputs = {
+            'input_a': 'signal',
+            'input_b': 'signal',
+            'prediction': 'signal'
+        }
+        self.outputs = {
+            'table_image': 'image'
+        }
+        
+        # Storage for the 4 states: [00, 01, 10, 11]
+        # Format: [sum_values, count]
+        self.states = {
+            (0, 0): [0.0, 0],
+            (0, 1): [0.0, 0],
+            (1, 0): [0.0, 0],
+            (1, 1): [0.0, 0]
+        }
+        
+        self.display_img = np.zeros((256, 256, 3), dtype=np.uint8)
+        self.reset_counter = 0
+
+    def step(self):
+        # Get signals
+        a = self.get_blended_input('input_a', 'sum') or 0.0
+        b = self.get_blended_input('input_b', 'sum') or 0.0
+        pred = self.get_blended_input('prediction', 'sum') or 0.0
+        
+        # Quantize Inputs (Threshold at 0.5)
+        state_a = 1 if a > 0.5 else 0
+        state_b = 1 if b > 0.5 else 0
+        key = (state_a, state_b)
+        
+        # Accumulate (EMA smoothing for stability)
+        current_avg = 0.0
+        if self.states[key][1] > 0:
+            current_avg = self.states[key][0] / self.states[key][1]
+            
+        # Smooth update: 95% old + 5% new
+        new_avg = current_avg * 0.95 + pred * 0.05
+        
+        # We store it back as (new_avg, 1) effectively resetting count to keep it moving
+        self.states[key] = [new_avg, 1]
+        
+        self._render_table()
+        
+    def _render_table(self):
+        # Draw 2x2 grid
+        h, w, _ = self.display_img.shape
+        half_w, half_h = w // 2, h // 2
+        
+        # Clear
+        self.display_img.fill(0)
+        
+        # Define quadrants:
+        # 0,0 (Top Left) | 0,1 (Top Right)
+        # 1,0 (Bot Left) | 1,1 (Bot Right) -- Wait, usually tables are Input based
+        # Let's do: A is Rows, B is Cols? 
+        # Standard Logic Table:
+        #      B=0   B=1
+        # A=0 [0,0] [0,1]
+        # A=1 [1,0] [1,1]
+        
+        positions = {
+            (0, 0): (0, 0),
+            (0, 1): (half_w, 0),
+            (1, 0): (0, half_h),
+            (1, 1): (half_w, half_h)
+        }
+        
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        
+        for key, (val_sum, count) in self.states.items():
+            avg = val_sum / count if count > 0 else 0.0
+            
+            x, y = positions[key]
+            
+            # Draw Background Color based on Value (Black -> Green)
+            brightness = int(np.clip(avg, 0, 1) * 255)
+            color = (0, brightness, 0) # Green
+            
+            cv2.rectangle(self.display_img, (x, y), (x + half_w, y + half_h), color, -1)
+            cv2.rectangle(self.display_img, (x, y), (x + half_w, y + half_h), (100, 100, 100), 1) # Border
+            
+            # Draw Text
+            label = f"{key}: {avg:.2f}"
+            text_color = (255, 255, 255) if brightness < 128 else (0, 0, 0)
+            
+            cv2.putText(self.display_img, label, (x + 10, y + half_h // 2), font, 0.6, text_color, 2)
+
+    def get_output(self, port_name):
+        if port_name == 'table_image':
+            return self.display_img.astype(np.float32) / 255.0
+        return None
+        
+    def get_display_image(self):
+        return QtGui.QImage(self.display_img.data, 256, 256, 256*3, QtGui.QImage.Format.Format_RGB888)
+    
+    def get_config_options(self):
+        return []
+
 === FILE: loopattractornode.py ===
 
 """
@@ -36801,29 +37130,23 @@ class SystemHolographNode(BaseNode):
 === FILE: systemoptimizernode.py ===
 
 """
-System Optimizer Node (The Meta-Brain)
---------------------------------------
-This is the "God Node" that sits above the graph.
-It uses Python introspection to find the host application,
-monitor every wire in your system, and optimize them in real-time.
+System Optimizer Node (Energy-Based Fix V3)
+------------------------------------------
+FIX V3: Excludes trigger/control signals from weight modulation.
+        Only optimizes data-flow connections, not control signals.
 
-FEATURES:
-1. Auto-Discovery: Finds all connections in your graph automatically.
-2. Traffic Analysis: Measures "Information Flow" (Variance/Entropy) on every wire.
-3. Neuroplasticity: Strengthens active wires, prunes dead ones.
-4. Global Optimization: Re-routes signal flow to maximize system complexity.
-
-It turns your 'Graph' into a 'Brain'.
+This allows triggers (like save_trigger, reset, etc.) to work reliably
+while still optimizing the main computational graph.
 """
 
 import numpy as np
 import cv2
 import gc
 import sys
-
+from PyQt6 import QtGui
 import __main__
+
 BaseNode = __main__.BaseNode
-QtGui = __main__.QtGui
 
 class SystemOptimizerNode(BaseNode):
     NODE_CATEGORY = "Meta"
@@ -36831,15 +37154,15 @@ class SystemOptimizerNode(BaseNode):
 
     def __init__(self, learning_rate=0.05, prune_threshold=0.1):
         super().__init__()
-        self.node_title = "System Optimizer"
+        self.node_title = "System Optimizer (Energy)"
         
         self.inputs = {
-            'global_reward': 'signal',   # Teach the system what you like
+            'global_reward': 'signal',
             'reset': 'signal'
         }
         
         self.outputs = {
-            'network_state': 'image',    # Visualization of the whole graph connections
+            'network_state': 'image',
             'active_connections': 'signal',
             'system_entropy': 'signal'
         }
@@ -36847,35 +37170,44 @@ class SystemOptimizerNode(BaseNode):
         self.learning_rate = float(learning_rate)
         self.prune_threshold = float(prune_threshold)
         
-        # Internal storage
         self.scene_ref = None
-        self.edge_stats = {} # Stores history for every edge in the app
+        self.edge_stats = {} 
         self.frame_count = 0
         self.matrix_vis = np.zeros((128, 128, 3), dtype=np.uint8)
+        
+        # CRITICAL: Ports that should NEVER be modulated
+        # These are control signals that must always get through
+        self.excluded_ports = {
+            'save_trigger', 'trigger', 'reset', 'pulse_out',
+            'gate', 'enable', 'clock', 'sync'
+        }
 
     def _find_scene(self):
-        """
-        The 'God Mode' Hack:
-        Uses garbage collection to find the PerceptionScene instance in memory.
-        This allows the node to see/modify the entire graph structure.
-        """
-        if self.scene_ref is not None:
-            return self.scene_ref
-            
-        # Look for objects that look like our Scene
+        if self.scene_ref is not None: return self.scene_ref
         for obj in gc.get_objects():
             if hasattr(obj, 'nodes') and hasattr(obj, 'edges') and hasattr(obj, 'add_node'):
-                # Verify it's likely the right object
                 if isinstance(obj.nodes, list) and isinstance(obj.edges, list):
                     self.scene_ref = obj
-                    print("SystemOptimizer: Connected to Graph Scene!")
                     return obj
         return None
 
+    def _is_control_signal(self, edge):
+        """Check if this edge carries a control/trigger signal"""
+        try:
+            # Check source port name
+            src_port = edge.src.name if hasattr(edge.src, 'name') else ''
+            # Check target port name
+            tgt_port = edge.tgt.name if hasattr(edge.tgt, 'name') else ''
+            
+            # Exclude if either end is a control port
+            return (src_port in self.excluded_ports or 
+                    tgt_port in self.excluded_ports)
+        except:
+            return False
+
     def step(self):
         scene = self._find_scene()
-        if scene is None: 
-            return
+        if scene is None: return
 
         reward = self.get_blended_input('global_reward', 'sum') or 0.0
         
@@ -36883,118 +37215,109 @@ class SystemOptimizerNode(BaseNode):
         total_entropy = 0.0
         active_count = 0
         
-        # --- 1. Introspect the Graph ---
-        # Iterate over every connection currently existing in the software
         for edge in scene.edges:
-            # Create a unique ID for this connection
             edge_id = id(edge)
+            
+            # CRITICAL FIX: Skip control/trigger edges
+            if self._is_control_signal(edge):
+                # Keep these at full strength always
+                edge.learned_weight = 1.0
+                continue
             
             if edge_id not in self.edge_stats:
                 self.edge_stats[edge_id] = {'activity': 0.0, 'strength': 0.5}
             
-            # Get the actual value flowing through the wire right now
-            # (We access the 'effect_val' visual parameter which tracks signal strength)
+            # Get current flow
             current_flow = getattr(edge, 'effect_val', 0.0)
             
-            # --- 2. Measure Information (Entropy/Variance) ---
-            # Information = Change. Static signals carry no info.
-            history = self.edge_stats[edge_id].get('history', 0.0)
-            change = abs(current_flow - history)
-            self.edge_stats[edge_id]['history'] = current_flow
+            # Energy metric (absolute value for static signals)
+            energy = abs(current_flow)
             
-            # Update activity metric (EMA)
-            self.edge_stats[edge_id]['activity'] = (self.edge_stats[edge_id]['activity'] * 0.9) + (change * 0.1)
+            # Smooth activity tracking
+            self.edge_stats[edge_id]['activity'] = (
+                self.edge_stats[edge_id]['activity'] * 0.9 + energy * 0.1
+            )
             
-            # --- 3. Apply Hebbian Learning ---
-            # If the wire is active, strengthen it. If static, weaken it.
-            # Reward signal acts as a global modulator (dopamine).
-            
-            target_strength = self.edge_stats[edge_id]['activity'] * (1.0 + reward)
+            # Hebbian learning: activity × reward
+            activity = self.edge_stats[edge_id]['activity']
+            target_strength = activity * (0.5 + reward * 2.0)
             
             current_strength = self.edge_stats[edge_id]['strength']
-            new_strength = current_strength * 0.99 + target_strength * self.learning_rate
             
-            # Clamp
+            # Asymmetric learning rates
+            if target_strength > current_strength:
+                lr = self.learning_rate  # Grow fast
+            else:
+                lr = self.learning_rate * 0.1  # Prune slow
+                
+            new_strength = current_strength * (1.0 - lr) + target_strength * lr
             new_strength = max(0.0, min(1.0, new_strength))
+            
             self.edge_stats[edge_id]['strength'] = new_strength
             
-            # --- 4. Modify the Physics ---
-            # We actually write back to the edge object!
-            # We use 'effect_val' to visually dim the wire, 
-            # effectively pruning it from the user's view.
-            # (In a deeper integration, we would modify the node's input multiplier).
-            
-            # If below threshold, we visually "cut" it (make it transparent)
+            # Apply to physics
+            edge.learned_weight = new_strength
+
+            # Visual feedback
             if new_strength < self.prune_threshold:
-                edge.setOpacity(0.1) # Ghost connection
+                edge.setOpacity(0.1) 
             else:
-                edge.setOpacity(0.5 + new_strength * 0.5) # Bright active connection
+                edge.setOpacity(0.5 + new_strength * 0.5) 
                 active_count += 1
                 
             total_entropy += new_strength
 
-        # --- 5. Visualize the "Brain State" ---
-        # Render a connectivity matrix of the whole system
         self.render_matrix(scene)
-        
-        # Outputs
         self.set_output('active_connections', float(active_count))
         self.set_output('system_entropy', total_entropy)
         self.set_output('network_state', self.matrix_vis)
 
     def render_matrix(self, scene):
-        """Draws the connectivity matrix of the living graph"""
         dim = 128
         img = np.zeros((dim, dim, 3), dtype=np.uint8)
-        
         num_nodes = len(scene.nodes)
         if num_nodes == 0: return
-        
         cell_size = max(2, dim // num_nodes)
-        
-        # Map edges to matrix coordinates
         node_map = {id(n): i for i, n in enumerate(scene.nodes)}
         
         for edge in scene.edges:
-            # Find source and target nodes
             try:
-                src_node = edge.src.parentItem()
-                tgt_node = edge.tgt.parentItem()
+                u = node_map.get(id(edge.src.parentItem()), 0)
+                v = node_map.get(id(edge.tgt.parentItem()), 0)
+                strength = self.edge_stats.get(id(edge), {}).get('strength', 1.0)
                 
-                u = node_map.get(id(src_node), 0)
-                v = node_map.get(id(tgt_node), 0)
-                
-                strength = self.edge_stats.get(id(edge), {}).get('strength', 0)
-                
-                # Draw cell
-                c = int(strength * 255)
-                color = (c, c, 50) # Yellow/Gold
-                
-                x = u * cell_size
-                y = v * cell_size
-                
-                cv2.rectangle(img, (x, y), (x+cell_size, y+cell_size), color, -1)
-            except:
+                # Highlight control signals in blue
+                if self._is_control_signal(edge):
+                    c = 255
+                    cv2.rectangle(img, (u*cell_size, v*cell_size), 
+                                ((u+1)*cell_size, (v+1)*cell_size), 
+                                (0, 100, c), -1)
+                else:
+                    c = int(strength * 255)
+                    cv2.rectangle(img, (u*cell_size, v*cell_size), 
+                                ((u+1)*cell_size, (v+1)*cell_size), 
+                                (c, c, 50), -1)
+            except: 
                 continue
-                
         self.matrix_vis = img
 
     def get_output(self, port_name):
         if hasattr(self, 'outputs_data') and port_name in self.outputs_data:
             return self.outputs_data[port_name]
         return None
-
+    
     def set_output(self, name, val):
-        if not hasattr(self, 'outputs_data'): self.outputs_data = {}
+        if not hasattr(self, 'outputs_data'): 
+            self.outputs_data = {}
         self.outputs_data[name] = val
-        
+    
     def get_display_image(self):
-        img_resized = cv2.resize(self.matrix_vis, (256, 256), interpolation=cv2.INTER_NEAREST)
-        return QtGui.QImage(img_resized.data, 256, 256, 256*3, QtGui.QImage.Format.Format_RGB888)
-
+        return QtGui.QImage(self.matrix_vis.data, 128, 128, 128*3, 
+                           QtGui.QImage.Format.Format_RGB888)
+    
     def get_config_options(self):
         return [
-            ("Learning Rate", "learning_rate", self.learning_rate, None),
+            ("Learning Rate", "learning_rate", self.learning_rate, None), 
             ("Prune Threshold", "prune_threshold", self.prune_threshold, None)
         ]
 
@@ -37692,6 +38015,197 @@ class TimescaleMismatchNode(BaseNode):
         return [
             ("History Length", "history_length", self.history_length, None),
         ]
+
+=== FILE: tinysqlnode.py ===
+
+"""
+Tiny SQL Node - A lightweight database for your graph.
+Uses Python's built-in sqlite3.
+
+Inputs:
+    query: String query to execute (can be parameterized with inputs).
+    trigger: Signal (0->1) to execute the query.
+    param1..3: Signals/Values to inject into the query parameters (?).
+
+Outputs:
+    result_text: JSON string of the fetched data.
+    result_signal: The first numeric value of the first row (useful for logic).
+    row_count: Number of rows affected or returned.
+"""
+
+import sqlite3
+import json
+import os
+import numpy as np
+from PyQt6 import QtGui  # ✅ FIXED
+import __main__
+
+BaseNode = __main__.BaseNode
+
+class TinySQLNode(BaseNode):
+    NODE_CATEGORY = "Data"
+    NODE_COLOR = QtGui.QColor(100, 100, 120)  # Database Grey
+    
+    def __init__(self, db_path="perception_lab.db", default_query="SELECT sqlite_version()"):
+        super().__init__()
+        self.node_title = "Tiny SQL"
+        
+        self.inputs = {
+            'trigger': 'signal',
+            'param_1': 'signal',
+            'param_2': 'signal',
+            'param_3': 'signal'
+        }
+        
+        self.outputs = {
+            'result_text': 'text_multi', # Assuming host supports text output display or similar
+            'result_signal': 'signal',
+            'row_count': 'signal'
+        }
+        
+        self.db_path = db_path
+        self.query = default_query
+        
+        self.last_trigger = 0.0
+        self.conn = None
+        self.result_json = "[]"
+        self.result_val = 0.0
+        self.row_count_val = 0.0
+        
+        self._connect()
+
+    def _connect(self):
+        try:
+            # Check if we are in a persistent environment or need a full path
+            # For now, local file relative to script execution
+            self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
+            # Enable column access by name
+            self.conn.row_factory = sqlite3.Row
+        except Exception as e:
+            print(f"TinySQL: Connection failed: {e}")
+
+    def get_config_options(self):
+        return [
+            ("Database Path", "db_path", self.db_path, None),
+            ("SQL Query", "query", self.query, "text_multi"), # Multiline text edit
+        ]
+
+    def set_config_options(self, options):
+        if "db_path" in options:
+            self.db_path = options["db_path"]
+            if self.conn: self.conn.close()
+            self._connect()
+        if "query" in options:
+            self.query = options["query"]
+
+    def step(self):
+        trigger = self.get_blended_input('trigger', 'sum') or 0.0
+        
+        # Execute on rising edge
+        if trigger > 0.5 and self.last_trigger <= 0.5:
+            self.execute_query()
+            
+        self.last_trigger = trigger
+    
+    def execute_query(self):
+        if not self.conn: return
+        
+        # Gather parameters
+        p1 = self.get_blended_input('param_1', 'sum')
+        p2 = self.get_blended_input('param_2', 'sum')
+        p3 = self.get_blended_input('param_3', 'sum')
+        
+        # Filter None values
+        params = []
+        if p1 is not None: params.append(float(p1))
+        if p2 is not None: params.append(float(p2))
+        if p3 is not None: params.append(float(p3))
+        
+        # We only use as many params as the query has '?' placeholders
+        needed_params = self.query.count('?')
+        params = params[:needed_params]
+        
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(self.query, tuple(params))
+            
+            if self.query.strip().upper().startswith("SELECT"):
+                rows = cursor.fetchall()
+                self.row_count_val = float(len(rows))
+                
+                # Convert to list of dicts
+                result_data = [dict(row) for row in rows]
+                self.result_json = json.dumps(result_data, indent=2)
+                
+                # Extract first scalar for signal output
+                if len(rows) > 0 and len(rows[0]) > 0:
+                    first_val = rows[0][0]
+                    if isinstance(first_val, (int, float)):
+                        self.result_val = float(first_val)
+                    else:
+                        self.result_val = 1.0 # Valid result but not a number
+                else:
+                    self.result_val = 0.0
+            else:
+                # INSERT/UPDATE/DELETE
+                self.conn.commit()
+                self.row_count_val = float(cursor.rowcount)
+                self.result_json = f'{{"status": "success", "rows_affected": {cursor.rowcount}}}'
+                self.result_val = float(cursor.rowcount)
+                
+        except sqlite3.Error as e:
+            self.result_json = f'{{"error": "{str(e)}"}}'
+            print(f"TinySQL Error: {e}")
+            self.result_val = -1.0
+
+    def get_output(self, port_name):
+        if port_name == 'result_text':
+            return self.result_json
+        elif port_name == 'result_signal':
+            return self.result_val
+        elif port_name == 'row_count':
+            return self.row_count_val
+        return None
+    
+    def get_display_image(self):
+        # Simple text display of the result JSON (truncated)
+        import cv2
+        from PIL import Image, ImageDraw, ImageFont
+        
+        w, h = 256, 128
+        img = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        # Background color based on success/error
+        if "error" in self.result_json:
+            img[:, :] = (50, 0, 0) # Dark red
+        else:
+            img[:, :] = (20, 20, 30) # Dark grey
+            
+        img_pil = Image.fromarray(img)
+        draw = ImageDraw.Draw(img_pil)
+        
+        # Try to load a font
+        try:
+            font = ImageFont.load_default()
+        except:
+            font = None
+            
+        # Draw query snippet
+        draw.text((5, 5), f"Q: {self.query[:30]}...", fill=(200, 200, 200), font=font)
+        
+        # Draw result snippet
+        lines = self.result_json.split('\n')
+        y = 25
+        for line in lines[:6]: # Show first 6 lines
+            draw.text((5, y), line[:40], fill=(100, 255, 100), font=font)
+            y += 12
+            
+        img = np.array(img_pil)
+        return QtGui.QImage(img.data, w, h, 3*w, QtGui.QImage.Format.Format_RGB888)
+
+    def close(self):
+        if self.conn:
+            self.conn.close()
 
 === FILE: tissuearchitecturenode.py ===
 
