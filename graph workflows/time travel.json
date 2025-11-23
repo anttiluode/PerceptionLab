@@ -25,8 +25,8 @@
         "node_title": "Real VAE (Injectable)",
         "latent_dim": 16,
         "img_size": 64,
-        "current_loss": 2.4195504188537598,
-        "training_steps": 42654,
+        "current_loss": 20.27672576904297,
+        "training_steps": 47205,
         "injecting": false
       }
     },
@@ -50,7 +50,7 @@
         "node_title": "Webcam Phase (0)",
         "device_id": 0,
         "motion_sensitivity": 1.0,
-        "history_idx": 27,
+        "history_idx": 17,
         "lk_params": {
           "winSize": [
             15,
@@ -177,10 +177,10 @@
     {
       "id": 7,
       "class_name": "SpacetimeVolumeNode",
-      "pos_x": -187.0,
-      "pos_y": -77.0,
-      "width": 200.0,
-      "height": 181.0,
+      "pos_x": -249.0,
+      "pos_y": -216.0,
+      "width": 279.0,
+      "height": 282.0,
       "config": {
         "inputs": {
           "image_in": "image",
@@ -195,7 +195,7 @@
         "depth": 128,
         "frame_idx": 0,
         "outputs_data": {
-          "temporal_complexity": 0.0017642887542024255
+          "temporal_complexity": 0.015338067896664143
         }
       }
     }
@@ -238,8 +238,8 @@
       "to_port": "hologram"
     },
     {
-      "from_node_id": 1,
-      "from_port": "motion_image",
+      "from_node_id": 0,
+      "from_port": "reconstruction",
       "to_node_id": 7,
       "to_port": "image_in"
     },
