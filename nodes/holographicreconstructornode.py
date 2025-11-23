@@ -65,7 +65,8 @@ class HolographicReconstructorNode(BaseNode):
         
         # Confidence inversely proportional to curvature
         # High curvature = uncertain = low confidence = need smoothing
-        confidence = 1.0 / (1.0 + abs(curvature) * 0.0001)
+        # FIXED: More responsive scaling
+        confidence = 1.0 / (1.0 + abs(curvature) * 0.02)  # Changed from 0.0001 to 0.02
         confidence = np.clip(confidence, 0.1, 1.0)
         
         # Store phase in history
