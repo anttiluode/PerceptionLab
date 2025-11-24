@@ -1,0 +1,855 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": -800.0,
+      "pos_y": 100.0,
+      "width": 240.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.2697216094771242
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ImageToVectorNode",
+      "pos_x": -500.0,
+      "pos_y": 100.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "vector_out": "spectrum"
+        },
+        "node_title": "Compression (32x32)",
+        "output_dim": 1024
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "NeuronalBrainNode",
+      "pos_x": -200.0,
+      "pos_y": 50.0,
+      "width": 250.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "input_vec": "spectrum",
+          "target_vec": "spectrum",
+          "train_gate": "signal"
+        },
+        "outputs": {
+          "output_vec": "spectrum",
+          "brain_activity": "image",
+          "error": "signal"
+        },
+        "node_title": "Reservoir Brain",
+        "input_dim": 1024,
+        "reservoir_size": 200,
+        "output_dim": 1024,
+        "leak_rate": 0.4,
+        "spectral_radius": 0.95,
+        "learning_rate": 0.15,
+        "frozen": false,
+        "error_val": 1.30933767178613
+      },
+      "custom_state_file": "node_2_brain.npz"
+    },
+    {
+      "id": 3,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -200.0,
+      "pos_y": 400.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Train Gate",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "BlochQubitNode",
+      "pos_x": 222.0,
+      "pos_y": -50.0,
+      "width": 300.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "rx_angle": "signal",
+          "ry_angle": "signal",
+          "rz_angle": "signal",
+          "hadamard_trigger": "signal"
+        },
+        "outputs": {
+          "bloch_x": "signal",
+          "bloch_y": "signal",
+          "bloch_z": "signal",
+          "prob_0": "signal"
+        },
+        "input_data": {
+          "rx_angle": [],
+          "ry_angle": [
+            0.8795938211857905
+          ],
+          "rz_angle": [],
+          "hadamard_trigger": []
+        },
+        "node_title": "Quantum State (Bloch Sphere)",
+        "hbar": 1.0,
+        "last_hadamard_trigger": 0.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "DataProbeNode",
+      "pos_x": 150.0,
+      "pos_y": 300.0,
+      "width": 300.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "visual_plot": "image"
+        },
+        "input_data": {
+          "signal_in": [
+            0.8795938211857905
+          ]
+        },
+        "node_title": "Brain Error History",
+        "history_length": 200,
+        "min_val": 0.8567599199486177,
+        "max_val": 0.9387274784202683
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "SignalMathNode",
+      "pos_x": 550.0,
+      "pos_y": 50.0,
+      "width": 200.0,
+      "height": 150.0,
+      "config": {
+        "inputs": {
+          "A": "signal",
+          "B": "signal"
+        },
+        "outputs": {
+          "result": "signal"
+        },
+        "input_data": {
+          "A": [
+            0.44454894793335337
+          ],
+          "B": [
+            0.44454894793335337
+          ]
+        },
+        "node_title": "Qubit Velocity X\u00c2\u00b2",
+        "operation": "multiply",
+        "result": 0.19762376710865132,
+        "last_a": 0.44454894793335337,
+        "last_b": 0.44454894793335337
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "SignalMathNode",
+      "pos_x": 550.0,
+      "pos_y": 250.0,
+      "width": 200.0,
+      "height": 150.0,
+      "config": {
+        "inputs": {
+          "A": "signal",
+          "B": "signal"
+        },
+        "outputs": {
+          "result": "signal"
+        },
+        "input_data": {
+          "A": [
+            0.0
+          ],
+          "B": [
+            0.0
+          ]
+        },
+        "node_title": "Qubit Velocity Y\u00c2\u00b2",
+        "operation": "multiply",
+        "result": 0.0,
+        "last_a": 0.0,
+        "last_b": 0.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 8,
+      "class_name": "SignalMathNode",
+      "pos_x": 800.0,
+      "pos_y": 150.0,
+      "width": 200.0,
+      "height": 150.0,
+      "config": {
+        "inputs": {
+          "A": "signal",
+          "B": "signal"
+        },
+        "outputs": {
+          "result": "signal"
+        },
+        "input_data": {
+          "A": [
+            0.05796060135373512
+          ],
+          "B": [
+            0.0
+          ]
+        },
+        "node_title": "Total Velocity",
+        "operation": "add",
+        "result": 0.05796060135373512,
+        "last_a": 0.05796060135373512,
+        "last_b": 0.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 9,
+      "class_name": "DataProbeNode",
+      "pos_x": 550.0,
+      "pos_y": 450.0,
+      "width": 300.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "visual_plot": "image"
+        },
+        "input_data": {
+          "signal_in": [
+            0.0003709556325113302
+          ]
+        },
+        "node_title": "Qubit Velocity History",
+        "history_length": 200,
+        "min_val": 4.667583368134668e-06,
+        "max_val": 0.24004462256313933
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 10,
+      "class_name": "SignalPlotterNode",
+      "pos_x": 100.0,
+      "pos_y": 600.0,
+      "width": 900.0,
+      "height": 400.0,
+      "config": {
+        "inputs": {
+          "signal_A (Red)": "signal",
+          "signal_B (Green)": "signal",
+          "signal_C (Blue)": "signal"
+        },
+        "outputs": {
+          "plot_image": "image"
+        },
+        "input_data": {
+          "signal_A (Red)": [
+            0.8795938211857905
+          ],
+          "signal_B (Green)": [
+            0.0003709556325113302
+          ],
+          "signal_C (Blue)": []
+        },
+        "node_title": "Correlation Plot: Brain \u00e2\u2020\u201d Qubit",
+        "history_size": 500,
+        "colors": {
+          "A": [
+            255,
+            0,
+            0
+          ],
+          "B": [
+            0,
+            255,
+            0
+          ],
+          "C": [
+            0,
+            0,
+            255
+          ]
+        },
+        "min_val": 3.124348472787541e-07,
+        "max_val": 0.9597077697922316
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 11,
+      "class_name": "SignalDisplayNode",
+      "pos_x": -200.0,
+      "pos_y": 600.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "signal": [
+            0.8795938211857905
+          ]
+        },
+        "node_title": "Brain Error",
+        "current_value": 0.8795938211857905
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 12,
+      "class_name": "SignalDisplayNode",
+      "pos_x": 1050.0,
+      "pos_y": 150.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "signal": [
+            0.0003709556325113302
+          ]
+        },
+        "node_title": "Qubit Velocity",
+        "current_value": 0.0003709556325113302
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 13,
+      "class_name": "DecisionGateNode",
+      "pos_x": 893.0,
+      "pos_y": 401.0,
+      "width": 200.0,
+      "height": 150.0,
+      "config": {
+        "inputs": {
+          "signal_in_a": "signal",
+          "signal_in_b": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in_a": [],
+          "signal_in_b": []
+        },
+        "node_title": "Quantum Detector",
+        "rules": [
+          "A > C",
+          "A < C",
+          "A > B",
+          "A < B",
+          "A == B"
+        ],
+        "rule": "A > C",
+        "constant": 0.5,
+        "output_signal": 0.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 14,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 1110.0,
+      "pos_y": 402.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 15,
+      "class_name": "DebugDataExporterNode",
+      "pos_x": 1387.0,
+      "pos_y": 67.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "input_a": "signal",
+          "input_b": "signal",
+          "target": "signal",
+          "prediction": "signal",
+          "save_trigger": "signal"
+        },
+        "outputs": {},
+        "input_data": {
+          "input_a": [],
+          "input_b": [],
+          "target": [],
+          "prediction": [],
+          "save_trigger": []
+        },
+        "node_title": "Data Exporter (CSV)",
+        "data_buffer": [
+          [
+            0.1284618377685547,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.1770155429840088,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.19818377494812012,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.325211763381958,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.359325647354126,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.49761128425598145,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.5450766086578369,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.6759231090545654,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.6986725330352783,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.7310888767242432,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.8504407405853271,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.8923676013946533,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.0249876976013184,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.048051357269287,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.2020325660705566,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.229943037033081,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.262873649597168,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.3790233135223389,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.4248089790344238,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.5736069679260254,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.608903169631958,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.634937047958374,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.7449517250061035,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.7923524379730225,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.92482328414917,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            1.948775291442871,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.0973658561706543,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.141885280609131,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.2769763469696045,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.3258464336395264,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.3568174839019775,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.4494247436523438,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.4807984828948975,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.626208543777466,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.668210744857788,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.699441432952881,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            2.81797194480896,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "max_buffer": 1000,
+        "start_time": 1763975329.1243005,
+        "last_trigger": 0.0,
+        "output_path": "E:\\DocsHouse\\542 percep lab latest\\PerceptionLab\\debug_data.csv"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "vector_out",
+      "to_node_id": 2,
+      "to_port": "input_vec",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "vector_out",
+      "to_node_id": 2,
+      "to_port": "target_vec",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "train_gate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "error",
+      "to_node_id": 4,
+      "to_port": "ry_angle",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "error",
+      "to_node_id": 5,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "error",
+      "to_node_id": 11,
+      "to_port": "signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "bloch_x",
+      "to_node_id": 6,
+      "to_port": "A",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "bloch_x",
+      "to_node_id": 6,
+      "to_port": "B",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "bloch_y",
+      "to_node_id": 7,
+      "to_port": "A",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "bloch_y",
+      "to_node_id": 7,
+      "to_port": "B",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "result",
+      "to_node_id": 8,
+      "to_port": "A",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "result",
+      "to_node_id": 8,
+      "to_port": "B",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "result",
+      "to_node_id": 9,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "result",
+      "to_node_id": 12,
+      "to_port": "signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "error",
+      "to_node_id": 10,
+      "to_port": "signal_A (Red)",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "result",
+      "to_node_id": 10,
+      "to_port": "signal_B (Green)",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 14,
+      "from_port": "signal",
+      "to_node_id": 15,
+      "to_port": "save_trigger",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "bloch_x",
+      "to_node_id": 15,
+      "to_port": "input_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "error",
+      "to_node_id": 15,
+      "to_port": "input_a",
+      "learned_weight": 1.0
+    }
+  ]
+}

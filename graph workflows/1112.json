@@ -1,0 +1,438 @@
+{
+  "global_settings": {
+    "coupling": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuronalBrainNode",
+      "pos_x": -350.0,
+      "pos_y": 0.0,
+      "width": 250.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "input_vec": "spectrum",
+          "target_vec": "spectrum",
+          "train_gate": "signal"
+        },
+        "outputs": {
+          "output_vec": "spectrum",
+          "brain_activity": "image",
+          "error": "signal"
+        },
+        "node_title": "Reservoir Brain",
+        "input_dim": 6,
+        "reservoir_size": 200,
+        "output_dim": 6,
+        "leak_rate": 0.2,
+        "spectral_radius": 0.95,
+        "learning_rate": 0.05,
+        "frozen": false,
+        "error_val": 0.00033008490228843317
+      },
+      "custom_state_file": "node_0_brain.npz"
+    },
+    {
+      "id": 1,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -350.0,
+      "pos_y": 350.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Train Gate",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "SignalAmplifierNode",
+      "pos_x": -50.0,
+      "pos_y": 150.0,
+      "width": 200.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            0.00033982585765998007
+          ]
+        },
+        "node_title": "Gain (10x)",
+        "gain": 10.0,
+        "output_value": 0.003398258576599801
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "BlochQubitNode",
+      "pos_x": 200.0,
+      "pos_y": 150.0,
+      "width": 250.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "ry_angle": "signal",
+          "rz_angle": "signal"
+        },
+        "outputs": {
+          "bloch_x": "signal",
+          "bloch_y": "signal",
+          "bloch_z": "signal",
+          "qubit_state": "spectrum"
+        },
+        "input_data": {
+          "ry_angle": [
+            0.0032237673874759482
+          ],
+          "rz_angle": []
+        },
+        "node_title": "Quantum Core"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "NeuronalImageReconstructorNode",
+      "pos_x": 200.0,
+      "pos_y": -150.0,
+      "width": 250.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "input_vec": "spectrum",
+          "target_image": "image",
+          "train_gate": "signal",
+          "quantum_interference": "signal"
+        },
+        "outputs": {
+          "reconstructed_image": "image",
+          "error": "signal"
+        },
+        "node_title": "Holographic Weaver",
+        "input_dim": 6,
+        "output_res": 64,
+        "channels": 3,
+        "learning_rate": 0.005,
+        "frozen": false,
+        "flat_dim": 12288
+      },
+      "custom_state_file": "node_4_decoder_weights.npy"
+    },
+    {
+      "id": 5,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": -855.0,
+      "pos_y": -4.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "raw_signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG (Occipital)",
+        "edf_file_path": "e:\\docshouse\\450\\1.edf",
+        "selected_region": "Occipital",
+        "_last_path": "e:\\docshouse\\450\\1.edf",
+        "_last_region": "Occipital",
+        "fs": 100.0,
+        "current_time": 23.600000000000332,
+        "window_size": 1.0,
+        "output_powers": {
+          "delta": 6.946312694794587e-10,
+          "theta": 1.538461608933046e-10,
+          "alpha": 1.0452444175621313e-10,
+          "beta": 3.110794952120498e-10,
+          "gamma": 1.972022305572508e-11,
+          "raw_signal": 0.00014455159571139152
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "EEGProcessorNode",
+      "pos_x": -613.0,
+      "pos_y": 0.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "delta_in": "signal",
+          "theta_in": "signal",
+          "alpha_in": "signal",
+          "beta_in": "signal",
+          "gamma_in": "signal",
+          "raw_in": "signal",
+          "scale_mod": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum",
+          "delta_out": "signal",
+          "theta_out": "signal",
+          "alpha_out": "signal",
+          "beta_out": "signal",
+          "gamma_out": "signal",
+          "raw_out": "signal"
+        },
+        "input_data": {
+          "delta_in": [
+            7.477006825928647e-10
+          ],
+          "theta_in": [
+            1.4902480801793633e-10
+          ],
+          "alpha_in": [
+            1.0737544496705246e-10
+          ],
+          "beta_in": [
+            3.0335718175417615e-10
+          ],
+          "gamma_in": [
+            1.8744771658605895e-11
+          ],
+          "raw_in": [],
+          "scale_mod": []
+        },
+        "node_title": "EEG Processor",
+        "base_scale": 10000000
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": -864.0,
+      "pos_y": 221.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "raw_signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG (Occipital)",
+        "edf_file_path": "e:\\docshouse\\450\\2.edf",
+        "selected_region": "Occipital",
+        "_last_path": "e:\\docshouse\\450\\2.edf",
+        "_last_region": "Occipital",
+        "fs": 100.0,
+        "current_time": 17.16666666666668,
+        "window_size": 1.0,
+        "output_powers": {
+          "delta": 9.599867278898639e-11,
+          "theta": 4.723629074706322e-11,
+          "alpha": 1.0168721085263511e-11,
+          "beta": 2.4826866585973037e-11,
+          "gamma": 5.30716576615983e-12,
+          "raw_signal": 0.0002772549250670714
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 8,
+      "class_name": "EEGProcessorNode",
+      "pos_x": -622.0,
+      "pos_y": 207.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "delta_in": "signal",
+          "theta_in": "signal",
+          "alpha_in": "signal",
+          "beta_in": "signal",
+          "gamma_in": "signal",
+          "raw_in": "signal",
+          "scale_mod": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum",
+          "delta_out": "signal",
+          "theta_out": "signal",
+          "alpha_out": "signal",
+          "beta_out": "signal",
+          "gamma_out": "signal",
+          "raw_out": "signal"
+        },
+        "input_data": {
+          "delta_in": [
+            1.0002444139651538e-10
+          ],
+          "theta_in": [
+            4.9140403483601624e-11
+          ],
+          "alpha_in": [
+            1.098526822662473e-11
+          ],
+          "beta_in": [
+            2.503078939950245e-11
+          ],
+          "gamma_in": [
+            5.332186229756084e-12
+          ],
+          "raw_in": [],
+          "scale_mod": []
+        },
+        "node_title": "EEG Processor",
+        "base_scale": 10000000
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "train_gate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 4,
+      "to_port": "train_gate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "output_vec",
+      "to_node_id": 4,
+      "to_port": "input_vec",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "error",
+      "to_node_id": 2,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal_out",
+      "to_node_id": 3,
+      "to_port": "ry_angle",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "bloch_x",
+      "to_node_id": 4,
+      "to_port": "quantum_interference",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "delta",
+      "to_node_id": 6,
+      "to_port": "delta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "theta",
+      "to_node_id": 6,
+      "to_port": "theta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "alpha",
+      "to_node_id": 6,
+      "to_port": "alpha_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "beta",
+      "to_node_id": 6,
+      "to_port": "beta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "gamma",
+      "to_node_id": 6,
+      "to_port": "gamma_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "latent_out",
+      "to_node_id": 0,
+      "to_port": "input_vec",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "delta",
+      "to_node_id": 8,
+      "to_port": "delta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "theta",
+      "to_node_id": 8,
+      "to_port": "theta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "alpha",
+      "to_node_id": 8,
+      "to_port": "alpha_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "beta",
+      "to_node_id": 8,
+      "to_port": "beta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "gamma",
+      "to_node_id": 8,
+      "to_port": "gamma_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "latent_out",
+      "to_node_id": 0,
+      "to_port": "target_vec",
+      "learned_weight": 1.0
+    }
+  ]
+}
