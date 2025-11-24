@@ -30,7 +30,7 @@ except ImportError:
     MNE_AVAILABLE = False
     print("Warning: EDFLoaderNode requires 'mne' and 'scipy'.")
 
-class EDFLoaderNode(BaseNode):
+class EDFLoaderholographicNode(BaseNode):
     NODE_CATEGORY = "Source"
     NODE_COLOR = QtGui.QColor(60, 140, 160) # Clinical Blue
     
