@@ -1,0 +1,179 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SpectralMorphogenesisNode",
+      "pos_x": -701.0,
+      "pos_y": -358.0,
+      "width": 284.0,
+      "height": 223.0,
+      "config": {
+        "inputs": {
+          "input_spectrum": "spectrum",
+          "growth_rate": "signal"
+        },
+        "outputs": {
+          "folded_view": "image",
+          "eigen_coords": "spectrum"
+        },
+        "node_title": "Spectral Morphogenesis",
+        "grid_size": 10,
+        "n_nodes": 100,
+        "angular_velocity": 2.007258590628401,
+        "coherence_metric": 0.5371288047094277,
+        "frame_counter": 44626,
+        "fold_interval": 5,
+        "trail_length": 30
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -1270.0,
+      "pos_y": -328.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "EEGSUPERFileSourceNode",
+      "pos_x": -1138.0,
+      "pos_y": 42.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "amplification": "signal"
+        },
+        "outputs": {
+          "latent_vector": "spectrum",
+          "raw_alpha": "signal",
+          "raw_beta": "signal",
+          "status": "signal"
+        },
+        "input_data": {
+          "amplification": [
+            0.7
+          ]
+        },
+        "node_title": "EEG Super-Loader",
+        "edf_file": "E:/DocsHouse/450/1.edf",
+        "output_dim": 64,
+        "sampling_rate": 256,
+        "chunk_size": 32,
+        "num_channels": 0,
+        "current_index": 0,
+        "total_samples": 0,
+        "playback_speed": 1,
+        "band_ranges": {
+          "delta": [
+            0.5,
+            4
+          ],
+          "theta": [
+            4,
+            8
+          ],
+          "alpha": [
+            8,
+            13
+          ],
+          "beta": [
+            13,
+            30
+          ],
+          "gamma": [
+            30,
+            100
+          ]
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -1400.0,
+      "pos_y": -92.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "NeuralFlowEncoderNode",
+      "pos_x": -358.0,
+      "pos_y": -371.0,
+      "width": 846.0,
+      "height": 656.0,
+      "config": {
+        "inputs": {
+          "input_vector": "spectrum",
+          "amplification": "signal"
+        },
+        "outputs": {
+          "latent_vector": "spectrum",
+          "flow_image": "image"
+        },
+        "node_title": "Neural Flow Encoder",
+        "target_latent_dim": 16,
+        "buffer_size": 100,
+        "current_input_dim": 300
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "growth_rate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "latent_vector",
+      "to_node_id": 0,
+      "to_port": "input_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "amplification",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "eigen_coords",
+      "to_node_id": 4,
+      "to_port": "input_vector",
+      "learned_weight": 1.0
+    }
+  ]
+}
