@@ -1,12 +1,12 @@
 """
-Neuronal Image Reconstructor Node (Holographic Weaver)
-------------------------------------------------------
-The "Decoder" sibling to the Approximator.
-Features:
-1. Auto-Resize (Self-Healing)
-2. QUANTUM INTERFERENCE PORT (The Glitch Input)
-"""
+Neuronal Image Reconstructor Node (The Holographic Weaver)
+----------------------------------------------------------
+Converts a latent vector (thought) into an image (hallucination).
+It learns to associate specific input vectors with specific target images
+using a Hebbian projection matrix (Holography).
 
+Use this to visualize what your Hebbian Brain is "thinking".
+"""
 import numpy as np
 import cv2
 import os
@@ -24,10 +24,10 @@ class NeuronalImageReconstructorNode(BaseNode):
         self.node_title = "Holographic Weaver"
         
         self.inputs = {
-            'input_vec': 'spectrum',
-            'target_image': 'image',
-            'train_gate': 'signal',
-            'quantum_interference': 'signal' # <--- THE MISSING PORT
+            'input_vec': 'spectrum',    # The abstract thought (from Brain/Approximator)
+            'target_image': 'image',    # The reality (to learn from)
+            'train_gate': 'signal',     # 1.0 = Learn, 0.0 = Dream
+            'glitch_mod': 'signal'      # Optional: Quantum interference
         }
         
         self.outputs = {
@@ -36,144 +36,116 @@ class NeuronalImageReconstructorNode(BaseNode):
         }
         
         # Config
-        self.input_dim = 16 # Will auto-adapt
+        self.input_dim = 16
         self.output_res = 64
-        self.channels = 3
-        self.learning_rate = 0.005
+        self.learning_rate = 0.01
         
         # State
-        self.frozen = False
-        self.flat_dim = self.output_res * self.output_res * self.channels
-        self.W = np.random.randn(self.flat_dim, self.input_dim).astype(np.float32) * 0.01
-        
-        self.current_output = None
+        self.W = None # Weights (The Hologram)
+        self.current_output = np.zeros((self.output_res, self.output_res, 3), dtype=np.float32)
         self.error_val = 0.0
+        self.frozen = False
+
+    def _init_weights(self, in_dim):
+        self.input_dim = in_dim
+        flat_dim = self.output_res * self.output_res * 3
+        # Initialize with small random noise (The "Quantum Foam")
+        self.W = np.random.randn(flat_dim, self.input_dim).astype(np.float32) * 0.01
+        print(f"Weaver: Initialized W ({flat_dim}x{self.input_dim})")
 
     def step(self):
-        # 1. Get Input Vector
-        x_in = self.get_blended_input('input_vec', 'first')
-        if x_in is None: return 
-        
-        # --- SAFETY: AUTO-HEAL DIMENSIONS ---
-        if len(x_in) != self.input_dim:
-             print(f"Reconstructor: Adapting input from {self.input_dim} to {len(x_in)}")
-             self.input_dim = len(x_in)
-             self.W = np.random.randn(self.flat_dim, self.input_dim).astype(np.float32) * 0.01
-             self.frozen = False
-             
-        x_vec = np.zeros(self.input_dim, dtype=np.float32)
-        x_vec[:] = x_in
-        
-        # Clamp Input
-        raw_input = np.nan_to_num(x_vec, nan=0.0, posinf=1.0, neginf=-1.0)
-        x_vec = np.clip(raw_input, -10.0, 10.0)
+        # 1. Get Input
+        vec = self.get_blended_input('input_vec', 'first')
+        if vec is None: return
 
-        # 2. Forward Pass (Calculate Base Image)
-        raw_output = np.dot(self.W, x_vec)
-        
-        # --- QUANTUM INTERFERENCE INJECTION ---
-        # We listen to the Bloch Qubit. If it's spinning, we glitch the matrix.
-        interference = self.get_blended_input('quantum_interference', 'sum')
-        if interference is not None and interference != 0:
-            # Scale up the interference to cause visible tearing
-            glitch_strength = 5.0 
-            raw_output += interference * glitch_strength
-
-        # 3. Activation (Tanh)
-        prediction = np.tanh(raw_output) 
-        
-        # Reshape to Image for Display
-        img_01 = (prediction + 1.0) / 2.0
-        self.current_output = img_01.reshape((self.output_res, self.output_res, self.channels))
-
-        # 4. Training Loop
-        if not self.frozen:
-            train_gate = self.get_blended_input('train_gate', 'sum')
-            target_img = self.get_blended_input('target_image', 'first')
+        # Auto-init if needed
+        if self.W is None or len(vec) != self.input_dim:
+            self._init_weights(len(vec))
             
-            if train_gate is not None and train_gate > 0.5 and target_img is not None:
-                # Resize and format target
-                t_img_s = cv2.resize(target_img, (self.output_res, self.output_res))
-                
-                # Handle Grayscale/RGBA
-                if len(t_img_s.shape) == 2: 
-                    t_img_s = cv2.cvtColor(t_img_s, cv2.COLOR_GRAY2RGB)
-                elif t_img_s.shape[2] == 4: 
-                    t_img_s = cv2.cvtColor(t_img_s, cv2.COLOR_RGBA2RGB)
-                
-                # Normalize Target
-                t_flat = (t_img_s.flatten().astype(np.float32) / 255.0) * 2.0 - 1.0
-                
-                if t_flat.shape != prediction.shape: return
+        # 2. Forward Pass (Dreaming)
+        # Image = Tanh( W * Vector )
+        # This is the holographic projection step
+        flat_img = np.dot(self.W, vec)
+        
+        # Apply Glitch (if connected)
+        glitch = self.get_blended_input('glitch_mod', 'sum')
+        if glitch is not None and glitch != 0:
+            flat_img += np.random.randn(len(flat_img)) * glitch * 5.0
+            
+        # Activation (squash to -1..1)
+        flat_img = np.tanh(flat_img)
+        
+        # Reshape to Image
+        # Map -1..1 to 0..1
+        self.current_output = ((flat_img + 1.0) / 2.0).reshape((self.output_res, self.output_res, 3))
 
-                # Calculate Error
-                diff = t_flat - prediction
-                self.error_val = np.mean(np.abs(diff))
+        # 3. Learning (if enabled)
+        if not self.frozen:
+            train = self.get_blended_input('train_gate', 'sum')
+            target = self.get_blended_input('target_image', 'first')
+            
+            if train is not None and train > 0.5 and target is not None:
+                # Resize target to match output resolution
+                if target.shape[:2] != (self.output_res, self.output_res):
+                    target = cv2.resize(target, (self.output_res, self.output_res))
                 
-                # Gradient Calculation
-                gradient = diff * (1 - prediction**2)
+                # Flatten target
+                if target.ndim == 2: target = cv2.cvtColor(target, cv2.COLOR_GRAY2RGB)
+                target_flat = (target.flatten() * 2.0) - 1.0 # Map 0..1 to -1..1
                 
-                # Safety Checks
-                update_step = np.outer(gradient, x_vec)
-                update_step = np.clip(update_step, -0.1, 0.1) 
+                # Error Calculation
+                error = target_flat - flat_img
+                self.error_val = np.mean(np.abs(error))
                 
-                self.W += self.learning_rate * update_step
-                self.W *= 0.999
+                # Hebbian/Delta Update: dW = lr * error * input.T
+                # This encodes the image structure into the weights
+                update = np.outer(error, vec)
+                self.W += update * self.learning_rate
                 
-                if not np.all(np.isfinite(self.W)):
-                    self.W = np.nan_to_num(self.W, nan=0.0, posinf=0.1, neginf=-0.1)
+                # Decay/Stabilize
+                self.W *= 0.9995
 
     def get_output(self, port_name):
         if port_name == 'reconstructed_image': return self.current_output
-        elif port_name == 'error': return self.error_val
+        if port_name == 'error': return self.error_val
         return None
 
-    # --- Persistence ---
-    def save_custom_state(self, folder_path, node_id):
-        filename = f"node_{node_id}_decoder_weights.npy"
-        filepath = os.path.join(folder_path, filename)
-        np.save(filepath, self.W)
-        return filename
-
-    def load_custom_state(self, filepath):
-        try:
-            loaded_W = np.load(filepath)
-            if loaded_W.shape == self.W.shape:
-                self.W = loaded_W.astype(np.float32)
-                self.frozen = True
-                print(f"Loaded decoder weights")
-        except Exception as e:
-            print(e)
-            
     def get_display_image(self):
-        if self.current_output is not None:
-            disp = np.clip(self.current_output, 0, 1)
-            img_u8 = (disp * 255).astype(np.uint8)
-            if self.frozen:
-                cv2.putText(img_u8, "FROZEN", (5, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0,255,0), 1)
-            else:
-                cv2.putText(img_u8, "TRAINING", (5, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0,0,255), 1)
-            h, w, c = img_u8.shape
-            return QtGui.QImage(img_u8.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
-        else:
-            black_img = np.zeros((64, 64, 3), dtype=np.uint8)
-            return QtGui.QImage(black_img.data, 64, 64, 64*3, QtGui.QImage.Format.Format_RGB888)
-            
+        img = (np.clip(self.current_output, 0, 1) * 255).astype(np.uint8)
+        
+        if self.frozen:
+             cv2.putText(img, "FROZEN", (5, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0,255,0), 1)
+        elif self.error_val > 0:
+             cv2.putText(img, f"Err: {self.error_val:.2f}", (5, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0,0,255), 1)
+             
+        return QtGui.QImage(img.data, self.output_res, self.output_res, self.output_res*3, QtGui.QImage.Format.Format_RGB888)
+        
     def get_config_options(self):
         return [
-            ("Input Dim", "input_dim", self.input_dim, None),
-            ("Output Res", "output_res", self.output_res, None),
+            ("Resolution", "output_res", self.output_res, None),
+            ("Learning Rate", "learning_rate", self.learning_rate, None),
             ("Frozen", "frozen", self.frozen, [(True, True), (False, False)])
         ]
         
     def set_config_options(self, options):
-        reset = False
-        if "input_dim" in options: self.input_dim = int(options["input_dim"])
-        if "output_res" in options:
-            self.output_res = int(options["output_res"])
-            reset = True
+        if "output_res" in options: 
+            new_res = int(options["output_res"])
+            if new_res != self.output_res:
+                self.output_res = new_res
+                self.W = None # Force re-init
+        if "learning_rate" in options: self.learning_rate = float(options["learning_rate"])
         if "frozen" in options: self.frozen = bool(options["frozen"])
-            
-        if reset:
-            self.flat_dim = self.output_res * self.output_res * self.channels
-            self.W = np.random.randn(self.flat_dim, self.input_dim).astype(np.float32) * 0.01
+
+    # --- State Persistence (Save the learned hologram) ---
+    def save_custom_state(self, folder_path, node_id):
+        if self.W is not None:
+            path = os.path.join(folder_path, f"weaver_{node_id}.npy")
+            np.save(path, self.W)
+            return f"weaver_{node_id}.npy"
+        return None
+        
+    def load_custom_state(self, path):
+        if os.path.exists(path):
+            self.W = np.load(path)
+            self.input_dim = self.W.shape[1]
+            print(f"Weaver loaded weights: {self.W.shape}")
