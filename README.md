@@ -1,9 +1,5 @@
 # Antti's Perception Laboratory (modular with node folder sepearate)
 
-EDIT: I added a autodependency installer that installs dependencies by extracting imports from nodes 
-folder. I have not tried it at all. Claude wrote it.. Could work, Could break your environment.. Who knows. 
-No guarantees. 
-
 ![GUI](./anttis.png)
 
 Welcome to the Perception Laboratory, a professional, node-based interface for designing and running 
@@ -22,32 +18,18 @@ file and load them later.Configurable: Right-click nodes to configure their inte
 
 # Core Application Requirements
 
-These are the essential libraries needed to run the main perception_lab_host.py application.
+Install the requirements.txt with 
 
-pip install PyQt6 numpy opencv-python pyqtgraph pyaudio Pillow
-
-# All Nodes Requirements (Recommended)
-
-To ensure all provided nodes load correctly, install their specific dependencies:
-
-pip install scipy numba mne scikit-learn networkx PyWavelets 
-(etc, check out the imports of the node you are running in nodes folder)
-
-# Note on PyAudio:
-
-PyAudio can be tricky. If pip install pyaudio fails:
-
-Windows: pip install pyaudio (usually works)
-
-macOS: brew install portaudio && pip install pyaudio
-
-Linux: sudo apt-get install portaudio19-dev && pip install pyaudio
+pip install -r requirements.txt 
 
 # Running the Application
 
 Once all dependencies are installed, just run the host file:
 
-python perception_lab_host.py
+python perception_lab_hostv8.py
+
+(notice the latest version, older might not work with all nodes) 
+
 
 The application will start, scan the nodes/ folder, and print a list of all successfully loaded nodes 
 to the console.
