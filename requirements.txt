@@ -1,0 +1,14 @@
+numpy
+opencv-python
+scipy
+PyQt6
+pyqtgraph
+Pillow
+mne
+scikit-learn
+networkx
+torch
+torchvision
+numba
+PyWavelets
+pyaudio
