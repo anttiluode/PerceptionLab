@@ -1,0 +1,174 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SelfConsistentResonanceNode",
+      "pos_x": -107.0,
+      "pos_y": -280.0,
+      "width": 309.0,
+      "height": 297.0,
+      "config": {
+        "inputs": {
+          "frequency_input": "spectrum",
+          "feedback_modulation": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "structure": "image",
+          "tension_map": "image",
+          "scars_insulation": "image",
+          "eigen_image": "image",
+          "eigenfrequencies": "spectrum",
+          "criticality_metric": "signal"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "center": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "EEGFileSourceNode16",
+      "pos_x": -734.0,
+      "pos_y": -238.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "band_1_2Hz": "signal",
+          "band_2_3Hz": "signal",
+          "band_3_4Hz": "signal",
+          "band_4_5Hz": "signal",
+          "band_5_6Hz": "signal",
+          "band_6_7Hz": "signal",
+          "band_7_8Hz": "signal",
+          "band_8_9Hz": "signal",
+          "band_9_10Hz": "signal",
+          "band_10_11Hz": "signal",
+          "band_11_12Hz": "signal",
+          "band_12_13Hz": "signal",
+          "band_13_14Hz": "signal",
+          "band_14_15Hz": "signal",
+          "band_15_30Hz": "signal",
+          "band_30_45Hz": "signal",
+          "raw_signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG 16-Band (Occipital)",
+        "edf_file_path": "E:\\docshouse\\450\\1.edf",
+        "selected_region": "Occipital",
+        "_last_path": "E:\\docshouse\\450\\1.edf",
+        "_last_region": "Occipital",
+        "fs": 100.0,
+        "current_time": 7.533333333333316,
+        "window_size": 1.0,
+        "output_powers": {
+          "band_1_2Hz": 5.863666847425041e-11,
+          "band_2_3Hz": 1.6787457157222665e-11,
+          "band_3_4Hz": 9.4359673613277e-12,
+          "band_4_5Hz": 7.172130323779541e-12,
+          "band_5_6Hz": 6.987599005793122e-12,
+          "band_6_7Hz": 1.064476550365762e-11,
+          "band_7_8Hz": 7.179377814518821e-12,
+          "band_8_9Hz": 4.399945240130464e-12,
+          "band_9_10Hz": 1.9251255805491102e-12,
+          "band_10_11Hz": 6.292266364733577e-12,
+          "band_11_12Hz": 1.0125264317325829e-11,
+          "band_12_13Hz": 6.9005794199857985e-12,
+          "band_13_14Hz": 1.8335293590240447e-12,
+          "band_14_15Hz": 3.658482617459787e-12,
+          "band_15_30Hz": 2.472312416015434e-10,
+          "band_30_45Hz": 1.4792853902758713e-11,
+          "raw_signal": 0.00013264219628209765
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": -399.0,
+      "pos_y": -248.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "input_data": {
+          "latent_base": [],
+          "in_0": [
+            2.7595462735955724e-11
+          ],
+          "in_1": [
+            1.3705873830345326e-11
+          ],
+          "in_2": [],
+          "in_3": [],
+          "in_4": [],
+          "in_5": [],
+          "in_6": [],
+          "in_7": [],
+          "in_8": [],
+          "in_9": [],
+          "in_10": [],
+          "in_11": [],
+          "in_12": [],
+          "in_13": [],
+          "in_14": [],
+          "in_15": []
+        },
+        "node_title": "Latent Assembler",
+        "latent_dim": 16
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 2,
+      "from_port": "latent_out",
+      "to_node_id": 0,
+      "to_port": "frequency_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "band_1_2Hz",
+      "to_node_id": 2,
+      "to_port": "in_0",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "band_2_3Hz",
+      "to_node_id": 2,
+      "to_port": "in_1",
+      "learned_weight": 1.0
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SelfConsistentResonanceNode",
+      "pos_x": -107.0,
+      "pos_y": -280.0,
+      "width": 309.0,
+      "height": 297.0,
+      "config": {
+        "inputs": {
+          "frequency_input": "spectrum",
+          "feedback_modulation": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "structure": "image",
+          "tension_map": "image",
+          "scars_insulation": "image",
+          "eigen_image": "image",
+          "eigenfrequencies": "spectrum",
+          "criticality_metric": "signal"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "center": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": -435.0,
+      "pos_y": -286.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "input_data": {
+          "latent_base": [],
+          "in_0": [
+            2.3564868361954763
+          ],
+          "in_1": [
+            0.8267745031870337
+          ],
+          "in_2": [],
+          "in_3": [],
+          "in_4": [],
+          "in_5": [],
+          "in_6": [],
+          "in_7": [],
+          "in_8": [],
+          "in_9": [],
+          "in_10": [],
+          "in_11": [],
+          "in_12": [],
+          "in_13": [],
+          "in_14": [],
+          "in_15": []
+        },
+        "node_title": "Latent Assembler",
+        "latent_dim": 16
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ChaoticControlNode",
+      "pos_x": -729.0,
+      "pos_y": -195.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "control_nudge": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "chaos_x": "signal",
+          "chaos_y": "signal",
+          "phase_image": "image"
+        },
+        "input_data": {
+          "control_nudge": [],
+          "reset": []
+        },
+        "node_title": "Chaotic Control (Lorenz)",
+        "sigma": 10.0,
+        "rho": 28.0,
+        "beta": 2.6666666666666665,
+        "dt": 0.01,
+        "history_len": 1000,
+        "output_x": 3.163096590926377,
+        "output_y": 1.2791507417416752
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "latent_out",
+      "to_node_id": 0,
+      "to_port": "frequency_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "chaos_x",
+      "to_node_id": 1,
+      "to_port": "in_0",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "chaos_y",
+      "to_node_id": 1,
+      "to_port": "in_1",
+      "learned_weight": 1.0
+    }
+  ]
+}
