@@ -1,0 +1,165 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "FFTCochleaNode",
+      "pos_x": -385.0,
+      "pos_y": -502.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "outputs": {
+          "spectrum": "spectrum",
+          "signal": "signal",
+          "image": "image",
+          "complex_spectrum": "complex_spectrum"
+        },
+        "node_title": "FFT Cochlea",
+        "freq_bins": 64,
+        "x": 0.0,
+        "internal_freq": 7.440902543498633
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "CrystalCaveNode",
+      "pos_x": -163.0,
+      "pos_y": -426.0,
+      "width": 356.0,
+      "height": 400.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "spectrum_in": "spectrum",
+          "train": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "spectrum_out": "spectrum",
+          "resonance": "signal",
+          "coherence": "signal"
+        },
+        "node_title": "Base Node",
+        "n_layers": 3,
+        "layer_sizes": [
+          32,
+          64,
+          128
+        ],
+        "n_harmonics": 5,
+        "settle_steps": 30,
+        "scar_rate": 0.02,
+        "tension_rate": 0.1,
+        "threshold": 0.6,
+        "diffusion": 0.5,
+        "phase_rate": 0.05,
+        "frozen": false,
+        "training_count": 1238,
+        "current_resonance": 0.9412151687320702,
+        "current_coherence": 0.9711621793381888
+      },
+      "custom_state_file": "node_1_crystal_cave.npz"
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -555.0,
+      "pos_y": -110.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "iFFTCochleaNode",
+      "pos_x": 215.0,
+      "pos_y": -420.0,
+      "width": 367.0,
+      "height": 367.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum"
+        },
+        "outputs": {
+          "image": "image"
+        },
+        "node_title": "iFFT Cochlea",
+        "h": 367,
+        "w": 367
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "MediaSourceNode",
+      "pos_x": -754.0,
+      "pos_y": -496.0,
+      "width": 308.0,
+      "height": 294.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 308,
+        "h": 294,
+        "sample_rate": 44100,
+        "signal_output": 0.1594238561225356
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "train",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "image",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "complex_spectrum",
+      "to_node_id": 3,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    }
+  ]
+}

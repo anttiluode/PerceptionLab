@@ -1,0 +1,125 @@
+{
+  "global_settings": {
+    "coupling": 70
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "CrystalCaveNode",
+      "pos_x": -285.0,
+      "pos_y": -301.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "spectrum_in": "spectrum",
+          "train": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "spectrum_out": "spectrum",
+          "resonance": "signal",
+          "coherence": "signal"
+        },
+        "input_data": {},
+        "node_title": "Base Node",
+        "n_layers": 3,
+        "layer_sizes": [
+          32,
+          64,
+          128
+        ],
+        "n_harmonics": 5,
+        "settle_steps": 30,
+        "scar_rate": 0.02,
+        "tension_rate": 0.1,
+        "threshold": 0.6,
+        "diffusion": 0.5,
+        "phase_rate": 0.05,
+        "frozen": false,
+        "training_count": 0,
+        "current_resonance": 0.0,
+        "current_coherence": 0.0
+      },
+      "custom_state_file": "node_0_crystal_cave.npz"
+    },
+    {
+      "id": 1,
+      "class_name": "LoadImageNode",
+      "pos_x": -681.0,
+      "pos_y": -463.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image_out": "image"
+        },
+        "input_data": {},
+        "node_title": "Load Image",
+        "file_path": "F:/All Pics From DVD's 02 11 2020/Black And White Pics 13 #1/5 June baby pony frugal stuff tuusula/050620131878.jpg"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -732.0,
+      "pos_y": -94.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "DisplayNode",
+      "pos_x": 91.0,
+      "pos_y": -408.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "input_data": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "image_out",
+      "to_node_id": 0,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "train",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "image_out",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
