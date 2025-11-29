@@ -35,6 +35,13 @@ class HolographicIFFTNode(BaseNode):
         
         if spec is None or spec.ndim != 2:
             return
+            
+        # Ensure complex type (host may corrupt to float)
+        if not np.iscomplexobj(spec):
+            # If we got real data, treat as magnitude with zero phase
+            spec = spec.astype(np.complex64)
+        else:
+            spec = spec.astype(np.complex64)
 
         # 2. Perform Inverse 2D FFT
         # We assume the input is standard unshifted FFT data
@@ -42,7 +49,7 @@ class HolographicIFFTNode(BaseNode):
         
         # 3. Extract Magnitude (The Image)
         # Real images correspond to the magnitude of the complex result
-        self.reconstruction = np.abs(complex_img)
+        self.reconstruction = np.abs(complex_img).astype(np.float32)
         
         # Normalize 0-1
         r_min, r_max = self.reconstruction.min(), self.reconstruction.max()
@@ -59,6 +66,7 @@ class HolographicIFFTNode(BaseNode):
         
         # Display Reconstruction
         img_u8 = (np.clip(self.reconstruction, 0, 1) * 255).astype(np.uint8)
+        img_u8 = np.ascontiguousarray(img_u8)
         
         h, w = img_u8.shape
         return QtGui.QImage(img_u8.data, w, h, w, QtGui.QImage.Format.Format_Grayscale8)

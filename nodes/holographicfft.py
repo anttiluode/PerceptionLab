@@ -42,16 +42,28 @@ class HolographicFFTNode(BaseNode):
         if img is None:
             return
             
-        # 2. Prepare Image (Grayscale Float)
-        if img.ndim == 3:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        if img.dtype != np.float32:
-            img = img.astype(np.float32)
-            if img.max() > 1.0: img /= 255.0
+        # 2. Prepare Image (Grayscale Float32)
+        # CRITICAL: Host converts to float64, OpenCV needs uint8 or float32
+        if img.dtype in [np.float64, np.float32]:
+            img_min, img_max = img.min(), img.max()
+            if img_max > img_min:
+                img_u8 = ((img - img_min) / (img_max - img_min) * 255).astype(np.uint8)
+            else:
+                img_u8 = np.zeros(img.shape[:2], dtype=np.uint8)
+        elif img.dtype == np.uint8:
+            img_u8 = img
+        else:
+            img_u8 = img.astype(np.uint8)
+        
+        if img_u8.ndim == 3:
+            img_u8 = cv2.cvtColor(img_u8, cv2.COLOR_BGR2GRAY)
+            
+        # Convert to float32 for FFT
+        img = img_u8.astype(np.float32) / 255.0
             
         # 3. Perform 2D FFT
         # We do NOT shift here for the data output, only for display
-        self.spectrum = fft2(img)
+        self.spectrum = fft2(img).astype(np.complex64)
         
         # 4. Visualization (Magnitude)
         # Shift zero frequency to center for viewing
@@ -61,9 +73,9 @@ class HolographicFFTNode(BaseNode):
         # Normalize magnitude for display
         m_min, m_max = magnitude.min(), magnitude.max()
         if m_max > m_min:
-            self.cached_mag = (magnitude - m_min) / (m_max - m_min)
+            self.cached_mag = ((magnitude - m_min) / (m_max - m_min)).astype(np.float32)
         else:
-            self.cached_mag = np.zeros_like(magnitude)
+            self.cached_mag = np.zeros_like(magnitude, dtype=np.float32)
 
     def get_output(self, port_name):
         if port_name == 'complex_spectrum':
@@ -78,6 +90,7 @@ class HolographicFFTNode(BaseNode):
         # Display Magnitude Spectrum
         img_u8 = (np.clip(self.cached_mag, 0, 1) * 255).astype(np.uint8)
         img_color = cv2.applyColorMap(img_u8, cv2.COLORMAP_INFERNO)
+        img_color = np.ascontiguousarray(img_color)
         
         h, w = img_color.shape[:2]
         return QtGui.QImage(img_color.data, w, h, w*3, QtGui.QImage.Format.Format_RGB888)
