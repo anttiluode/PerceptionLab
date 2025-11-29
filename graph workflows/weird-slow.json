@@ -1,0 +1,139 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 7
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -240.0,
+      "pos_y": 173.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "GatedResonanceNode",
+      "pos_x": 88.0,
+      "pos_y": -212.0,
+      "width": 245.0,
+      "height": 273.0,
+      "config": {
+        "inputs": {
+          "frequency_input": "spectrum",
+          "threshold_mod": "signal",
+          "coupling_mod": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "potential_map": "image",
+          "spike_map": "image",
+          "refractory_map": "image",
+          "eigen_image": "image",
+          "firing_rate": "signal",
+          "synchrony": "signal",
+          "eigenfrequencies": "spectrum"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "center": 64,
+        "threshold": 0.01,
+        "refractory_period": 5,
+        "leak": 0.05,
+        "coupling": 0.1,
+        "input_gain": 0.3,
+        "kernel_type": "Hexagonal",
+        "_last_kernel_type": "Hexagonal",
+        "t": 822
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "DisplayNode",
+      "pos_x": 451.0,
+      "pos_y": -237.0,
+      "width": 528.0,
+      "height": 559.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "ImageToVectorNode",
+      "pos_x": -224.0,
+      "pos_y": -55.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "vector_out": "spectrum"
+        },
+        "node_title": "Image -> Vector",
+        "output_dim": 256
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "LoadImageNode",
+      "pos_x": -226.0,
+      "pos_y": -251.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image_out": "image"
+        },
+        "input_data": {},
+        "node_title": "Load Image",
+        "file_path": "F:/All Pics From DVD's 02 11 2020/Black And White Pics 13 #1/5 June baby pony frugal stuff tuusula/050620131878.jpg"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "eigen_image",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "vector_out",
+      "to_node_id": 1,
+      "to_port": "frequency_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "image_out",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
