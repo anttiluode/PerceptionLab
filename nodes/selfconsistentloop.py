@@ -14,7 +14,7 @@ except AttributeError:
         def get_blended_input(self, name, mode): return None
     import PyQt6.QtGui as QtGui
 
-class SelfConsistentResonanceNode(BaseNode):
+class SelfConsistentResonanceNode2(BaseNode):
     """
     The Wednesday Loop:
     1. Structure (Space) determines Eigenfrequencies (Time).
@@ -25,7 +25,7 @@ class SelfConsistentResonanceNode(BaseNode):
     to its own geometry.
     """
     NODE_CATEGORY = "Consciousness"
-    NODE_TITLE = "Self-Consistent Loop"
+    NODE_TITLE = "Self-Consistent Loop2"
     NODE_COLOR = QtGui.QColor(255, 100, 255) # Magenta for emergence
     
     def __init__(self):
