@@ -1,0 +1,310 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 44
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "AudioPlayerNode",
+      "pos_x": -798.0,
+      "pos_y": -323.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "volume": "signal",
+          "playback_pos": "signal",
+          "pause": "signal"
+        },
+        "outputs": {
+          "spectrum": "spectrum",
+          "raw_signal": "signal",
+          "band_power": "image",
+          "band_1_Sub": "signal",
+          "band_2_Bass": "signal",
+          "band_3_Mid": "signal",
+          "band_4_High": "signal",
+          "band_5_Air": "signal"
+        },
+        "input_data": {
+          "volume": [],
+          "playback_pos": [],
+          "pause": []
+        },
+        "node_title": "Base Node",
+        "band_names": [
+          "Sub",
+          "Bass",
+          "Mid",
+          "High",
+          "Air"
+        ],
+        "file_path": "F:/Main/ALL VOCAL SONGS 2018/anttiluode_asongforyou.mp3",
+        "gain": 1.0,
+        "sample_rate": 44100,
+        "play_head": 2633728,
+        "is_playing": true,
+        "last_step_time": 1764505572.941556,
+        "five_edges": [
+          20,
+          60,
+          250,
+          2000,
+          6000,
+          20000
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "SelfConsistentResonanceNode",
+      "pos_x": -541.0,
+      "pos_y": -346.0,
+      "width": 558.0,
+      "height": 527.0,
+      "config": {
+        "inputs": {
+          "frequency_input": "spectrum",
+          "feedback_modulation": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "structure": "image",
+          "tension_map": "image",
+          "scars_insulation": "image",
+          "eigen_image": "image",
+          "eigenfrequencies": "spectrum",
+          "criticality_metric": "signal"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "center": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 68.0,
+      "pos_y": -336.0,
+      "width": 480.0,
+      "height": 499.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "GatedResonanceNode",
+      "pos_x": 625.0,
+      "pos_y": -357.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "frequency_input": "spectrum",
+          "threshold_mod": "signal",
+          "coupling_mod": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "potential_map": "image",
+          "spike_map": "image",
+          "refractory_map": "image",
+          "eigen_image": "image",
+          "firing_rate": "signal",
+          "synchrony": "signal",
+          "eigenfrequencies": "spectrum"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "center": 64,
+        "threshold": 0.05,
+        "refractory_period": 5,
+        "leak": 0.05,
+        "coupling": 0.15,
+        "input_gain": 0.3,
+        "kernel_type": "Square 8",
+        "_last_kernel_type": "Square 8",
+        "t": 2808
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "ComplexInterferenceNode",
+      "pos_x": 1173.0,
+      "pos_y": -403.0,
+      "width": 548.0,
+      "height": 597.0,
+      "config": {
+        "inputs": {
+          "complex_a": "complex_spectrum",
+          "complex_b": "complex_spectrum",
+          "mode_select": "signal",
+          "mix_ratio": "signal"
+        },
+        "outputs": {
+          "interference_out": "complex_spectrum",
+          "magnitude_view": "image"
+        },
+        "node_title": "Base Node",
+        "size": 128
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 887.0,
+      "pos_y": -258.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 853.0,
+      "pos_y": -12.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "ImageCombineNode",
+      "pos_x": 1753.0,
+      "pos_y": -417.0,
+      "width": 653.0,
+      "height": 621.0,
+      "config": {
+        "inputs": {
+          "image_in_a": "image",
+          "image_in_b": "image"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Image Combiner",
+        "modes": [
+          "Average",
+          "Add",
+          "Subtract",
+          "Multiply",
+          "Screen",
+          "HStack",
+          "VStack"
+        ],
+        "mode": "Average",
+        "config": {
+          "mode": 0
+        }
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "spectrum",
+      "to_node_id": 1,
+      "to_port": "frequency_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "eigen_image",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "band_3_Mid",
+      "to_node_id": 1,
+      "to_port": "feedback_modulation",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "eigenfrequencies",
+      "to_node_id": 3,
+      "to_port": "frequency_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "eigen_image",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "complex_spectrum",
+      "to_node_id": 4,
+      "to_port": "complex_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "complex_spectrum",
+      "to_node_id": 4,
+      "to_port": "complex_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 4,
+      "to_port": "mode_select",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "magnitude_view",
+      "to_node_id": 7,
+      "to_port": "image_in_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "magnitude_view",
+      "to_node_id": 7,
+      "to_port": "image_in_b",
+      "learned_weight": 1.0
+    }
+  ]
+}
