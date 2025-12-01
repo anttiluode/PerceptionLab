@@ -1,0 +1,178 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "HolographicFFTNode",
+      "pos_x": -793.0,
+      "pos_y": -192.0,
+      "width": 511.0,
+      "height": 420.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "TemporalBlurNode",
+      "pos_x": -351.0,
+      "pos_y": -264.0,
+      "width": 580.0,
+      "height": 471.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Temporal Blur (Ghosting)",
+        "feedback": 0.98
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "NeurotransmitterResonanceNode",
+      "pos_x": -649.0,
+      "pos_y": -344.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "frequency_input": "spectrum",
+          "reset": "signal"
+        },
+        "outputs": {
+          "potential_map": "image",
+          "chemical_map": "image",
+          "vesicle_map": "image",
+          "eigen_image": "image",
+          "mean_chemical": "signal"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "threshold": 0.003,
+        "coupling": 0.3,
+        "leak": 0.1,
+        "fire_cost": 0.07,
+        "recovery_rate": 5,
+        "release_amount": 3,
+        "chemical_decay": 5e-05,
+        "diffusion_rate": 1,
+        "inhibition_strength": 0.005,
+        "t": 63849
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "DisplayNode",
+      "pos_x": -887.0,
+      "pos_y": 356.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "MediaSourceNode",
+      "pos_x": -960.0,
+      "pos_y": -258.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.21815870098039214
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "ImageToVectorNode",
+      "pos_x": -934.0,
+      "pos_y": -5.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "vector_out": "spectrum"
+        },
+        "node_title": "Image -> Vector",
+        "output_dim": 4096
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "magnitude_view",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "eigen_image",
+      "to_node_id": 0,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "eigen_image",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "image",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "vector_out",
+      "to_node_id": 2,
+      "to_port": "frequency_input",
+      "learned_weight": 1.0
+    }
+  ]
+}
