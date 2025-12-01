@@ -1,0 +1,183 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SelfConsistentResonanceNode",
+      "pos_x": -937.0,
+      "pos_y": -348.0,
+      "width": 395.0,
+      "height": 413.0,
+      "config": {
+        "inputs": {
+          "frequency_input": "spectrum",
+          "feedback_modulation": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "structure": "image",
+          "tension_map": "image",
+          "scars_insulation": "image",
+          "eigen_image": "image",
+          "eigenfrequencies": "spectrum",
+          "criticality_metric": "signal"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "center": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "DendriticWebNode",
+      "pos_x": -514.0,
+      "pos_y": -359.0,
+      "width": 393.0,
+      "height": 422.0,
+      "config": {
+        "inputs": {
+          "stimulation": "image",
+          "chemical_bath": "image",
+          "regrow": "signal"
+        },
+        "outputs": {
+          "membrane_potential": "image",
+          "neurotransmitter_map": "image",
+          "structure_map": "image",
+          "firing_event": "signal"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "n_neurons": 12,
+        "diffusion_rate": 0.8,
+        "decay_rate": 0.05,
+        "vesicle_packet_size": 5.0,
+        "binding_affinity": 0.2,
+        "action_threshold": 0.8,
+        "needs_growth": false
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "HolographicFFTNode",
+      "pos_x": -82.0,
+      "pos_y": 311.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "DisplayNode",
+      "pos_x": -368.0,
+      "pos_y": 114.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "NoiseSourceNode",
+      "pos_x": -1170.0,
+      "pos_y": -266.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "amplitude": "signal"
+        },
+        "outputs": {
+          "noise_image": "image",
+          "noise_spectrum": "spectrum"
+        },
+        "input_data": {
+          "amplitude": []
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "amp": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "TemporalBlurNode",
+      "pos_x": 163.0,
+      "pos_y": -328.0,
+      "width": 831.0,
+      "height": 644.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Temporal Blur (Ghosting)",
+        "feedback": 0.9
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "eigen_image",
+      "to_node_id": 1,
+      "to_port": "stimulation",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "neurotransmitter_map",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "membrane_potential",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "noise_spectrum",
+      "to_node_id": 0,
+      "to_port": "frequency_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "magnitude_view",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
