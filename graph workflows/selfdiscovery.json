@@ -1,0 +1,67 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "CoEvolutionaryUniverseNode",
+      "pos_x": -293.0,
+      "pos_y": -458.0,
+      "width": 898.0,
+      "height": 677.0,
+      "config": {
+        "inputs": {
+          "perturbation": "complex_spectrum",
+          "noise_seed": "image",
+          "coupling": "signal"
+        },
+        "outputs": {
+          "observer_O": "image",
+          "hamiltonian_H": "image",
+          "perceived_reality": "image",
+          "commutator_norm": "signal"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "lr_O": 0.03,
+        "lr_H": 0.02
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "NoiseSourceNode",
+      "pos_x": -597.0,
+      "pos_y": -284.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "amplitude": "signal"
+        },
+        "outputs": {
+          "noise_image": "image",
+          "noise_spectrum": "spectrum"
+        },
+        "input_data": {
+          "amplitude": []
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "amp": 1.0
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "noise_image",
+      "to_node_id": 0,
+      "to_port": "noise_seed",
+      "learned_weight": 1.0
+    }
+  ]
+}
