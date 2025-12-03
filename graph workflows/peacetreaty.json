@@ -1,0 +1,167 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 80
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "QuantumFieldGeneratorNode",
+      "pos_x": -900.0,
+      "pos_y": -200.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "The Quantum Field",
+        "size": 128,
+        "mode": 0,
+        "evolution_speed": 0.05
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "DecoherenceFieldNode",
+      "pos_x": -600.0,
+      "pos_y": -150.0,
+      "width": 280.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "Nature (Base Landscape)",
+        "size": 128,
+        "center_protection": 0.95,
+        "falloff": 2.5
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 10,
+      "class_name": "SocialForceNode",
+      "pos_x": -250.0,
+      "pos_y": -450.0,
+      "width": 300.0,
+      "height": 200.0,
+      "config": {
+        "node_title": "Social Force (The Treaty)",
+        "size": 128,
+        "repulsion": 0.8
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "AddressLearnerNode",
+      "pos_x": -250.0,
+      "pos_y": 0.0,
+      "width": 280.0,
+      "height": 200.0,
+      "config": {
+        "node_title": "Agent A (Incumbent)",
+        "size": 128,
+        "learning_rate": 0.02,
+        "target_coherence": 0.95
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 11,
+      "class_name": "AddressLearnerNode",
+      "pos_x": 100.0,
+      "pos_y": 0.0,
+      "width": 280.0,
+      "height": 200.0,
+      "config": {
+        "node_title": "Agent B (Challenger)",
+        "size": 128,
+        "learning_rate": 0.02,
+        "target_coherence": 0.95
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "SocialTopologyNode",
+      "pos_x": 450.0,
+      "pos_y": -200.0,
+      "width": 300.0,
+      "height": 300.0,
+      "config": {
+        "node_title": "Social Topology Analysis",
+        "size": 128
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "complex_spectrum",
+      "to_node_id": 4,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "complex_spectrum",
+      "to_node_id": 11,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "decoherence_map",
+      "to_node_id": 10,
+      "to_port": "base_landscape",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "learned_address",
+      "to_node_id": 10,
+      "to_port": "address_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 11,
+      "from_port": "learned_address",
+      "to_node_id": 10,
+      "to_port": "address_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "landscape_a",
+      "to_node_id": 4,
+      "to_port": "decoherence_map",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "landscape_b",
+      "to_node_id": 11,
+      "to_port": "decoherence_map",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "learned_address",
+      "to_node_id": 5,
+      "to_port": "address_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 11,
+      "from_port": "learned_address",
+      "to_node_id": 5,
+      "to_port": "address_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "protection_map",
+      "to_node_id": 5,
+      "to_port": "protection_map",
+      "learned_weight": 1.0
+    }
+  ]
+}
