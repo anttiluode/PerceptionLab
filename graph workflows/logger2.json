@@ -1,0 +1,488 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "QuantumFieldGeneratorNode",
+      "pos_x": -1023.0,
+      "pos_y": -281.0,
+      "width": 300.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "modulation": "image",
+          "frequency_bias": "signal",
+          "coherence": "signal",
+          "evolution_rate": "signal"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "decoherence_map": "image",
+          "hamiltonian_phase": "image",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "input_data": {
+          "modulation": [],
+          "frequency_bias": [],
+          "coherence": [],
+          "evolution_rate": []
+        },
+        "node_title": "Quantum Field Generator",
+        "size": 128,
+        "mode": 0,
+        "base_coherence": 0.7,
+        "evolution_speed": 0.05,
+        "attractor_freqs": [
+          3,
+          5,
+          8,
+          13
+        ],
+        "t": 12
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ModeAddressAlgebraNode",
+      "pos_x": -808.0,
+      "pos_y": -681.0,
+      "width": 501.0,
+      "height": 334.0,
+      "config": {
+        "inputs": {
+          "field_in": "complex_spectrum",
+          "decoherence_map": "image",
+          "hamiltonian_phase": "image",
+          "address_threshold": "signal"
+        },
+        "outputs": {
+          "occupied_address": "image",
+          "protected_address": "image",
+          "stable_address": "image",
+          "address_entropy": "signal",
+          "participation_ratio": "signal",
+          "address_overlap": "signal"
+        },
+        "input_data": {},
+        "node_title": "Mode Address Algebra",
+        "size": 128,
+        "address_threshold": 0.01,
+        "entropy_history": [
+          -0.0,
+          0.7452672123908997,
+          0.7454291582107544,
+          0.7464148998260498,
+          0.7477118968963623,
+          0.7483816146850586,
+          0.7504096627235413,
+          0.7527791857719421,
+          0.7539799809455872,
+          0.7542191743850708,
+          0.7560396790504456,
+          0.7563729286193848
+        ],
+        "pr_history": [
+          1000000000.0,
+          463.2986755371094,
+          474.3638000488281,
+          492.0528869628906,
+          507.6750183105469,
+          533.2498779296875,
+          563.5444946289062,
+          598.8462524414062,
+          632.7100830078125,
+          657.5393676757812,
+          691.7118530273438,
+          698.6509399414062
+        ],
+        "overlap_history": [
+          0.0,
+          0.35675808787345886,
+          0.3575262725353241,
+          0.3566707968711853,
+          0.35710981488227844,
+          0.35541999340057373,
+          0.35545283555984497,
+          0.3546455502510071,
+          0.35404494404792786,
+          0.3527880012989044,
+          0.35114336013793945,
+          0.35082879662513733
+        ],
+        "stable_fraction_history": [],
+        "gamma_crit": 0.5,
+        "coupling_radius": 3
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "AddressProjectionNode",
+      "pos_x": 50.0,
+      "pos_y": -500.0,
+      "width": 280.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum",
+          "address_mask": "image",
+          "projection_strength": "signal"
+        },
+        "outputs": {
+          "projected_field": "complex_spectrum",
+          "projected_image": "image",
+          "filtered_out": "image",
+          "projection_loss": "signal"
+        },
+        "input_data": {},
+        "node_title": "Address Projection",
+        "size": 128,
+        "projection_loss": 0.9863949419301997,
+        "projection_strength": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "AttractorDynamicsNode",
+      "pos_x": -749.0,
+      "pos_y": -294.0,
+      "width": 420.0,
+      "height": 185.0,
+      "config": {
+        "inputs": {
+          "stable_address": "image",
+          "address_entropy": "signal",
+          "participation_ratio": "signal",
+          "complex_spectrum": "complex_spectrum",
+          "dilution_rate": "signal"
+        },
+        "outputs": {
+          "attractor_health": "signal",
+          "stability_map": "image",
+          "division_rate": "signal",
+          "time_to_collapse": "signal",
+          "evolved_field": "complex_spectrum"
+        },
+        "input_data": {},
+        "node_title": "Attractor Dynamics",
+        "size": 128,
+        "entropy_history": [
+          0.0,
+          0.0,
+          0.5216870486736297,
+          0.521800410747528,
+          0.5224904298782348,
+          0.5233983278274535,
+          0.523867130279541,
+          0.5252867639064789,
+          0.5269454300403594,
+          0.527785986661911,
+          0.5279534220695495,
+          0.5292277753353118
+        ],
+        "pr_history": [
+          0.7,
+          700000000.0,
+          324.30907287597654,
+          332.0546600341797,
+          344.4370208740234,
+          355.3725128173828,
+          373.2749145507812,
+          394.48114624023435,
+          419.19237670898434,
+          442.8970581054687,
+          460.2775573730468,
+          484.1982971191406
+        ],
+        "health_history": [
+          4.2e-05,
+          0.3,
+          0.3535410417308808,
+          0.35379127534103394,
+          0.3543399320755005,
+          0.35440249469757085,
+          0.3552685995178222,
+          0.3557380213680267,
+          0.35612783926582336,
+          0.3571922705516815,
+          0.35791491270065307,
+          0.3587076154384613
+        ],
+        "stable_size_history": [],
+        "attractor_health": 0.3587076154384613,
+        "division_rate": 0.00030517578125,
+        "time_to_collapse": Infinity,
+        "dilution_rate": 0.02,
+        "division_strength": 0.1
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "HolographicIFFTNode",
+      "pos_x": 400.0,
+      "pos_y": -400.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum"
+        },
+        "outputs": {
+          "reconstructed_image": "image"
+        },
+        "input_data": {},
+        "node_title": "Holographic iFFT (Reconstruct)"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "IHTDataLoggerNode",
+      "pos_x": -184.0,
+      "pos_y": -655.0,
+      "width": 382.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "address_entropy": "signal",
+          "participation_ratio": "signal",
+          "address_overlap": "signal",
+          "attractor_health": "signal",
+          "time_to_collapse": "signal",
+          "projection_loss": "signal",
+          "division_rate": "signal",
+          "coherence": "signal",
+          "stable_address": "image"
+        },
+        "outputs": {
+          "step_count": "signal",
+          "avg_health": "signal"
+        },
+        "input_data": {
+          "address_entropy": [],
+          "participation_ratio": [],
+          "address_overlap": [],
+          "attractor_health": [],
+          "time_to_collapse": [],
+          "projection_loss": [],
+          "division_rate": [],
+          "coherence": [],
+          "stable_address": []
+        },
+        "node_title": "Base Node",
+        "data": {
+          "metadata": {
+            "start_time": "2025-12-03 08:40:17",
+            "description": "IHT Address Algebra experiment"
+          },
+          "timeseries": {
+            "step": [
+              10
+            ],
+            "entropy": [
+              null
+            ],
+            "participation_ratio": [
+              null
+            ],
+            "overlap": [
+              null
+            ],
+            "health": [
+              null
+            ],
+            "ttc": [
+              null
+            ],
+            "projection_loss": [
+              null
+            ],
+            "division_rate": [
+              null
+            ],
+            "coherence": [
+              null
+            ],
+            "stable_fraction": [
+              0.0
+            ]
+          },
+          "summary": {
+            "total_steps": 10,
+            "logged_points": 1,
+            "entropy": {
+              "mean": null,
+              "std": null,
+              "min": null,
+              "max": null
+            },
+            "participation_ratio": {
+              "mean": null,
+              "std": null,
+              "min": null,
+              "max": null
+            },
+            "health": {
+              "mean": null,
+              "std": null,
+              "min": null,
+              "max": null
+            },
+            "stable_fraction": {
+              "mean": 0.0,
+              "std": 0.0,
+              "min": 0.0,
+              "max": 0.0
+            },
+            "projection_loss": {
+              "mean": null,
+              "std": null,
+              "min": null,
+              "max": null
+            }
+          }
+        },
+        "step_count": 12,
+        "log_interval": 10,
+        "max_points": 1000,
+        "size": 64
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "complex_spectrum",
+      "to_node_id": 1,
+      "to_port": "field_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "decoherence_map",
+      "to_node_id": 1,
+      "to_port": "decoherence_map",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "hamiltonian_phase",
+      "to_node_id": 1,
+      "to_port": "hamiltonian_phase",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "complex_spectrum",
+      "to_node_id": 2,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "stable_address",
+      "to_node_id": 2,
+      "to_port": "address_mask",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "stable_address",
+      "to_node_id": 3,
+      "to_port": "stable_address",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "address_entropy",
+      "to_node_id": 3,
+      "to_port": "address_entropy",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "participation_ratio",
+      "to_node_id": 3,
+      "to_port": "participation_ratio",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "complex_spectrum",
+      "to_node_id": 3,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "projected_field",
+      "to_node_id": 4,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "time_to_collapse",
+      "to_node_id": 5,
+      "to_port": "time_to_collapse",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "division_rate",
+      "to_node_id": 5,
+      "to_port": "division_rate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "attractor_health",
+      "to_node_id": 5,
+      "to_port": "attractor_health",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "address_entropy",
+      "to_node_id": 5,
+      "to_port": "address_entropy",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "participation_ratio",
+      "to_node_id": 5,
+      "to_port": "participation_ratio",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "address_overlap",
+      "to_node_id": 5,
+      "to_port": "address_overlap",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "stable_address",
+      "to_node_id": 5,
+      "to_port": "stable_address",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "projection_loss",
+      "to_node_id": 5,
+      "to_port": "projection_loss",
+      "learned_weight": 1.0
+    }
+  ]
+}
