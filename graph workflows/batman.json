@@ -1,0 +1,161 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EntropyOceanNode",
+      "pos_x": -989.0,
+      "pos_y": -547.0,
+      "width": 482.0,
+      "height": 413.0,
+      "config": {
+        "inputs": {
+          "drift_speed": "signal",
+          "turbulence": "signal",
+          "complexity": "signal",
+          "center_bias": "signal"
+        },
+        "outputs": {
+          "decoherence_map": "image",
+          "protection_map": "image",
+          "storm_level": "signal"
+        },
+        "input_data": {
+          "drift_speed": [],
+          "turbulence": [
+            99.9161376953125
+          ],
+          "complexity": [],
+          "center_bias": []
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "time": 604.4799999995953,
+        "speed": 0.1,
+        "turb": 2.0,
+        "bias": 0.5
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "EquivalenceNode",
+      "pos_x": -955.0,
+      "pos_y": -99.0,
+      "width": 386.0,
+      "height": 212.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "force_spectrum_out": "spectrum"
+        },
+        "node_title": "Equivalence (E=m*c^2)",
+        "spectrum_size": 512
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "NestedAttractorNode",
+      "pos_x": -436.0,
+      "pos_y": -496.0,
+      "width": 617.0,
+      "height": 555.0,
+      "config": {
+        "inputs": {
+          "phi_input": "complex_spectrum",
+          "noise_seed": "image",
+          "depth": "signal"
+        },
+        "outputs": {
+          "level_0": "image",
+          "level_1": "image",
+          "level_2": "image",
+          "level_3": "image",
+          "deepest_view": "image",
+          "hierarchy_stability": "signal"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "n_levels": 4,
+        "max_levels": 4,
+        "lr_base": 0.05
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "EigenmodeLobeNode",
+      "pos_x": 218.0,
+      "pos_y": -463.0,
+      "width": 393.0,
+      "height": 493.0,
+      "config": {
+        "inputs": {
+          "thickness_modulation": "signal",
+          "geometry_distortion": "image"
+        },
+        "outputs": {
+          "eigenmode_field": "image",
+          "lobe_map": "image",
+          "constraint_density": "image",
+          "lobe_count": "signal",
+          "eigenvalue": "signal"
+        },
+        "node_title": "Eigenmode Lobes (Physics)",
+        "cortical_thickness": 3.0,
+        "aspect_ratio": 2.0,
+        "mode_n": 2,
+        "mode_m": 2,
+        "resolution": 256,
+        "peak_threshold": 0.6,
+        "lobe_count": 6,
+        "eigenvalue": 70.84999891909588,
+        "k": 0.2277
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "decoherence_map",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "decoherence_map",
+      "to_node_id": 2,
+      "to_port": "noise_seed",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "hierarchy_stability",
+      "to_node_id": 0,
+      "to_port": "turbulence",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "deepest_view",
+      "to_node_id": 3,
+      "to_port": "geometry_distortion",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "hierarchy_stability",
+      "to_node_id": 3,
+      "to_port": "thickness_modulation",
+      "learned_weight": 1.0
+    }
+  ]
+}
