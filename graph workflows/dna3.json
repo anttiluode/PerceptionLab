@@ -1,0 +1,320 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 50
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "DisplayNode",
+      "pos_x": 118.0,
+      "pos_y": -615.0,
+      "width": 545.0,
+      "height": 440.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "BreedingArenaNode",
+      "pos_x": -139.0,
+      "pos_y": -355.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "champion_dna": "spectrum"
+        },
+        "outputs": {
+          "arena_view": "image"
+        },
+        "node_title": "Breeding Arena"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "SyntheticEvolutionNode",
+      "pos_x": -388.0,
+      "pos_y": -355.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "seed_dna": "spectrum",
+          "selection_pressure": "signal"
+        },
+        "outputs": {
+          "champion_dna": "spectrum",
+          "dead_dna": "spectrum",
+          "avg_fitness": "signal",
+          "generation": "signal"
+        },
+        "node_title": "Evolution Engine",
+        "pop_size": 32,
+        "dna_len": 128,
+        "gen_counter": 1245,
+        "out_fitness": 1.9575520833333333,
+        "out_gen": 1245.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "SyntheticEvolutionNode",
+      "pos_x": -376.0,
+      "pos_y": -139.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "seed_dna": "spectrum",
+          "selection_pressure": "signal"
+        },
+        "outputs": {
+          "champion_dna": "spectrum",
+          "dead_dna": "spectrum",
+          "avg_fitness": "signal",
+          "generation": "signal"
+        },
+        "node_title": "Evolution Engine",
+        "pop_size": 32,
+        "dna_len": 128,
+        "gen_counter": 1245,
+        "out_fitness": 1.871484375,
+        "out_gen": 1245.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "GenomicNoiseNode",
+      "pos_x": -627.0,
+      "pos_y": -357.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "volatility": "signal",
+          "roughness": "signal"
+        },
+        "outputs": {
+          "dna_spectrum": "spectrum",
+          "value": "signal"
+        },
+        "input_data": {
+          "volatility": [],
+          "roughness": []
+        },
+        "node_title": "Genomic Noise",
+        "length": 128,
+        "out_value": 0.04856735909722662
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "GenomicNoiseNode",
+      "pos_x": -623.0,
+      "pos_y": -131.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "volatility": "signal",
+          "roughness": "signal"
+        },
+        "outputs": {
+          "dna_spectrum": "spectrum",
+          "value": "signal"
+        },
+        "input_data": {
+          "volatility": [],
+          "roughness": []
+        },
+        "node_title": "Genomic Noise",
+        "length": 128,
+        "out_value": 0.047976926734393646
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "MolecularGraveyardNode",
+      "pos_x": -140.0,
+      "pos_y": -570.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "corpse_dna": "spectrum"
+        },
+        "outputs": {
+          "ghost_dna": "spectrum",
+          "entropy_view": "image"
+        },
+        "node_title": "Molecular Graveyard",
+        "memory_size": 50
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 156.0,
+      "pos_y": 54.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 8,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -621.0,
+      "pos_y": -572.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Noise Gen",
+        "w": 160,
+        "h": 120,
+        "noise_type": "quantum",
+        "speed": 0.1,
+        "signal_value": -0.02210756732267416
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 9,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -363.0,
+      "pos_y": -547.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Noise Gen",
+        "w": 160,
+        "h": 120,
+        "noise_type": "perlin",
+        "speed": 0.1,
+        "signal_value": 0.8650700459187817
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 2,
+      "from_port": "champion_dna",
+      "to_node_id": 1,
+      "to_port": "champion_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "arena_view",
+      "to_node_id": 0,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "champion_dna",
+      "to_node_id": 1,
+      "to_port": "champion_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "dna_spectrum",
+      "to_node_id": 2,
+      "to_port": "seed_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "dna_spectrum",
+      "to_node_id": 3,
+      "to_port": "seed_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "dead_dna",
+      "to_node_id": 6,
+      "to_port": "corpse_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "dead_dna",
+      "to_node_id": 6,
+      "to_port": "corpse_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "ghost_dna",
+      "to_node_id": 2,
+      "to_port": "seed_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "ghost_dna",
+      "to_node_id": 3,
+      "to_port": "seed_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "entropy_view",
+      "to_node_id": 7,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "selection_pressure",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "selection_pressure",
+      "learned_weight": 1.0
+    }
+  ]
+}
