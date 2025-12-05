@@ -1,9 +1,10 @@
 """
-Synthetic Evolution Ecosystem (v3 - Architecture Fixed)
--------------------------------------------------------
+Synthetic Evolution Ecosystem (v5 - Auto-Scroll Fixed)
+------------------------------------------------------
 Fixes:
-1. Broadcasting Error: Automatically resizes any input vector to the target DNA length.
-2. API Error: Replaced 'set_output' with 'get_output' pattern used in your working nodes.
+- Breeding Arena now defaults to "Live Feed" (End of history).
+- History recording is more sensitive (captures micro-mutations).
+- Visualization layout improved.
 """
 
 import numpy as np
@@ -26,7 +27,6 @@ def match_size(vector, target_len):
     arr = np.array(vector).flatten()
     if len(arr) == 0: return np.zeros(target_len)
     if len(arr) == target_len: return arr
-    # Resize by tiling
     return np.resize(arr, target_len)
 
 class MiniSolverLite:
@@ -37,12 +37,10 @@ class MiniSolverLite:
 
     def load_dna(self, dna):
         if dna is None or len(dna) == 0: return
-        # Map DNA to phases
         limit = min(len(dna), len(self.phases))
         self.phases[:limit] = dna[:limit] * 2 * np.pi
 
     def evaluate_fitness(self):
-        """Returns (stability_score, stress_score)"""
         n = self.N
         bond_matrix = self.phases[:n*n].reshape(n, n)
         conn = np.cos(bond_matrix)
@@ -55,8 +53,7 @@ class MiniSolverLite:
 
 class SyntheticEvolutionNode(BaseNode):
     """
-    The Engine of Life.
-    Manages a population, runs selection, and produces champions.
+    The Engine of Life. Manages population and selection.
     """
     NODE_CATEGORY = "Artificial Life"
     NODE_COLOR = QtGui.QColor(255, 100, 200) # Hot Pink
@@ -98,12 +95,9 @@ class SyntheticEvolutionNode(BaseNode):
         pressure = self.get_blended_input('selection_pressure', 'sum')
         if pressure is None: pressure = 0.5
         
-        # 2. Inject Seed (Safe Resizing)
+        # 2. Inject Seed
         if seed is not None:
-            # FIX: Resize seed to match population DNA length
             seed_fixed = match_size(seed, self.dna_len)
-            
-            # Replace random 10%
             indices = np.random.choice(self.pop_size, size=int(self.pop_size*0.1))
             for i in indices:
                 self.population[i] = seed_fixed + np.random.randn(self.dna_len) * 0.1
@@ -119,7 +113,6 @@ class SyntheticEvolutionNode(BaseNode):
         best_idx = sorted_idx[0]
         worst_idx = sorted_idx[-1]
         
-        # Update Output Buffers
         self.out_champion = self.population[best_idx].copy()
         self.out_dead = self.population[worst_idx].copy()
         self.out_fitness = float(np.mean(self.fitness_scores))
@@ -156,9 +149,7 @@ class SyntheticEvolutionNode(BaseNode):
 
 
 class FitnessFunctionNode(BaseNode):
-    """
-    Analyzes a DNA vector.
-    """
+    """Analyzes a DNA vector."""
     NODE_CATEGORY = "Artificial Life"
     NODE_COLOR = QtGui.QColor(200, 200, 50) 
 
@@ -192,9 +183,7 @@ class FitnessFunctionNode(BaseNode):
 
 
 class MolecularGraveyardNode(BaseNode):
-    """
-    Recycles dead DNA into Ghost DNA.
-    """
+    """Recycles dead DNA into Ghost DNA."""
     NODE_CATEGORY = "Artificial Life"
     NODE_COLOR = QtGui.QColor(80, 80, 80)
 
@@ -213,7 +202,6 @@ class MolecularGraveyardNode(BaseNode):
         corpse = self.get_blended_input('corpse_dna', 'mean')
         
         if corpse is not None:
-            # FIX: Resize input to match memory
             corpse_fixed = match_size(corpse, 128)
             self.graveyard.append(corpse_fixed)
             if len(self.graveyard) > self.memory_size:
@@ -242,6 +230,7 @@ class MolecularGraveyardNode(BaseNode):
 class BreedingArenaNode(BaseNode):
     """
     Visualizes the top organisms in a grid.
+    Features: Auto-scroll to live generation.
     """
     NODE_CATEGORY = "Artificial Life"
     NODE_COLOR = QtGui.QColor(0, 150, 200)
@@ -249,50 +238,105 @@ class BreedingArenaNode(BaseNode):
     def __init__(self):
         super().__init__()
         self.node_title = "Breeding Arena"
-        self.inputs = {'champion_dna': 'spectrum'}
+        self.inputs = {
+            'champion_dna': 'spectrum',
+            'scroll': 'signal' # 0.0=Oldest, 1.0=Live
+        }
         self.outputs = {'arena_view': 'image'}
         
-        self.hall_of_fame = []
+        self.history_size = 500
+        self.hall_of_fame = [] # List of (dna, generation_index)
         self.display = np.zeros((256, 256, 3), dtype=np.uint8)
+        self.global_gen_counter = 0
 
     def step(self):
         dna = self.get_blended_input('champion_dna', 'mean')
+        scroll = self.get_blended_input('scroll', 'mean')
         
+        # 1. Record History (More sensitive check: 0.001)
         if dna is not None:
             dna_fixed = match_size(dna, 128)
-            # Add to hall of fame if unique
-            if len(self.hall_of_fame) == 0 or not np.allclose(dna_fixed, self.hall_of_fame[-1], atol=0.1):
-                self.hall_of_fame.append(dna_fixed)
-                if len(self.hall_of_fame) > 9:
+            
+            # Check if it's different enough or if it's the first one
+            is_new = False
+            if len(self.hall_of_fame) == 0:
+                is_new = True
+            else:
+                last_dna = self.hall_of_fame[-1][0]
+                # Compare similarity. If distance > threshold, it's a new gene
+                dist = np.mean(np.abs(dna_fixed - last_dna))
+                if dist > 0.001: # 0.1% change is enough to record
+                    is_new = True
+            
+            if is_new:
+                self.hall_of_fame.append( (dna_fixed, self.global_gen_counter) )
+                self.global_gen_counter += 1
+                if len(self.hall_of_fame) > self.history_size:
                     self.hall_of_fame.pop(0)
 
-        # Draw Grid
-        self.display.fill(0)
+        # 2. Determine View Window
+        n_items = len(self.hall_of_fame)
+        if n_items == 0: 
+            self.display.fill(0)
+            return
+
+        # LOGIC FIX: If scroll is None, Force Auto-Scroll (Live View)
+        if scroll is None:
+            start_idx = max(0, n_items - 9)
+        else:
+            # Map 0..1 to index
+            target = int(scroll * (n_items - 9))
+            start_idx = np.clip(target, 0, max(0, n_items - 9))
+        
+        # Get the slice
+        view_slice = self.hall_of_fame[start_idx : start_idx+9]
+
+        # 3. Draw Grid
+        self.display.fill(20) # Dark bg
         cell_w = 256 // 3
         cell_h = 256 // 3
         
-        for idx, gene in enumerate(self.hall_of_fame):
+        for idx, (gene, gen_num) in enumerate(view_slice):
             row = idx // 3
             col = idx % 3
             ox = col * cell_w
             oy = row * cell_h
             center = (ox + cell_w//2, oy + cell_h//2)
             
-            # Simple Radial Glyph
+            # Draw Cell BG
+            cv2.rectangle(self.display, (ox, oy), (ox+cell_w, oy+cell_h), (40,40,40), 1)
+            
+            # Draw Glyph (Miniature Organism)
             pts = []
             for k in range(8):
                 val = gene[k] if k < len(gene) else 0
                 angle = k * (2*np.pi/8)
-                r = 15 + val * 20
+                r = 10 + val * 25
                 px = int(center[0] + r * np.cos(angle))
                 py = int(center[1] + r * np.sin(angle))
                 pts.append((px, py))
             
+            # Draw lines
             for k in range(8):
-                cv2.line(self.display, pts[k], pts[(k+1)%8], (0, 255, 100), 1)
+                cv2.line(self.display, pts[k], pts[(k+1)%8], (0, 255, 150), 1)
+            
+            # Gen Label
+            cv2.putText(self.display, f"#{gen_num}", (ox+5, oy+15), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200,200,200), 1)
+
+        # 4. Scrollbar Indicator
+        if n_items > 9:
+            # Draw a bar on the right side
+            bar_height = max(10, int((9 / n_items) * 256))
+            bar_rel_pos = start_idx / max(1, (n_items - 9))
+            bar_y = int(bar_rel_pos * (256 - bar_height))
+            
+            # Color: Blue if scrolling, Red if Locked Live
+            color = (100, 100, 255) # Red-ish (BGR)
+            if start_idx == max(0, n_items - 9):
+                color = (0, 255, 0) # Green (Live)
                 
-            cv2.putText(self.display, f"Gen {idx}", (ox+5, oy+15), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255,255,255), 1)
+            cv2.rectangle(self.display, (250, bar_y), (256, bar_y+bar_height), color, -1)
 
     def get_output(self, name):
         if name == 'arena_view': return self.display
