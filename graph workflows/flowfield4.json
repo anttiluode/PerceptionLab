@@ -1,0 +1,147 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 43
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EDFLoaderholographicNode",
+      "pos_x": -839.0,
+      "pos_y": -468.0,
+      "width": 285.0,
+      "height": 272.0,
+      "config": {
+        "inputs": {
+          "external_signal": "signal"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image",
+          "dominant_freq": "signal",
+          "spectral_entropy": "signal"
+        },
+        "input_data": {
+          "external_signal": []
+        },
+        "node_title": "EEG\u2192Holo (Occipital)",
+        "edf_file_path": "e:\\docshouse\\450\\1.edf",
+        "selected_region": "Occipital",
+        "window_samples": 128,
+        "freq_bins": 64,
+        "output_mode": "spectrogram",
+        "_last_path": "e:\\docshouse\\450\\1.edf",
+        "_last_region": "Occipital",
+        "fs": 256.0,
+        "current_sample": 14940,
+        "dominant_freq": 0.7525996611745185
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ConsciousnessSpectrumNode",
+      "pos_x": -845.0,
+      "pos_y": -788.0,
+      "width": 762.0,
+      "height": 292.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum",
+          "image_spectrum": "image",
+          "containment_level": "signal"
+        },
+        "outputs": {
+          "mode_occupation": "image",
+          "phase_coherence": "image",
+          "log_polar_view": "image",
+          "eigenmode_spectrum": "spectrum",
+          "address_size": "signal",
+          "coherence_index": "signal",
+          "fast_leak": "signal",
+          "slow_stable": "signal",
+          "dominant_mode": "signal"
+        },
+        "node_title": "Consciousness Spectrum",
+        "num_modes": 16,
+        "history_length": 100,
+        "address_size": 2.7513208365883357,
+        "coherence_index": 0.2035292685031891,
+        "fast_leak": 0.0017246660268442197,
+        "slow_stable": 0.002129410672932863,
+        "dominant_mode": 3
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "RealVAE_2_Node",
+      "pos_x": -495.0,
+      "pos_y": -478.0,
+      "width": 411.0,
+      "height": 281.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "latent_in": "spectrum",
+          "train": "signal",
+          "use_injection": "signal"
+        },
+        "outputs": {
+          "reconstruction": "image",
+          "latent_out": "spectrum",
+          "loss": "signal"
+        },
+        "node_title": "Real VAE (Injectable)",
+        "latent_dim": 16,
+        "img_size": 64,
+        "current_loss": 0.00352350901812315,
+        "training_steps": 3904,
+        "injecting": false
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -806.0,
+      "pos_y": -206.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "complex_spectrum",
+      "to_node_id": 1,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "eigenmode_spectrum",
+      "to_node_id": 2,
+      "to_port": "latent_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "train",
+      "learned_weight": 1.0
+    }
+  ]
+}
