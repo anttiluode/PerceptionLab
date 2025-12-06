@@ -1,0 +1,114 @@
+{
+  "global_settings": {
+    "coupling": 50,
+    "speed": 50
+  },
+  "nodes": [
+    {
+      "id": 1,
+      "class_name": "CoEvolutionNode",
+      "node_title": "Arms Race",
+      "pos_x": 100.0,
+      "pos_y": 50.0,
+      "width": 300.0,
+      "height": 200.0,
+      "config": {
+        "node_title": "Virus vs Antibody"
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ProtocellVisualizerNode",
+      "node_title": "Pathogen View",
+      "pos_x": 450.0,
+      "pos_y": -100.0,
+      "width": 280.0,
+      "height": 280.0,
+      "config": {
+        "node_title": "Evolved Pathogen"
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "ProtocellVisualizerNode",
+      "node_title": "Antibody View",
+      "pos_x": 450.0,
+      "pos_y": 200.0,
+      "width": 280.0,
+      "height": 280.0,
+      "config": {
+        "node_title": "Evolved Antibody"
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "DisplayNode",
+      "node_title": "Battle Display",
+      "pos_x": 750.0,
+      "pos_y": 50.0,
+      "width": 300.0,
+      "height": 200.0,
+      "config": {
+        "node_title": "Arms Race View"
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "SignalOscillatorNode",
+      "node_title": "Mutation Pressure",
+      "pos_x": -150.0,
+      "pos_y": 50.0,
+      "width": 180.0,
+      "height": 120.0,
+      "config": {
+        "node_title": "Mutation Waves",
+        "base_frequency": 0.05,
+        "base_amplitude": 0.3
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "pathogen_dna",
+      "to_node_id": 2,
+      "to_port": "dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "antibody_dna",
+      "to_node_id": 3,
+      "to_port": "dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "battle_view",
+      "to_node_id": 4,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "mutation_rate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "arms_race_index",
+      "to_node_id": 2,
+      "to_port": "stress",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "arms_race_index",
+      "to_node_id": 3,
+      "to_port": "stress",
+      "learned_weight": 1.0
+    }
+  ]
+}

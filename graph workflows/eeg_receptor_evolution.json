@@ -1,0 +1,160 @@
+{
+  "global_settings": {
+    "coupling": 50,
+    "speed": 45
+  },
+  "nodes": [
+    {
+      "id": 1,
+      "class_name": "EEGReceptorNode",
+      "node_title": "Brain Shape",
+      "pos_x": -200.0,
+      "pos_y": 0.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "node_title": "Your Brain as Shape"
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "ShapeEvolutionNode",
+      "node_title": "Receptor Evolution",
+      "pos_x": 100.0,
+      "pos_y": 50.0,
+      "width": 280.0,
+      "height": 200.0,
+      "config": {
+        "node_title": "Evolving Neural Receptors"
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "ShapeFitnessNode",
+      "node_title": "Binding Test",
+      "pos_x": 100.0,
+      "pos_y": -150.0,
+      "width": 180.0,
+      "height": 180.0,
+      "config": {
+        "node_title": "Brain-Receptor Fit"
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "ProtocellVisualizerNode",
+      "node_title": "Champion Receptor",
+      "pos_x": 450.0,
+      "pos_y": -50.0,
+      "width": 280.0,
+      "height": 280.0,
+      "config": {
+        "node_title": "Neural Receptor Shape"
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "DisplayNode",
+      "node_title": "Display",
+      "pos_x": 750.0,
+      "pos_y": 0.0,
+      "width": 300.0,
+      "height": 300.0,
+      "config": {
+        "node_title": "Consciousness Antenna"
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "SignalOscillatorNode",
+      "node_title": "Alpha Proxy",
+      "pos_x": -450.0,
+      "pos_y": -50.0,
+      "width": 180.0,
+      "height": 120.0,
+      "config": {
+        "node_title": "Simulated Alpha (10Hz)",
+        "base_frequency": 10.0,
+        "base_amplitude": 0.8
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "GenomicNoiseNode",
+      "node_title": "Neural Noise",
+      "pos_x": -450.0,
+      "pos_y": 100.0,
+      "width": 180.0,
+      "height": 120.0,
+      "config": {
+        "node_title": "1/f Brain Noise"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "_comment": "Brain shape becomes evolution target",
+      "from_node_id": 1,
+      "from_port": "brain_shape_dna",
+      "to_node_id": 2,
+      "to_port": "target_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "_comment": "Compare champion to brain shape",
+      "from_node_id": 2,
+      "from_port": "champion_dna",
+      "to_node_id": 3,
+      "to_port": "organism_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "_comment": "Target for fitness comparison",
+      "from_node_id": 1,
+      "from_port": "brain_shape_dna",
+      "to_node_id": 3,
+      "to_port": "target_dna",
+      "learned_weight": 1.0
+    },
+    {
+      "_comment": "Visualize evolved receptor",
+      "from_node_id": 2,
+      "from_port": "champion_dna",
+      "to_node_id": 4,
+      "to_port": "dna",
+      "learned_weight": 1.0
+    },
+    {
+      "_comment": "Display the receptor",
+      "from_node_id": 4,
+      "from_port": "cell_view",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "_comment": "Alpha oscillation to brain noise",
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 7,
+      "to_port": "volatility",
+      "learned_weight": 1.0
+    },
+    {
+      "_comment": "Brain noise creates dynamic target",
+      "from_node_id": 7,
+      "from_port": "dna_spectrum",
+      "to_node_id": 1,
+      "to_port": "eeg_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "_comment": "Fitness affects cell stress visualization",
+      "from_node_id": 3,
+      "from_port": "fitness",
+      "to_node_id": 4,
+      "to_port": "energy",
+      "learned_weight": 1.0
+    }
+  ]
+}
