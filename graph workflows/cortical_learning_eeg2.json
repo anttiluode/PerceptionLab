@@ -1,0 +1,543 @@
+{
+  "global_settings": {
+    "coupling": 80,
+    "speed": 50
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": -900.0,
+      "pos_y": -150.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "raw_signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG (Occipital)",
+        "edf_file_path": "e:\\docshouse\\450\\1.edf",
+        "selected_region": "Occipital",
+        "_last_path": "e:\\docshouse\\450\\1.edf",
+        "_last_region": "Occipital",
+        "fs": 100.0,
+        "current_time": 45.96666666666662,
+        "window_size": 1.0,
+        "output_powers": {
+          "delta": 4.726370017397027e-10,
+          "theta": 2.673872420942983e-10,
+          "alpha": 2.7764223022413807e-10,
+          "beta": 1.492686156797638e-10,
+          "gamma": 1.1804419566826157e-11,
+          "raw_signal": 8.886314983786974e-06
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "EEGProcessorNode",
+      "pos_x": -650.0,
+      "pos_y": -150.0,
+      "width": 180.0,
+      "height": 160.0,
+      "config": {
+        "inputs": {
+          "delta_in": "signal",
+          "theta_in": "signal",
+          "alpha_in": "signal",
+          "beta_in": "signal",
+          "gamma_in": "signal",
+          "raw_in": "signal",
+          "scale_mod": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum",
+          "delta_out": "signal",
+          "theta_out": "signal",
+          "alpha_out": "signal",
+          "beta_out": "signal",
+          "gamma_out": "signal",
+          "raw_out": "signal"
+        },
+        "input_data": {
+          "delta_in": [
+            3.39597417044668e-10
+          ],
+          "theta_in": [
+            2.1279405994873542e-10
+          ],
+          "alpha_in": [
+            2.235621577581763e-10
+          ],
+          "beta_in": [
+            1.2076897114441847e-10
+          ],
+          "gamma_in": [
+            9.49114556819248e-12
+          ],
+          "raw_in": [],
+          "scale_mod": []
+        },
+        "node_title": "EEG \u00e2\u2020\u2019 Vector",
+        "base_scale": 1000000000000
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "CorticalSubstrateNode",
+      "pos_x": -400.0,
+      "pos_y": -200.0,
+      "width": 280.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "activity_pattern": "spectrum",
+          "plasticity_signal": "signal",
+          "external_geometry": "spectrum"
+        },
+        "outputs": {
+          "eigenmodes": "tensor",
+          "eigenvalues": "spectrum",
+          "laplacian": "tensor",
+          "connectivity": "tensor",
+          "positions": "tensor",
+          "geometry_view": "image"
+        },
+        "node_title": "Simulated Cortex",
+        "n_nodes": 64,
+        "n_modes": 16,
+        "geometry_plasticity_rate": 0.001,
+        "connection_decay": 0.9999,
+        "min_connection": 0.01,
+        "max_connection": 2.0,
+        "step_count": 3180
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "ResonantProcessingNode",
+      "pos_x": -101.0,
+      "pos_y": -193.0,
+      "width": 220.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "input_signal": "spectrum",
+          "eigenmodes": "tensor",
+          "eigenvalues": "spectrum",
+          "gain_modulation": "spectrum",
+          "learning_signal": "signal"
+        },
+        "outputs": {
+          "output_signal": "spectrum",
+          "mode_activations": "spectrum",
+          "resonance_energy": "signal",
+          "processing_view": "image"
+        },
+        "node_title": "Eigenmode Activation",
+        "n_modes": 16,
+        "activation_tau": 0.9,
+        "learning_rate": 0.01,
+        "resonance_energy": 4358815.328826438
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "PredictiveCodingNode",
+      "pos_x": 143.0,
+      "pos_y": -191.0,
+      "width": 220.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "sensory_input": "spectrum",
+          "top_down_prediction": "spectrum",
+          "mode_activations": "spectrum"
+        },
+        "outputs": {
+          "prediction_error": "spectrum",
+          "prediction": "spectrum",
+          "free_energy": "signal",
+          "learn_trigger": "signal",
+          "prediction_view": "image"
+        },
+        "node_title": "Prediction & Error",
+        "free_energy": NaN,
+        "prediction_horizon": 1,
+        "model_learning_rate": 0.05
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "GeometryLearnerNode",
+      "pos_x": -170.0,
+      "pos_y": 147.0,
+      "width": 220.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "connectivity": "tensor",
+          "activity_pattern": "spectrum",
+          "prediction_error": "spectrum",
+          "free_energy": "signal"
+        },
+        "outputs": {
+          "modified_connectivity": "tensor",
+          "growth_signal": "spectrum",
+          "prune_signal": "spectrum",
+          "geometry_delta": "signal",
+          "learner_view": "image"
+        },
+        "node_title": "Developmental Learning",
+        "growth_rate": 0.0001,
+        "prune_threshold": 0.05,
+        "activity_threshold": 0.1,
+        "step_count": 3180,
+        "last_geometry_delta": 7.606246055307294e+43
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "LearningMonitorNode",
+      "pos_x": 85.0,
+      "pos_y": 144.0,
+      "width": 200.0,
+      "height": 214.0,
+      "config": {
+        "inputs": {
+          "free_energy": "signal",
+          "geometry_delta": "signal",
+          "resonance_energy": "signal",
+          "eigenvalues": "spectrum"
+        },
+        "outputs": {
+          "learning_quality": "signal",
+          "monitor_view": "image"
+        },
+        "node_title": "Learning Progress"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "FractalAntenna2Node",
+      "pos_x": -691.0,
+      "pos_y": 101.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "dna_in": "spectrum",
+          "field_in": "image"
+        },
+        "outputs": {
+          "reception_strength": "signal",
+          "antenna_view": "image",
+          "tuned_signal": "spectrum"
+        },
+        "node_title": "Your EEG Shape",
+        "points": []
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 8,
+      "class_name": "HolographicFFTNode",
+      "pos_x": -690.0,
+      "pos_y": 358.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "EEG Folds"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 9,
+      "class_name": "HolographicFFTNode",
+      "pos_x": -400.0,
+      "pos_y": 150.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Cortex Folds"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 10,
+      "class_name": "DisplayNode",
+      "pos_x": -361.0,
+      "pos_y": 356.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 11,
+      "class_name": "DisplayNode",
+      "pos_x": 313.0,
+      "pos_y": 147.0,
+      "width": 328.0,
+      "height": 372.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 12,
+      "class_name": "DisplayNode",
+      "pos_x": 376.0,
+      "pos_y": -195.0,
+      "width": 315.0,
+      "height": 343.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "delta",
+      "to_node_id": 1,
+      "to_port": "delta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta",
+      "to_node_id": 1,
+      "to_port": "theta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha",
+      "to_node_id": 1,
+      "to_port": "alpha_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta",
+      "to_node_id": 1,
+      "to_port": "beta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma",
+      "to_node_id": 1,
+      "to_port": "gamma_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "latent_out",
+      "to_node_id": 2,
+      "to_port": "activity_pattern",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "latent_out",
+      "to_node_id": 7,
+      "to_port": "dna_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "eigenmodes",
+      "to_node_id": 3,
+      "to_port": "eigenmodes",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "eigenvalues",
+      "to_node_id": 3,
+      "to_port": "eigenvalues",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "latent_out",
+      "to_node_id": 3,
+      "to_port": "input_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "output_signal",
+      "to_node_id": 4,
+      "to_port": "sensory_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_activations",
+      "to_node_id": 4,
+      "to_port": "mode_activations",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "learn_trigger",
+      "to_node_id": 3,
+      "to_port": "learning_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "connectivity",
+      "to_node_id": 5,
+      "to_port": "connectivity",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "output_signal",
+      "to_node_id": 5,
+      "to_port": "activity_pattern",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "prediction_error",
+      "to_node_id": 5,
+      "to_port": "prediction_error",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "free_energy",
+      "to_node_id": 5,
+      "to_port": "free_energy",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "free_energy",
+      "to_node_id": 6,
+      "to_port": "free_energy",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "geometry_delta",
+      "to_node_id": 6,
+      "to_port": "geometry_delta",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "resonance_energy",
+      "to_node_id": 6,
+      "to_port": "resonance_energy",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "eigenvalues",
+      "to_node_id": 6,
+      "to_port": "eigenvalues",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "antenna_view",
+      "to_node_id": 8,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "geometry_view",
+      "to_node_id": 9,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "growth_signal",
+      "to_node_id": 2,
+      "to_port": "plasticity_signal",
+      "learned_weight": 0.1
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "antenna_view",
+      "to_node_id": 10,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "monitor_view",
+      "to_node_id": 11,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "monitor_view",
+      "to_node_id": 11,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "prediction_view",
+      "to_node_id": 12,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
