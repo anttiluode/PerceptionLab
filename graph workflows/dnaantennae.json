@@ -1,0 +1,226 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 16
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "GenomicNoiseNode",
+      "pos_x": -831.0,
+      "pos_y": -754.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "volatility": "signal",
+          "roughness": "signal"
+        },
+        "outputs": {
+          "dna_spectrum": "spectrum",
+          "value": "signal"
+        },
+        "input_data": {
+          "volatility": [],
+          "roughness": []
+        },
+        "node_title": "Genomic Noise",
+        "length": 128,
+        "out_value": 0.057407335111046634
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "FractalAntenna2Node",
+      "pos_x": -827.0,
+      "pos_y": -553.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "dna_in": "spectrum",
+          "field_in": "image"
+        },
+        "outputs": {
+          "reception_strength": "signal",
+          "antenna_view": "image",
+          "tuned_signal": "spectrum"
+        },
+        "node_title": "Fractal Antenna",
+        "points": []
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "HolographicFFTNode",
+      "pos_x": -552.0,
+      "pos_y": -709.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "DisplayNode",
+      "pos_x": -551.0,
+      "pos_y": -504.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "FieldEcosystemNode",
+      "pos_x": -836.0,
+      "pos_y": -362.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "external_signal": "spectrum",
+          "mutation_rate": "signal"
+        },
+        "outputs": {
+          "best_receiver_dna": "spectrum",
+          "best_transmitter_dna": "spectrum",
+          "ecosystem_view": "image",
+          "avg_coupling": "signal",
+          "generation": "signal"
+        },
+        "node_title": "Field Ecosystem",
+        "pop_size": 16,
+        "dna_len": 32,
+        "gen": 47,
+        "time": 78.99999999999979
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "DisplayNode",
+      "pos_x": -555.0,
+      "pos_y": -312.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "AntennaFieldNode",
+      "pos_x": -303.0,
+      "pos_y": -314.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "dna": "spectrum",
+          "frequency": "signal"
+        },
+        "outputs": {
+          "field_view": "image",
+          "bandwidth": "signal",
+          "directivity": "signal"
+        },
+        "node_title": "Antenna Field",
+        "time": 9.199999999999983,
+        "bandwidth": 9.0,
+        "directivity": 0.4742802679538727
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "DisplayNode",
+      "pos_x": -298.0,
+      "pos_y": -693.0,
+      "width": 463.0,
+      "height": 348.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "dna_spectrum",
+      "to_node_id": 1,
+      "to_port": "dna_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "antenna_view",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "antenna_view",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "dna_spectrum",
+      "to_node_id": 4,
+      "to_port": "external_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "ecosystem_view",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "best_transmitter_dna",
+      "to_node_id": 6,
+      "to_port": "dna",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "field_view",
+      "to_node_id": 7,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
