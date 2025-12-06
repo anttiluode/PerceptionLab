@@ -32,19 +32,19 @@
         },
         "input_data": {
           "delta_in": [
-            2.4709983810445247e-11
+            2.3892271618320927e-10
           ],
           "theta_in": [
-            8.141239813348388e-12
+            1.389919407762724e-10
           ],
           "alpha_in": [
-            7.084836785661447e-12
+            7.1363857342589e-11
           ],
           "beta_in": [
-            1.6295579041539235e-11
+            5.4249712032675937e-11
           ],
           "gamma_in": [
-            9.682587128742246e-12
+            1.1657062798082872e-11
           ],
           "raw_in": [],
           "scale_mod": []
@@ -82,7 +82,7 @@
         "connection_decay": 0.9999,
         "min_connection": 0.01,
         "max_connection": 2.0,
-        "step_count": 12013
+        "step_count": 25895
       },
       "custom_state_file": null
     },
@@ -111,7 +111,7 @@
         "n_modes": 16,
         "activation_tau": 0.9,
         "learning_rate": 0.01,
-        "resonance_energy": 0.5692757017903431
+        "resonance_energy": 1.4115101256915756
       },
       "custom_state_file": null
     },
@@ -136,7 +136,7 @@
           "prediction_view": "image"
         },
         "node_title": "Prediction & Error",
-        "free_energy": NaN,
+        "free_energy": 0.0006136414979043504,
         "prediction_horizon": 1,
         "model_learning_rate": 0.05
       },
@@ -167,8 +167,8 @@
         "growth_rate": 0.0001,
         "prune_threshold": 0.05,
         "activity_threshold": 0.1,
-        "step_count": 12013,
-        "last_geometry_delta": 1.6669899818103338e+55
+        "step_count": 25895,
+        "last_geometry_delta": 9.62374245953348e-05
       },
       "custom_state_file": null
     },
@@ -238,26 +238,6 @@
     },
     {
       "id": 8,
-      "class_name": "HolographicFFTNode",
-      "pos_x": -400.0,
-      "pos_y": 150.0,
-      "width": 200.0,
-      "height": 180.0,
-      "config": {
-        "inputs": {
-          "image_in": "image"
-        },
-        "outputs": {
-          "complex_spectrum": "complex_spectrum",
-          "magnitude_view": "image",
-          "phase_view": "image"
-        },
-        "node_title": "Cortex Folds"
-      },
-      "custom_state_file": null
-    },
-    {
-      "id": 9,
       "class_name": "DisplayNode",
       "pos_x": -361.0,
       "pos_y": 356.0,
@@ -273,7 +253,7 @@
       "custom_state_file": null
     },
     {
-      "id": 10,
+      "id": 9,
       "class_name": "DisplayNode",
       "pos_x": 313.0,
       "pos_y": 147.0,
@@ -289,7 +269,7 @@
       "custom_state_file": null
     },
     {
-      "id": 11,
+      "id": 10,
       "class_name": "DisplayNode",
       "pos_x": 376.0,
       "pos_y": -195.0,
@@ -305,7 +285,7 @@
       "custom_state_file": null
     },
     {
-      "id": 12,
+      "id": 11,
       "class_name": "DisplayNode",
       "pos_x": -75.0,
       "pos_y": 321.0,
@@ -321,7 +301,7 @@
       "custom_state_file": null
     },
     {
-      "id": 13,
+      "id": 12,
       "class_name": "EEGFileSourceNode",
       "pos_x": -911.0,
       "pos_y": -148.0,
@@ -339,21 +319,37 @@
         },
         "input_data": {},
         "node_title": "EEG (All)",
-        "edf_file_path": "e:\\docshouse\\450\\2.edf",
+        "edf_file_path": "e:\\docshouse\\450\\1.edf",
         "selected_region": "All",
-        "_last_path": "e:\\docshouse\\450\\2.edf",
+        "_last_path": "e:\\docshouse\\450\\1.edf",
         "_last_region": "All",
         "fs": 100.0,
-        "current_time": 96.8333333333304,
+        "current_time": 28.93333333333393,
         "window_size": 1.0,
         "output_powers": {
-          "delta": 3.00260113972935e-11,
-          "theta": 9.69472035997963e-12,
-          "alpha": 8.867029855936532e-12,
-          "beta": 2.023599143161584e-11,
-          "gamma": 1.1987422466207338e-11,
-          "raw_signal": 9.917934897601553e-05
+          "delta": 3.7621871904405586e-10,
+          "theta": 1.6066496550123798e-10,
+          "alpha": 8.327855643574252e-11,
+          "beta": 6.741069540888067e-11,
+          "gamma": 1.42709477951441e-11,
+          "raw_signal": 0.00020750668433412346
         }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 13,
+      "class_name": "DisplayNode",
+      "pos_x": -416.0,
+      "pos_y": 97.0,
+      "width": 225.0,
+      "height": 243.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
       },
       "custom_state_file": null
     }
@@ -479,13 +475,6 @@
       "learned_weight": 1.0
     },
     {
-      "from_node_id": 1,
-      "from_port": "geometry_view",
-      "to_node_id": 8,
-      "to_port": "image_in",
-      "learned_weight": 1.0
-    },
-    {
       "from_node_id": 4,
       "from_port": "growth_signal",
       "to_node_id": 1,
@@ -495,6 +484,13 @@
     {
       "from_node_id": 6,
       "from_port": "antenna_view",
+      "to_node_id": 8,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "monitor_view",
       "to_node_id": 9,
       "to_port": "image_in",
       "learned_weight": 1.0
@@ -502,64 +498,64 @@
     {
       "from_node_id": 5,
       "from_port": "monitor_view",
-      "to_node_id": 10,
-      "to_port": "image_in",
-      "learned_weight": 1.0
-    },
-    {
-      "from_node_id": 5,
-      "from_port": "monitor_view",
-      "to_node_id": 10,
+      "to_node_id": 9,
       "to_port": "image_in",
       "learned_weight": 1.0
     },
     {
       "from_node_id": 3,
       "from_port": "prediction_view",
-      "to_node_id": 11,
+      "to_node_id": 10,
       "to_port": "image_in",
       "learned_weight": 1.0
     },
     {
       "from_node_id": 2,
       "from_port": "processing_view",
-      "to_node_id": 12,
+      "to_node_id": 11,
       "to_port": "image_in",
       "learned_weight": 1.0
     },
     {
-      "from_node_id": 13,
+      "from_node_id": 12,
       "from_port": "theta",
       "to_node_id": 0,
       "to_port": "theta_in",
       "learned_weight": 1.0
     },
     {
-      "from_node_id": 13,
+      "from_node_id": 12,
       "from_port": "alpha",
       "to_node_id": 0,
       "to_port": "alpha_in",
       "learned_weight": 1.0
     },
     {
-      "from_node_id": 13,
+      "from_node_id": 12,
       "from_port": "beta",
       "to_node_id": 0,
       "to_port": "beta_in",
       "learned_weight": 1.0
     },
     {
-      "from_node_id": 13,
+      "from_node_id": 12,
       "from_port": "gamma",
       "to_node_id": 0,
       "to_port": "gamma_in",
       "learned_weight": 1.0
     },
     {
-      "from_node_id": 13,
+      "from_node_id": 12,
       "from_port": "delta",
       "to_node_id": 0,
       "to_port": "delta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "geometry_view",
+      "to_node_id": 13,
+      "to_port": "image_in",
       "learned_weight": 1.0
     }
   ]
