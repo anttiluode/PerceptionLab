@@ -1,0 +1,463 @@
+{
+  "global_settings": {
+    "coupling": 50,
+    "speed": 50
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": -580.0,
+      "pos_y": -150.0,
+      "width": 300.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "alpha": "signal",
+          "theta": "signal",
+          "gamma": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG (Frontal)",
+        "edf_file_path": "e:\\docshouse\\450\\3.edf",
+        "selected_region": "Frontal",
+        "_last_path": "e:\\docshouse\\450\\3.edf",
+        "_last_region": "Frontal",
+        "fs": 100.0,
+        "current_time": 35.86666666666719,
+        "window_size": 1.0,
+        "output_powers": {
+          "delta": 0.0,
+          "theta": 1.691292141201556e-11,
+          "alpha": 1.6397541242749992e-11,
+          "beta": 0.0,
+          "gamma": 5.864044154679562e-12,
+          "raw_signal": -6.906594364253631e-05
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "SignalAmplifierNode",
+      "pos_x": -200.0,
+      "pos_y": -300.0,
+      "width": 150.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            8.786627529127423e-12
+          ]
+        },
+        "node_title": "X Drive (Alpha)",
+        "gain": 5000000.0,
+        "output_value": 4.393313764563712e-05
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "SignalAmplifierNode",
+      "pos_x": -200.0,
+      "pos_y": -150.0,
+      "width": 150.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            7.838265524825326e-12
+          ]
+        },
+        "node_title": "Y Drive (Theta)",
+        "gain": 5000000.0,
+        "output_value": 3.919132762412663e-05
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "EEGProcessorNode",
+      "pos_x": -670.0,
+      "pos_y": -480.0,
+      "width": 370.0,
+      "height": 187.0,
+      "config": {
+        "inputs": {
+          "delta_in": "signal",
+          "theta_in": "signal",
+          "alpha_in": "signal",
+          "beta_in": "signal",
+          "gamma_in": "signal",
+          "raw_in": "signal",
+          "scale_mod": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum",
+          "delta_out": "signal",
+          "theta_out": "signal",
+          "alpha_out": "signal",
+          "beta_out": "signal",
+          "gamma_out": "signal",
+          "raw_out": "signal"
+        },
+        "input_data": {
+          "delta_in": [
+            0.0
+          ],
+          "theta_in": [
+            7.838265524825326e-12
+          ],
+          "alpha_in": [
+            8.786627529127423e-12
+          ],
+          "beta_in": [
+            0.0
+          ],
+          "gamma_in": [
+            2.9532163656283395e-12
+          ],
+          "raw_in": [],
+          "scale_mod": []
+        },
+        "node_title": "EEG Processor",
+        "base_scale": 10000000
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "SignalSpaceManifoldNode2",
+      "pos_x": -230.0,
+      "pos_y": -686.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "manifold_view": "image",
+          "entropy": "signal",
+          "eigen_1": "signal",
+          "eigen_2": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            3.933242987841368e-05
+          ]
+        },
+        "node_title": "Base Node",
+        "window_size": 60,
+        "history_len": 200,
+        "image_size": 256
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "SignalSpaceManifoldNode2",
+      "pos_x": -229.0,
+      "pos_y": -495.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "manifold_view": "image",
+          "entropy": "signal",
+          "eigen_1": "signal",
+          "eigen_2": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            4.571030513034202e-05
+          ]
+        },
+        "node_title": "Base Node",
+        "window_size": 60,
+        "history_len": 200,
+        "image_size": 256
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "SignalSpaceManifoldNode2",
+      "pos_x": -5.0,
+      "pos_y": -171.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "manifold_view": "image",
+          "entropy": "signal",
+          "eigen_1": "signal",
+          "eigen_2": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            1.5172997336776461e-05
+          ]
+        },
+        "node_title": "Base Node",
+        "window_size": 60,
+        "history_len": 200,
+        "image_size": 256
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": -3.0,
+      "pos_y": -448.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "input_data": {
+          "latent_base": [],
+          "in_0": [
+            -0.0005905682407811703
+          ],
+          "in_1": [
+            4.434829877864939e-05
+          ],
+          "in_2": [
+            -2.1492094525730735e-05
+          ],
+          "in_3": [
+            -1.5778371522526546e-05
+          ],
+          "in_4": [
+            2.972081956470874e-05
+          ],
+          "in_5": [
+            5.667356283655805e-06
+          ],
+          "in_6": [
+            0.0
+          ],
+          "in_7": [
+            0.0
+          ],
+          "in_8": [],
+          "in_9": [],
+          "in_10": [],
+          "in_11": [],
+          "in_12": [],
+          "in_13": [],
+          "in_14": [],
+          "in_15": []
+        },
+        "node_title": "Latent Assembler",
+        "latent_dim": 16
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 8,
+      "class_name": "SignalSpaceManifoldNode2",
+      "pos_x": -19.0,
+      "pos_y": -621.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "manifold_view": "image",
+          "entropy": "signal",
+          "eigen_1": "signal",
+          "eigen_2": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            0.0
+          ]
+        },
+        "node_title": "Base Node",
+        "window_size": 60,
+        "history_len": 200,
+        "image_size": 256
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "alpha",
+      "to_node_id": 1,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta",
+      "to_node_id": 2,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha",
+      "to_node_id": 3,
+      "to_port": "alpha_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta",
+      "to_node_id": 3,
+      "to_port": "theta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "delta",
+      "to_node_id": 3,
+      "to_port": "delta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta",
+      "to_node_id": 3,
+      "to_port": "beta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma",
+      "to_node_id": 3,
+      "to_port": "gamma_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "theta_out",
+      "to_node_id": 4,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "alpha_out",
+      "to_node_id": 5,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "gamma_out",
+      "to_node_id": 6,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "eigen_1",
+      "to_node_id": 7,
+      "to_port": "in_0",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "eigen_2",
+      "to_node_id": 7,
+      "to_port": "in_1",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "eigen_1",
+      "to_node_id": 7,
+      "to_port": "in_2",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "eigen_2",
+      "to_node_id": 7,
+      "to_port": "in_3",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "eigen_1",
+      "to_node_id": 7,
+      "to_port": "in_4",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "eigen_2",
+      "to_node_id": 7,
+      "to_port": "in_5",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "beta_out",
+      "to_node_id": 8,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "eigen_1",
+      "to_node_id": 7,
+      "to_port": "in_6",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "eigen_2",
+      "to_node_id": 7,
+      "to_port": "in_7",
+      "learned_weight": 1.0
+    }
+  ]
+}

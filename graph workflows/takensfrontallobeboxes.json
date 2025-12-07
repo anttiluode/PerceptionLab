@@ -1,0 +1,311 @@
+{
+  "global_settings": {
+    "coupling": 50,
+    "speed": 50
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": -580.0,
+      "pos_y": -150.0,
+      "width": 300.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "alpha": "signal",
+          "theta": "signal",
+          "gamma": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG (Frontal)",
+        "edf_file_path": "e:\\docshouse\\450\\3.edf",
+        "selected_region": "Frontal",
+        "_last_path": "e:\\docshouse\\450\\3.edf",
+        "_last_region": "Frontal",
+        "fs": 100.0,
+        "current_time": 70.06666666666526,
+        "window_size": 1.0,
+        "output_powers": {
+          "delta": 0.0,
+          "theta": 4.067861716213424e-11,
+          "alpha": 8.172852438435971e-12,
+          "beta": 0.0,
+          "gamma": 4.771594747255957e-12,
+          "raw_signal": 8.160428511848622e-05
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "SignalAmplifierNode",
+      "pos_x": -200.0,
+      "pos_y": -300.0,
+      "width": 150.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            4.367418469737437e-12
+          ]
+        },
+        "node_title": "X Drive (Alpha)",
+        "gain": 5000000.0,
+        "output_value": 2.1837092348687184e-05
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "SignalAmplifierNode",
+      "pos_x": -200.0,
+      "pos_y": -150.0,
+      "width": 150.0,
+      "height": 100.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            2.323879782733743e-11
+          ]
+        },
+        "node_title": "Y Drive (Theta)",
+        "gain": 5000000.0,
+        "output_value": 0.00011619398913668715
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "EEGProcessorNode",
+      "pos_x": -651.0,
+      "pos_y": -523.0,
+      "width": 370.0,
+      "height": 187.0,
+      "config": {
+        "inputs": {
+          "delta_in": "signal",
+          "theta_in": "signal",
+          "alpha_in": "signal",
+          "beta_in": "signal",
+          "gamma_in": "signal",
+          "raw_in": "signal",
+          "scale_mod": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum",
+          "delta_out": "signal",
+          "theta_out": "signal",
+          "alpha_out": "signal",
+          "beta_out": "signal",
+          "gamma_out": "signal",
+          "raw_out": "signal"
+        },
+        "input_data": {
+          "delta_in": [
+            0.0
+          ],
+          "theta_in": [
+            2.323879782733743e-11
+          ],
+          "alpha_in": [
+            4.367418469737437e-12
+          ],
+          "beta_in": [
+            0.0
+          ],
+          "gamma_in": [
+            2.3588985938575942e-12
+          ],
+          "raw_in": [],
+          "scale_mod": []
+        },
+        "node_title": "EEG Processor",
+        "base_scale": 10000000
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "PhaseSpaceNode2",
+      "pos_x": 14.0,
+      "pos_y": -340.0,
+      "width": 332.0,
+      "height": 364.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "phase_plot": "image"
+        },
+        "input_data": {
+          "signal_in": [
+            0.00013952686276752502
+          ]
+        },
+        "node_title": "Base Node",
+        "history_len": 1000,
+        "delay": 15,
+        "image_size": 256
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "PhaseSpaceNode2",
+      "pos_x": -189.0,
+      "pos_y": -696.0,
+      "width": 274.0,
+      "height": 322.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal"
+        },
+        "outputs": {
+          "phase_plot": "image"
+        },
+        "input_data": {
+          "signal_in": [
+            2.3076097932062112e-05
+          ]
+        },
+        "node_title": "Base Node",
+        "history_len": 1000,
+        "delay": 15,
+        "image_size": 256
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "ComplexInterferenceNode",
+      "pos_x": 661.0,
+      "pos_y": -448.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_a": "complex_spectrum",
+          "complex_b": "complex_spectrum",
+          "mode_select": "signal",
+          "mix_ratio": "signal"
+        },
+        "outputs": {
+          "interference_out": "complex_spectrum",
+          "magnitude_view": "image"
+        },
+        "input_data": {
+          "complex_a": [],
+          "complex_b": [],
+          "mode_select": [],
+          "mix_ratio": []
+        },
+        "node_title": "Base Node",
+        "size": 256
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "DisplayNode",
+      "pos_x": 919.0,
+      "pos_y": -446.0,
+      "width": 304.0,
+      "height": 398.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "alpha",
+      "to_node_id": 1,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta",
+      "to_node_id": 2,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha",
+      "to_node_id": 3,
+      "to_port": "alpha_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta",
+      "to_node_id": 3,
+      "to_port": "theta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "delta",
+      "to_node_id": 3,
+      "to_port": "delta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta",
+      "to_node_id": 3,
+      "to_port": "beta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma",
+      "to_node_id": 3,
+      "to_port": "gamma_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "theta_out",
+      "to_node_id": 4,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "alpha_out",
+      "to_node_id": 5,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "magnitude_view",
+      "to_node_id": 7,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
