@@ -49,7 +49,9 @@ class BrainSamplerNode(BaseNode):
             'sample_snapshot': 'image',   # Current sample visualization
             'sample_trigger': 'signal',   # 1.0 when sampling, 0.0 when holding
             'attractor_state': 'signal',  # Box/Star classification
-            'sample_stream': 'spectrum'   # History of samples
+            'sample_stream': 'spectrum',  # History of samples
+            'spatial_field': 'image',     # The filtered spatial pattern (the "sun")
+            'complex_field': 'complex_spectrum'  # Complex FFT for interference
         }
         
         # Config
@@ -62,6 +64,10 @@ class BrainSamplerNode(BaseNode):
         self.eeg_history = deque(maxlen=self.buffer_len)
         self.last_phase_point = (0.0, 0.0)
         self.sample_buffer = []  # List of captured samples
+        
+        # Current sample outputs
+        self.current_spatial_field = None  # The raw spatial pattern
+        self.current_complex_field = None  # FFT of spatial for interference
         
         # Visualization
         self.current_sample_viz = np.zeros((200, 300, 3), dtype=np.uint8)
@@ -189,6 +195,22 @@ class BrainSamplerNode(BaseNode):
         if np.max(np.abs(spatial_map)) > 1e-9:
             spatial_map = spatial_map / np.max(np.abs(spatial_map))
         
+        # STORE spatial field for output
+        self.current_spatial_field = spatial_map
+        
+        # COMPUTE complex FFT for interference
+        # Pad to power of 2 for efficiency
+        target_size = 64
+        if spatial_map.shape[0] < target_size:
+            padded = np.zeros((target_size, target_size), dtype=np.float32)
+            padded[:spatial_map.shape[0], :spatial_map.shape[1]] = spatial_map
+        else:
+            padded = cv2.resize(spatial_map, (target_size, target_size))
+        
+        # FFT (shift zero-frequency to center)
+        complex_fft = np.fft.fftshift(np.fft.fft2(padded))
+        self.current_complex_field = complex_fft
+        
         # D. CREATE SAMPLE RECORD
         sample = {
             'timestamp': len(self.sample_buffer),
@@ -276,6 +298,20 @@ class BrainSamplerNode(BaseNode):
             if len(self.sample_buffer) > 0:
                 return np.array([s['attractor'] for s in self.sample_buffer])
             return np.zeros(1)
+        
+        elif port_name == 'spatial_field':
+            # The raw spatial pattern (the "sun")
+            if self.current_spatial_field is not None:
+                # Return as image (0-255)
+                viz = ((self.current_spatial_field + 1) * 127.5).astype(np.uint8)
+                return cv2.applyColorMap(viz, cv2.COLORMAP_VIRIDIS)
+            return np.zeros((64, 64, 3), dtype=np.uint8)
+        
+        elif port_name == 'complex_field':
+            # The FFT for interference experiments
+            if self.current_complex_field is not None:
+                return self.current_complex_field
+            return np.zeros((64, 64), dtype=np.complex128)
         
         return None
     
