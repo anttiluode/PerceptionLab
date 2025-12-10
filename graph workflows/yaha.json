@@ -1,0 +1,302 @@
+{
+  "global_settings": {
+    "coupling": 50,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": -938.0,
+      "pos_y": -296.0,
+      "width": 300.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "alpha": "signal",
+          "theta": "signal",
+          "gamma": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG (Frontal)",
+        "edf_file_path": "e:\\docshouse\\450\\2.edf",
+        "selected_region": "Frontal",
+        "_last_path": "e:\\docshouse\\450\\2.edf",
+        "_last_region": "Frontal",
+        "fs": 100.0,
+        "current_time": 91.76666666666402,
+        "window_size": 1.0,
+        "output_powers": {
+          "delta": 0.0,
+          "theta": 4.1718702884736444e-10,
+          "alpha": 7.504027824772105e-11,
+          "beta": 0.0,
+          "gamma": 8.891091670239416e-12,
+          "raw_signal": -3.863279049575465e-05
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "EEGProcessorNode",
+      "pos_x": -940.0,
+      "pos_y": -519.0,
+      "width": 370.0,
+      "height": 187.0,
+      "config": {
+        "inputs": {
+          "delta_in": "signal",
+          "theta_in": "signal",
+          "alpha_in": "signal",
+          "beta_in": "signal",
+          "gamma_in": "signal",
+          "raw_in": "signal",
+          "scale_mod": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum",
+          "delta_out": "signal",
+          "theta_out": "signal",
+          "alpha_out": "signal",
+          "beta_out": "signal",
+          "gamma_out": "signal",
+          "raw_out": "signal"
+        },
+        "input_data": {
+          "delta_in": [
+            0.0
+          ],
+          "theta_in": [
+            1.996251939351869e-10
+          ],
+          "alpha_in": [
+            3.576481464106184e-11
+          ],
+          "beta_in": [
+            0.0
+          ],
+          "gamma_in": [
+            4.521000286706524e-12
+          ],
+          "raw_in": [],
+          "scale_mod": []
+        },
+        "node_title": "EEG Processor",
+        "base_scale": 100000000000
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "BrainSamplerNode",
+      "pos_x": -528.0,
+      "pos_y": -607.0,
+      "width": 230.0,
+      "height": 181.0,
+      "config": {
+        "inputs": {
+          "frontal_theta": "signal",
+          "full_eeg": "spectrum",
+          "sample_threshold": "signal"
+        },
+        "outputs": {
+          "sample_snapshot": "image",
+          "sample_trigger": "signal",
+          "attractor_state": "signal",
+          "sample_stream": "spectrum"
+        },
+        "node_title": "Base Node",
+        "fs": 256.0,
+        "buffer_len": 256,
+        "min_corner_velocity": 0.1,
+        "delay": 15
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicFFTNode",
+      "pos_x": -312.0,
+      "pos_y": -378.0,
+      "width": 551.0,
+      "height": 519.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "HolographicFFTNode",
+      "pos_x": -234.0,
+      "pos_y": -606.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "ComplexInterferenceNode",
+      "pos_x": 82.0,
+      "pos_y": -602.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_a": "complex_spectrum",
+          "complex_b": "complex_spectrum",
+          "mode_select": "signal",
+          "mix_ratio": "signal"
+        },
+        "outputs": {
+          "interference_out": "complex_spectrum",
+          "magnitude_view": "image"
+        },
+        "node_title": "Base Node",
+        "size": 3
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "SimpleNeuralFieldNode",
+      "pos_x": -582.0,
+      "pos_y": -283.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "complex_field": "complex_spectrum"
+        },
+        "input_data": {
+          "delta": [],
+          "theta": [],
+          "alpha": [],
+          "beta": [
+            0.0
+          ],
+          "gamma": []
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "t": 1797
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "alpha",
+      "to_node_id": 1,
+      "to_port": "alpha_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta",
+      "to_node_id": 1,
+      "to_port": "theta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "delta",
+      "to_node_id": 1,
+      "to_port": "delta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta",
+      "to_node_id": 1,
+      "to_port": "beta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma",
+      "to_node_id": 1,
+      "to_port": "gamma_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "latent_out",
+      "to_node_id": 2,
+      "to_port": "full_eeg",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "theta_out",
+      "to_node_id": 2,
+      "to_port": "frontal_theta",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "spatial_field",
+      "to_node_id": 4,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "complex_spectrum",
+      "to_node_id": 5,
+      "to_port": "complex_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "complex_spectrum",
+      "to_node_id": 5,
+      "to_port": "complex_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "beta_out",
+      "to_node_id": 6,
+      "to_port": "beta",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "image",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
