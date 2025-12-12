@@ -298,11 +298,33 @@ class PhaseSelectiveGatingNode(BaseNode):
         speed = self.base_speed
         gain = self.base_gain
         
-        # Get current index
-        idx = int(self.playback_idx)
-        if idx >= len(self.frontal_theta_series) - 1:
+
+        # Get total length
+        total_len = len(self.frontal_theta_series)
+        
+        # 1. Safety Check: If data is empty or too short, stop.
+        if total_len < self.buffer_len:
+            self._render_error() # Or just return
+            return
+
+        # 2. Robust Rewind Logic
+        # Check if the NEXT step will go out of bounds
+        if self.playback_idx + speed >= total_len - 1:
+            print("[Gating] Loop: Rewinding to start.")
             self.playback_idx = 0
+            
+            # OPTIONAL: Clear buffers on loop to prevent "glitch" artifacts
+            self.theta_buffer.clear()
+            for k in self.signal_buffers:
+                self.signal_buffers[k].clear()
+
+        # 3. Get current integer index
+        idx = int(self.playback_idx)
+        
+        # Double-check bounds (just in case)
+        if idx >= total_len:
             idx = 0
+            self.playback_idx = 0
         
         # Get current values
         theta_val = self.frontal_theta_series[idx] * gain
