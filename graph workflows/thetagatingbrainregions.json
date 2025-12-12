@@ -1,0 +1,46 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PhaseSelectiveGatingNode",
+      "pos_x": -918.0,
+      "pos_y": -721.0,
+      "width": 1268.0,
+      "height": 725.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "display": "image",
+          "interference_field": "image",
+          "control_matrix": "complex_spectrum",
+          "gating_strength": "spectrum",
+          "topology_state": "signal"
+        },
+        "input_data": {},
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 6074.0,
+        "phase_bins": 36,
+        "buffer_len": 512,
+        "gating_strengths": {
+          "frontal_beta": 0.445563204420598,
+          "temporal_gamma": 0.2409510547515379,
+          "parietal_beta": 0.5407353707885605,
+          "occipital_gamma": 0.5009740110398991
+        }
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": []
+}
