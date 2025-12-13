@@ -1,0 +1,144 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -422.0,
+      "pos_y": -501.0,
+      "width": 820.0,
+      "height": 505.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 4890.0,
+        "current_tokens": [
+          {
+            "id": 4,
+            "region": "frontal",
+            "band": "gamma",
+            "amplitude": 46.062919942385456,
+            "phase": 0.7471654060405912,
+            "frequency": 50.0
+          },
+          {
+            "id": 5,
+            "region": "temporal",
+            "band": "delta",
+            "amplitude": 8.425893822573963,
+            "phase": -2.2647867890049924,
+            "frequency": 2.25
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "TokenInterferenceEngine2",
+      "pos_x": 434.0,
+      "pos_y": -563.0,
+      "width": 613.0,
+      "height": 682.0,
+      "config": {
+        "inputs": {
+          "tokens_a": "spectrum",
+          "tokens_b": "spectrum",
+          "phase_reference": "signal",
+          "interference_mode": "signal",
+          "zoom": "signal"
+        },
+        "node_title": "Base Node",
+        "field_size": 512,
+        "embed_dim": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "SpectralSynthesizerNode",
+      "pos_x": 1072.0,
+      "pos_y": -551.0,
+      "width": 630.0,
+      "height": 676.0,
+      "config": {
+        "inputs": {
+          "dna_55": "spectrum",
+          "master_gain": "signal"
+        },
+        "outputs": {
+          "visualizer": "image",
+          "audio_signal": "signal",
+          "spectrum": "spectrum",
+          "fft_image": "image"
+        },
+        "node_title": "Spectral Synthesizer",
+        "base_freq": 110.0,
+        "master_gain": 1.0,
+        "num_modes": 55,
+        "active": true,
+        "sample_rate": 44100,
+        "chunk_size": 1024,
+        "time_counter": 3.9999999999999907,
+        "fft_buffer_size": 2048
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "theta_phase",
+      "to_node_id": 1,
+      "to_port": "phase_reference",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "sample_trigger",
+      "to_node_id": 1,
+      "to_port": "interference_mode",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "temporal_tokens",
+      "to_node_id": 1,
+      "to_port": "tokens_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "parietal_tokens",
+      "to_node_id": 1,
+      "to_port": "tokens_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "relationship_vector",
+      "to_node_id": 2,
+      "to_port": "dna_55",
+      "learned_weight": 1.0
+    }
+  ]
+}
