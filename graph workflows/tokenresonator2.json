@@ -1,0 +1,137 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "TokenDecoderNode",
+      "pos_x": 207.0,
+      "pos_y": -628.0,
+      "width": 689.0,
+      "height": 681.0,
+      "config": {
+        "inputs": {
+          "context_vector": "spectrum",
+          "token_stream": "spectrum",
+          "theta_phase": "signal",
+          "sample_trigger": "signal"
+        },
+        "node_title": "Base Node",
+        "embed_dim": 64,
+        "n_states": 5,
+        "dominant_state": 2,
+        "sample_count": 2001,
+        "learning_rate": 0.01,
+        "use_online_learning": false
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "TokenInterferenceEngine2",
+      "pos_x": 922.0,
+      "pos_y": -623.0,
+      "width": 883.0,
+      "height": 667.0,
+      "config": {
+        "inputs": {
+          "tokens_a": "spectrum",
+          "tokens_b": "spectrum",
+          "phase_reference": "signal",
+          "interference_mode": "signal",
+          "zoom": "signal"
+        },
+        "node_title": "Base Node",
+        "field_size": 512,
+        "embed_dim": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -524.0,
+      "pos_y": -623.0,
+      "width": 731.0,
+      "height": 678.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 2126.0,
+        "current_tokens": [
+          {
+            "id": 14,
+            "region": "parietal",
+            "band": "gamma",
+            "amplitude": 37.7298218018925,
+            "phase": 2.536746452991709,
+            "frequency": 50.0
+          }
+        ]
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 2,
+      "from_port": "token_stream",
+      "to_node_id": 0,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "context_vector",
+      "to_node_id": 0,
+      "to_port": "context_vector",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "theta_phase",
+      "to_node_id": 0,
+      "to_port": "theta_phase",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "sample_trigger",
+      "to_node_id": 0,
+      "to_port": "sample_trigger",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "token_stream",
+      "to_node_id": 1,
+      "to_port": "tokens_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "theta_phase",
+      "to_node_id": 1,
+      "to_port": "phase_reference",
+      "learned_weight": 1.0
+    }
+  ]
+}
