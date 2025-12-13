@@ -1,0 +1,358 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -422.0,
+      "pos_y": -501.0,
+      "width": 514.0,
+      "height": 285.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 13181.0,
+        "current_tokens": [
+          {
+            "id": 9,
+            "region": "temporal",
+            "band": "gamma",
+            "amplitude": 17.140177134036843,
+            "phase": -2.9334151809187943,
+            "frequency": 50.0
+          },
+          {
+            "id": 12,
+            "region": "parietal",
+            "band": "alpha",
+            "amplitude": 9.118623557728293,
+            "phase": 0.3509688907985951,
+            "frequency": 10.5
+          },
+          {
+            "id": 14,
+            "region": "parietal",
+            "band": "gamma",
+            "amplitude": 24.36528999956226,
+            "phase": -0.54641242313932,
+            "frequency": 50.0
+          },
+          {
+            "id": 19,
+            "region": "occipital",
+            "band": "gamma",
+            "amplitude": 19.620583268680548,
+            "phase": -2.4617423031739225,
+            "frequency": 50.0
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "TokenInterferenceEngine2",
+      "pos_x": 164.0,
+      "pos_y": -573.0,
+      "width": 257.0,
+      "height": 348.0,
+      "config": {
+        "inputs": {
+          "tokens_a": "spectrum",
+          "tokens_b": "spectrum",
+          "phase_reference": "signal",
+          "interference_mode": "signal",
+          "zoom": "signal"
+        },
+        "node_title": "Base Node",
+        "field_size": 512,
+        "embed_dim": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "TokenInterferenceEngine2",
+      "pos_x": 169.0,
+      "pos_y": -188.0,
+      "width": 273.0,
+      "height": 276.0,
+      "config": {
+        "inputs": {
+          "tokens_a": "spectrum",
+          "tokens_b": "spectrum",
+          "phase_reference": "signal",
+          "interference_mode": "signal",
+          "zoom": "signal"
+        },
+        "node_title": "Base Node",
+        "field_size": 512,
+        "embed_dim": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "NeuronalBrainNode",
+      "pos_x": 622.0,
+      "pos_y": -332.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "input_vec": "spectrum",
+          "target_vec": "spectrum",
+          "train_gate": "signal"
+        },
+        "outputs": {
+          "output_vec": "spectrum",
+          "brain_activity": "image",
+          "error": "signal"
+        },
+        "node_title": "Neuronal Brain (ESN)",
+        "input_dim": 64,
+        "reservoir_size": 200,
+        "output_dim": 64,
+        "leak_rate": 0.3,
+        "spectral_radius": 0.95,
+        "learning_rate": 0.05,
+        "frozen": false,
+        "error_val": 3.140931996544358e-05
+      },
+      "custom_state_file": "node_3_brain.npz"
+    },
+    {
+      "id": 4,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 548.0,
+      "pos_y": -114.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": 942.0,
+      "pos_y": -335.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "node_title": "Latent Assembler",
+        "latent_dim": 16
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "SpectralSynthesizerNode",
+      "pos_x": 837.0,
+      "pos_y": -542.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "dna_55": "spectrum",
+          "master_gain": "signal"
+        },
+        "outputs": {
+          "visualizer": "image",
+          "audio_signal": "signal",
+          "spectrum": "spectrum",
+          "fft_image": "image"
+        },
+        "node_title": "Spectral Synthesizer",
+        "base_freq": 110.0,
+        "master_gain": 1.0,
+        "num_modes": 55,
+        "active": true,
+        "sample_rate": 44100,
+        "chunk_size": 1024,
+        "time_counter": 29.94999999999958,
+        "fft_buffer_size": 2048
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "FractalAntenna2Node",
+      "pos_x": 1262.0,
+      "pos_y": -509.0,
+      "width": 382.0,
+      "height": 464.0,
+      "config": {
+        "inputs": {
+          "dna_in": "spectrum",
+          "field_in": "image"
+        },
+        "outputs": {
+          "reception_strength": "signal",
+          "antenna_view": "image",
+          "tuned_signal": "spectrum"
+        },
+        "node_title": "Fractal Antenna",
+        "points": []
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 8,
+      "class_name": "DisplayNode",
+      "pos_x": 1719.0,
+      "pos_y": -396.0,
+      "width": 409.0,
+      "height": 438.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "theta_phase",
+      "to_node_id": 1,
+      "to_port": "phase_reference",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "sample_trigger",
+      "to_node_id": 1,
+      "to_port": "interference_mode",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "temporal_tokens",
+      "to_node_id": 1,
+      "to_port": "tokens_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "parietal_tokens",
+      "to_node_id": 1,
+      "to_port": "tokens_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "frontal_tokens",
+      "to_node_id": 2,
+      "to_port": "tokens_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "temporal_tokens",
+      "to_node_id": 2,
+      "to_port": "tokens_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "relationship_vector",
+      "to_node_id": 3,
+      "to_port": "input_vec",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "relationship_vector",
+      "to_node_id": 3,
+      "to_port": "target_vec",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "train_gate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "output_vec",
+      "to_node_id": 5,
+      "to_port": "latent_base",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "latent_out",
+      "to_node_id": 6,
+      "to_port": "dna_55",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "latent_out",
+      "to_node_id": 7,
+      "to_port": "dna_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "antenna_view",
+      "to_node_id": 8,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
