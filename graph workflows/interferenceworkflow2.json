@@ -1,0 +1,126 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "WaveletTokenEngineNode",
+      "pos_x": -327.0,
+      "pos_y": -215.0,
+      "width": 604.0,
+      "height": 486.0,
+      "config": {
+        "inputs": {
+          "speed": "signal",
+          "gain": "signal",
+          "burst_threshold": "signal"
+        },
+        "input_data": {
+          "speed": [],
+          "gain": [],
+          "burst_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "fs": 160.0,
+        "base_speed": 1.0,
+        "base_threshold": 1.5,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 1476.0,
+        "freq_bands": {
+          "delta": [
+            0.5,
+            4
+          ],
+          "theta": [
+            4,
+            8
+          ],
+          "alpha": [
+            8,
+            13
+          ],
+          "beta": [
+            13,
+            30
+          ],
+          "gamma": [
+            30,
+            70
+          ]
+        },
+        "active_tokens": [
+          {
+            "key": 0.0,
+            "region": "frontal",
+            "band": "delta",
+            "amplitude": 1.597846276821389,
+            "phase": -0.8569670122149886,
+            "frequency": 2.25,
+            "time": 9.21875
+          },
+          {
+            "key": 6.0,
+            "region": "temporal",
+            "band": "theta",
+            "amplitude": 0.6318272905685238,
+            "phase": 0.3324340721009004,
+            "frequency": 6.0,
+            "time": 9.21875
+          },
+          {
+            "key": 8.0,
+            "region": "temporal",
+            "band": "beta",
+            "amplitude": 1.147212343948357,
+            "phase": 0.01189345552897123,
+            "frequency": 21.5,
+            "time": 9.21875
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "TokenInterferenceEngine2",
+      "pos_x": 286.0,
+      "pos_y": -240.0,
+      "width": 913.0,
+      "height": 675.0,
+      "config": {
+        "inputs": {
+          "tokens_a": "spectrum",
+          "tokens_b": "spectrum",
+          "phase_reference": "signal",
+          "interference_mode": "signal",
+          "zoom": "signal"
+        },
+        "node_title": "Base Node",
+        "field_size": 512,
+        "embed_dim": 64
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "frontal_tokens",
+      "to_node_id": 1,
+      "to_port": "tokens_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "temporal_tokens",
+      "to_node_id": 1,
+      "to_port": "tokens_b",
+      "learned_weight": 1.0
+    }
+  ]
+}

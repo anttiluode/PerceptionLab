@@ -1,0 +1,101 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -797.0,
+      "pos_y": -531.0,
+      "width": 1121.0,
+      "height": 659.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 4360.0,
+        "current_tokens": [
+          {
+            "id": 0,
+            "region": "frontal",
+            "band": "delta",
+            "amplitude": 26.463757160372968,
+            "phase": 0.4295937188823332,
+            "frequency": 2.25
+          },
+          {
+            "id": 2,
+            "region": "frontal",
+            "band": "alpha",
+            "amplitude": 11.003904976309215,
+            "phase": -0.3251976832460493,
+            "frequency": 10.5
+          },
+          {
+            "id": 18,
+            "region": "occipital",
+            "band": "beta",
+            "amplitude": 22.8707810465781,
+            "phase": 2.9888347940733926,
+            "frequency": 21.5
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "TokenInterferenceEngine2",
+      "pos_x": 364.0,
+      "pos_y": -511.0,
+      "width": 768.0,
+      "height": 591.0,
+      "config": {
+        "inputs": {
+          "tokens_a": "spectrum",
+          "tokens_b": "spectrum",
+          "phase_reference": "signal",
+          "interference_mode": "signal",
+          "zoom": "signal"
+        },
+        "node_title": "Base Node",
+        "field_size": 512,
+        "embed_dim": 64
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "frontal_tokens",
+      "to_node_id": 1,
+      "to_port": "tokens_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "occipital_tokens",
+      "to_node_id": 1,
+      "to_port": "tokens_b",
+      "learned_weight": 1.0
+    }
+  ]
+}
