@@ -7,10 +7,10 @@
     {
       "id": 0,
       "class_name": "NeuralTransformerNode",
-      "pos_x": -1409.0,
-      "pos_y": -308.0,
-      "width": 1176.0,
-      "height": 328.0,
+      "pos_x": -944.0,
+      "pos_y": -388.0,
+      "width": 243.0,
+      "height": 187.0,
       "config": {
         "inputs": {
           "temperature": "float",
@@ -30,7 +30,7 @@
         "is_loaded": true,
         "load_error": "",
         "needs_load": false,
-        "playback_idx": 3542.0,
+        "playback_idx": 3571.0,
         "current_tokens": []
       },
       "custom_state_file": null
@@ -38,10 +38,10 @@
     {
       "id": 1,
       "class_name": "EigenConstraintDecoder",
-      "pos_x": -192.0,
-      "pos_y": -396.0,
-      "width": 934.0,
-      "height": 708.0,
+      "pos_x": -659.0,
+      "pos_y": -394.0,
+      "width": 1029.0,
+      "height": 662.0,
       "config": {
         "inputs": {
           "token_stream": "spectrum",
@@ -55,13 +55,31 @@
         "history_len": 200,
         "manifold_size": 256,
         "latent_dim": 32,
-        "compatible_count": 255,
-        "constraint_violation": 0.001457521518952147,
-        "entropy": 5.54517380676805,
-        "epoch": 3542,
+        "compatible_count": 254,
+        "constraint_violation": 0.002047961832820807,
+        "entropy": 5.537563052749412,
+        "epoch": 29,
         "eigenbasis_lr": 0.01,
         "skull_filter_lr": 0.001,
         "manifold_lr": 0.01
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -912.0,
+      "pos_y": -38.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 0.1
       },
       "custom_state_file": null
     }
@@ -69,16 +87,23 @@
   "edges": [
     {
       "from_node_id": 0,
-      "from_port": "token_stream",
+      "from_port": "theta_phase",
+      "to_node_id": 1,
+      "to_port": "theta_phase",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "frontal_tokens",
       "to_node_id": 1,
       "to_port": "token_stream",
       "learned_weight": 1.0
     },
     {
-      "from_node_id": 0,
-      "from_port": "theta_phase",
+      "from_node_id": 2,
+      "from_port": "signal",
       "to_node_id": 1,
-      "to_port": "theta_phase",
+      "to_port": "temperature",
       "learned_weight": 1.0
     }
   ]
