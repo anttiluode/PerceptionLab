@@ -377,7 +377,18 @@ class GenerativeDecoder(BaseNode):
         # ===============================
         # 10. OUTPUTS (STRICT CONTRACT)
         # ===============================
-        self.outputs['reconstructed_tokens'] = self.current_reconstruction.astype(np.float32)
+        
+        # --- FIX: SANITIZE BEFORE CASTING ---
+        # 1. Catch Infinity/NaN from the feedback loop
+        safe_recon = np.nan_to_num(self.current_reconstruction, nan=0.0, posinf=0.0, neginf=0.0)
+        
+        # 2. Clamp values to prevent 32-bit float overflow 
+        # (Tokens rarely exceed 100.0, so +/- 1000.0 is a safe, wide limit)
+        safe_recon = np.clip(safe_recon, -1000.0, 1000.0)
+        
+        # 3. Safe Cast
+        self.outputs['reconstructed_tokens'] = safe_recon.astype(np.float32)
+        
         self.outputs['reconstruction_error'] = float(self.current_error)
         self.outputs['generated_field'] = self._field_img
         self.outputs['consistency_score'] = float(consistency)
