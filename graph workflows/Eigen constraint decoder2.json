@@ -1,0 +1,168 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -944.0,
+      "pos_y": -388.0,
+      "width": 243.0,
+      "height": 187.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 4756.0,
+        "current_tokens": [
+          {
+            "id": 1,
+            "region": "frontal",
+            "band": "theta",
+            "amplitude": 16.10431402038638,
+            "phase": 0.4509809885634524,
+            "frequency": 6.0
+          },
+          {
+            "id": 5,
+            "region": "temporal",
+            "band": "delta",
+            "amplitude": 10.125286154594212,
+            "phase": -0.5569132910751832,
+            "frequency": 2.25
+          },
+          {
+            "id": 8,
+            "region": "temporal",
+            "band": "beta",
+            "amplitude": 21.352802588631754,
+            "phase": 2.2284771856671934,
+            "frequency": 21.5
+          },
+          {
+            "id": 18,
+            "region": "occipital",
+            "band": "beta",
+            "amplitude": 20.56796470308497,
+            "phase": 2.332158537332479,
+            "frequency": 21.5
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "EigenConstraintDecoder",
+      "pos_x": -659.0,
+      "pos_y": -394.0,
+      "width": 597.0,
+      "height": 539.0,
+      "config": {
+        "inputs": {
+          "token_stream": "spectrum",
+          "theta_phase": "signal",
+          "temperature": "signal",
+          "prior_strength": "signal"
+        },
+        "node_title": "Eigen Constraint Decoder",
+        "embed_dim": 64,
+        "n_eigenmodes": 16,
+        "history_len": 200,
+        "manifold_size": 256,
+        "latent_dim": 32,
+        "compatible_count": 67,
+        "constraint_violation": 0.06385642807266106,
+        "entropy": 4.21823234495293,
+        "epoch": 1214,
+        "eigenbasis_lr": 0.01,
+        "skull_filter_lr": 0.001,
+        "manifold_lr": 0.01
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -912.0,
+      "pos_y": -38.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 0.1
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicIFFTNode",
+      "pos_x": -38.0,
+      "pos_y": -390.0,
+      "width": 526.0,
+      "height": 537.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum"
+        },
+        "outputs": {
+          "reconstructed_image": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "theta_phase",
+      "to_node_id": 1,
+      "to_port": "theta_phase",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "frontal_tokens",
+      "to_node_id": 1,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "temperature",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "constrained_manifold",
+      "to_node_id": 3,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    }
+  ]
+}
