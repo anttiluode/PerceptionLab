@@ -1,0 +1,378 @@
+{
+  "global_settings": {
+    "coupling": 50,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -706.0,
+      "pos_y": -308.0,
+      "width": 720.0,
+      "height": 640.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "1. REALITY (Input)",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 25.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 730.0,
+        "current_tokens": [
+          {
+            "id": 17,
+            "region": "occipital",
+            "band": "alpha",
+            "amplitude": 17.342856333302063,
+            "phase": 0.49069035725963905,
+            "frequency": 10.5
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "RateReductionEncoder",
+      "pos_x": 53.0,
+      "pos_y": -306.0,
+      "width": 688.0,
+      "height": 638.0,
+      "config": {
+        "inputs": {
+          "token_stream": "spectrum",
+          "context_vector": "spectrum",
+          "temperature": "signal",
+          "learning_rate": "signal"
+        },
+        "node_title": "2. ENCODER f(x)\u00e2\u2020\u2019z",
+        "input_dim": 64,
+        "n_subspaces": 5,
+        "subspace_dim": 16,
+        "epsilon": 0.5,
+        "lambda_reg": 0.1,
+        "history_len": 100,
+        "current_rate": 25.11236765377514,
+        "current_reduction": 19.366711489518792
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "GenerativeDecoder",
+      "pos_x": 766.0,
+      "pos_y": -300.0,
+      "width": 910.0,
+      "height": 632.0,
+      "config": {
+        "inputs": {
+          "compressed_z": "spectrum",
+          "subspace_assignments": "spectrum",
+          "original_tokens": "spectrum",
+          "theta_phase": "signal"
+        },
+        "node_title": "3. DECODER g(z)\u00e2\u2020\u2019x\u00cc\u201a",
+        "latent_dim": 64,
+        "n_subspaces": 5,
+        "n_tokens": 20,
+        "current_error": 1.0077926553700158,
+        "current_surprise": 0.0,
+        "learning_rate": 0.01
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "ClosedLoopTranscription",
+      "pos_x": 1720.0,
+      "pos_y": -315.0,
+      "width": 857.0,
+      "height": 649.0,
+      "config": {
+        "inputs": {
+          "token_stream": "spectrum",
+          "theta_phase": "signal",
+          "learning_rate": "signal",
+          "temperature": "signal"
+        },
+        "node_title": "4. CLOSED LOOP f\u00e2\u02c6\u02dcg\u00e2\u02c6\u02dcf",
+        "input_dim": 64,
+        "latent_dim": 64,
+        "n_subspaces": 5,
+        "subspace_dim": 16,
+        "n_tokens": 20,
+        "epsilon": 0.5,
+        "consistency_threshold": 0.1,
+        "current_loss": 0.4432608813143857,
+        "current_rate_reduction": 6.119038538047821,
+        "base_lr": 0.01,
+        "epoch": 730
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "MinimaxGameEngine",
+      "pos_x": 2586.0,
+      "pos_y": -314.0,
+      "width": 848.0,
+      "height": 631.0,
+      "config": {
+        "inputs": {
+          "real_rate": "signal",
+          "fake_rate": "signal",
+          "loop_loss": "signal",
+          "learning_rate": "signal"
+        },
+        "input_data": {
+          "real_rate": [
+            15.610396279201572
+          ],
+          "fake_rate": [
+            1525709231.1018214
+          ],
+          "loop_loss": [
+            0.0
+          ],
+          "learning_rate": []
+        },
+        "node_title": "5. MINIMAX GAME",
+        "f_reward": -1525709215.491425,
+        "g_reward": 1525709215.491425,
+        "game_value": 0.0,
+        "nash_distance": 3051418430.98285,
+        "base_lr": 0.01,
+        "f_lr_mult": 2.0,
+        "g_lr_mult": 0.5,
+        "f_momentum": 0.0,
+        "g_momentum": 0.0,
+        "momentum_decay": 0.9,
+        "equilibrium_threshold": 0.05,
+        "equilibrium_window": 50
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "ParsimonyIntelligenceMonitor",
+      "pos_x": 3467.0,
+      "pos_y": -314.0,
+      "width": 905.0,
+      "height": 638.0,
+      "config": {
+        "inputs": {
+          "rate_reduction": "signal",
+          "loop_loss": "signal",
+          "nash_distance": "signal",
+          "coding_rate": "signal",
+          "game_state": "signal"
+        },
+        "outputs": {
+          "display": "image",
+          "intelligence_score": 0.0,
+          "is_intelligent": 0.0,
+          "parsimony_score": 0.9999999999627915,
+          "consistency_score": 0.006737946999085467,
+          "equilibrium_score": 0.0,
+          "emergence_level": 1.0
+        },
+        "input_data": {
+          "rate_reduction": [
+            12.007241173019992
+          ],
+          "loop_loss": [
+            0.0
+          ],
+          "nash_distance": [
+            1556837137.8099222
+          ],
+          "coding_rate": [
+            15.610396279201572
+          ],
+          "game_state": [
+            1.0
+          ]
+        },
+        "node_title": "6. INTELLIGENCE MONITOR",
+        "parsimony_threshold": 0.5,
+        "consistency_threshold": 0.1,
+        "equilibrium_threshold": 0.1,
+        "parsimony_score": 0.9999999999627915,
+        "consistency_score": 0.006737946999085467,
+        "equilibrium_score": 0.0,
+        "intelligence_score": 0.0,
+        "emergence_level": 1
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "ConsciousnessSpectrumNode",
+      "pos_x": 4404.0,
+      "pos_y": -316.0,
+      "width": 874.0,
+      "height": 649.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum",
+          "image_spectrum": "image",
+          "containment_level": "signal"
+        },
+        "outputs": {
+          "mode_occupation": "image",
+          "phase_coherence": "image",
+          "log_polar_view": "image",
+          "eigenmode_spectrum": "spectrum",
+          "address_size": "signal",
+          "coherence_index": "signal",
+          "fast_leak": "signal",
+          "slow_stable": "signal",
+          "dominant_mode": "signal"
+        },
+        "node_title": "7. THE DREAM",
+        "num_modes": 16,
+        "history_length": 100,
+        "address_size": 0.0,
+        "coherence_index": 1.0,
+        "fast_leak": 0.0,
+        "slow_stable": 0.0,
+        "dominant_mode": 0
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "token_stream",
+      "to_node_id": 1,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "context_vector",
+      "to_node_id": 1,
+      "to_port": "context_vector",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_phase",
+      "to_node_id": 2,
+      "to_port": "theta_phase",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "compressed_z",
+      "to_node_id": 2,
+      "to_port": "compressed_z",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "subspace_assignments",
+      "to_node_id": 2,
+      "to_port": "subspace_assignments",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "token_stream",
+      "to_node_id": 2,
+      "to_port": "original_tokens",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "token_stream",
+      "to_node_id": 3,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_phase",
+      "to_node_id": 3,
+      "to_port": "theta_phase",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "coding_rate",
+      "to_node_id": 4,
+      "to_port": "real_rate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "reconstruction_error",
+      "to_node_id": 4,
+      "to_port": "fake_rate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "loop_loss",
+      "to_node_id": 4,
+      "to_port": "loop_loss",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "rate_reduction",
+      "to_node_id": 5,
+      "to_port": "rate_reduction",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "loop_loss",
+      "to_node_id": 5,
+      "to_port": "loop_loss",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "nash_distance",
+      "to_node_id": 5,
+      "to_port": "nash_distance",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "coding_rate",
+      "to_node_id": 5,
+      "to_port": "coding_rate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "game_state",
+      "to_node_id": 5,
+      "to_port": "game_state",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "complex_spectrum",
+      "to_node_id": 6,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    }
+  ]
+}
