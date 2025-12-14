@@ -1,0 +1,85 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -1409.0,
+      "pos_y": -308.0,
+      "width": 1176.0,
+      "height": 328.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 3542.0,
+        "current_tokens": []
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "EigenConstraintDecoder",
+      "pos_x": -192.0,
+      "pos_y": -396.0,
+      "width": 934.0,
+      "height": 708.0,
+      "config": {
+        "inputs": {
+          "token_stream": "spectrum",
+          "theta_phase": "signal",
+          "temperature": "signal",
+          "prior_strength": "signal"
+        },
+        "node_title": "Eigen Constraint Decoder",
+        "embed_dim": 64,
+        "n_eigenmodes": 16,
+        "history_len": 200,
+        "manifold_size": 256,
+        "latent_dim": 32,
+        "compatible_count": 255,
+        "constraint_violation": 0.001457521518952147,
+        "entropy": 5.54517380676805,
+        "epoch": 3542,
+        "eigenbasis_lr": 0.01,
+        "skull_filter_lr": 0.001,
+        "manifold_lr": 0.01
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "token_stream",
+      "to_node_id": 1,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_phase",
+      "to_node_id": 1,
+      "to_port": "theta_phase",
+      "learned_weight": 1.0
+    }
+  ]
+}
