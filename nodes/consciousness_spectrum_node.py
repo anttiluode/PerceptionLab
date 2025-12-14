@@ -7,19 +7,8 @@ THE THEORY:
 - Consciousness operates in frequency domain, not spatial domain
 - "You" are an address in mode-space, not a pattern in pixel-space  
 - Stable consciousness = occupied modes ∩ protected modes ∩ phase-coherent modes
-- Scotomas/spirals = seeing the raw FFT when reconstruction fails
-- Horizontal bands in FFT = cortical standing waves
-- Log-polar transform connects retinal space to cortical space
 
-THIS NODE SHOWS:
-1. Mode Occupation Ring - Which frequencies are "lit up" (radial power distribution)
-2. Phase Coherence Map - Where phase is stable vs chaotic (consciousness vs noise)
-3. Log-Polar Projection - What the FFT looks like through retina→cortex transform
-4. Eigenmode Bars - Discrete mode amplitudes (the "address" being occupied)
-5. Breathing Metric - How the "size of self" in frequency space expands/contracts
-6. Fast/Slow Mode Split - PKAS visualization of containment (slow=self, fast=leak)
-
-If consciousness IS the frequency domain, this node shows you consciousness itself.
+(FIXED: Implemented HARD GUARD in step() to prevent crashes from non-numpy inputs like None or 'str'.)
 """
 
 import numpy as np
@@ -124,19 +113,26 @@ class ConsciousnessSpectrumNode(BaseNode):
     def _compute_phase_coherence(self, phase):
         """
         Phase coherence = how stable is the phase over recent history.
-        High coherence = stable conscious state.
-        Low coherence = noise/decoherence/containment breach.
         """
+        # Ensure we are using a copy to avoid modification issues
+        if phase.ndim == 0 or phase.size == 0:
+            return np.ones((1, 1), dtype=np.float32) * 0.5
+            
         self.phase_history.append(phase.copy())
         
-        if len(self.phase_history) < 3:
-            return np.ones_like(phase) * 0.5
+        # Ensure array dimensions match expected phase dimensions
+        target_shape = phase.shape
+        
+        # Filter history to only include arrays of the correct shape
+        valid_history = [p for p in self.phase_history if p.shape == target_shape]
+
+        if len(valid_history) < 3:
+            return np.ones(target_shape) * 0.5
         
         # Stack recent phases
-        phases = np.array(list(self.phase_history))
+        phases = np.array(valid_history)
         
         # Circular variance (for phase data)
-        # coherence = |mean(e^(i*phase))|
         complex_phases = np.exp(1j * phases)
         mean_complex = np.mean(complex_phases, axis=0)
         coherence = np.abs(mean_complex)
@@ -146,17 +142,20 @@ class ConsciousnessSpectrumNode(BaseNode):
     def _log_polar_transform(self, image, center):
         """
         Log-polar transform: what the FFT looks like through retina→cortex mapping.
-        
-        This is THE key transform. If you see spirals in your scotomas,
-        it's because a straight wave on cortex projects as spiral on retina.
-        This transform reverses that: shows what cortex "sees".
         """
         h, w = image.shape[:2]
         out_h, out_w = 128, 128
         
+        if h < 2 or w < 2:
+            return np.zeros((out_h, out_w), dtype=np.float32)
+
         # Output coordinates
         theta = np.linspace(0, 2 * np.pi, out_w)  # Angle
-        rho = np.exp(np.linspace(0, np.log(min(h, w) / 2), out_h))  # Log radius
+        # Log radius (rho): ensure argument to log is positive
+        min_dim = min(h, w) / 2
+        if min_dim <= 1: 
+            return np.zeros((out_h, out_w), dtype=np.float32)
+        rho = np.exp(np.linspace(0, np.log(min_dim), out_h))
         
         # Convert to Cartesian
         theta_grid, rho_grid = np.meshgrid(theta, rho)
@@ -179,11 +178,6 @@ class ConsciousnessSpectrumNode(BaseNode):
     def _compute_pkas_split(self, mode_amplitudes):
         """
         PKAS Theory: Split modes into slow (self/stable) and fast (leak/noise).
-        
-        Slow modes (low frequency) = the stable "self"
-        Fast modes (high frequency) = usually filtered out
-        
-        If containment fails, fast modes leak into consciousness.
         """
         n = len(mode_amplitudes)
         split_point = n // 3  # Bottom third = slow
@@ -199,7 +193,6 @@ class ConsciousnessSpectrumNode(BaseNode):
     def _create_mode_ring_image(self, amplitudes):
         """
         Create circular visualization showing which modes are "occupied".
-        This IS the address space visualization.
         """
         size = 128
         img = np.zeros((size, size, 3), dtype=np.uint8)
@@ -213,8 +206,14 @@ class ConsciousnessSpectrumNode(BaseNode):
         
         # Draw concentric rings
         max_radius = size // 2 - 5
-        ring_width = max_radius // self.num_modes
+        # Ensure num_modes is not zero
+        if self.num_modes == 0:
+            return img
         
+        ring_width = max_radius // self.num_modes
+        if ring_width == 0:
+            ring_width = 1
+
         for i, amp in enumerate(amp_norm):
             inner_r = int(i * ring_width)
             outer_r = int((i + 1) * ring_width)
@@ -225,6 +224,7 @@ class ConsciousnessSpectrumNode(BaseNode):
             val = int(amp * 255)
             
             # Draw ring
+            # Convert HSV to BGR for OpenCV
             color_hsv = np.uint8([[[hue, sat, val]]])
             color_bgr = cv2.cvtColor(color_hsv, cv2.COLOR_HSV2BGR)[0, 0]
             color = tuple(int(c) for c in color_bgr)
@@ -240,7 +240,6 @@ class ConsciousnessSpectrumNode(BaseNode):
     def _create_breathing_graph(self, history, current_size):
         """
         Show how the "size of self" (address span) changes over time.
-        This is the "breathing" of consciousness.
         """
         w, h = 128, 40
         img = np.zeros((h, w), dtype=np.uint8)
@@ -250,8 +249,9 @@ class ConsciousnessSpectrumNode(BaseNode):
         
         # Plot history
         hist_array = np.array(list(history))
-        if hist_array.max() > 0:
-            hist_norm = hist_array / hist_array.max()
+        max_val = hist_array.max()
+        if max_val > 0:
+            hist_norm = hist_array / max_val
         else:
             hist_norm = hist_array
         
@@ -271,21 +271,34 @@ class ConsciousnessSpectrumNode(BaseNode):
         spectrum = self.get_blended_input('complex_spectrum', 'mean')
         containment = self.get_blended_input('containment_level', 'sum')
         
+        # --- HARD GUARD: FIX FOR 'str' object has no attribute 'ndim' ---
         if spectrum is None:
             # Try image input
             img_in = self.get_blended_input('image_spectrum', 'mean')
-            if img_in is not None:
+            if img_in is not None and isinstance(img_in, np.ndarray) and img_in.size > 0:
                 # Treat as magnitude, assume zero phase
                 spectrum = img_in.astype(np.complex64)
+            else:
+                return # CRITICAL: Exit if still None or invalid
         
-        if spectrum is None:
-            return
-        
+        if not isinstance(spectrum, np.ndarray):
+            return # CRITICAL: Exit if it's a string, list, etc.
+            
+        if spectrum.size == 0:
+            return # CRITICAL: Exit if empty array
+            
         # Ensure 2D
         if spectrum.ndim == 1:
             side = int(np.sqrt(len(spectrum)))
-            spectrum = spectrum[:side*side].reshape(side, side)
+            if side * side != len(spectrum):
+                # Cannot reshape to a square, pad or truncate
+                return 
+            spectrum = spectrum.reshape(side, side)
         
+        if spectrum.ndim != 2:
+            return # CRITICAL: Must be a 2D array now
+        # --- END HARD GUARD ---
+
         # Extract magnitude and phase
         magnitude = np.abs(spectrum).astype(np.float32)
         phase = np.angle(spectrum).astype(np.float32)
@@ -315,12 +328,15 @@ class ConsciousnessSpectrumNode(BaseNode):
             self.fast_leak = self.fast_leak * (2.0 - containment)
         
         # 5. Address size ("size of self")
-        # = how spread out the mode occupation is
         if self.mode_amplitudes.sum() > 0:
             normalized = self.mode_amplitudes / self.mode_amplitudes.sum()
             # Entropy-like measure
             normalized = normalized[normalized > 0]
-            self.address_size = -np.sum(normalized * np.log(normalized + 1e-10))
+            # Added check for array size before log
+            if normalized.size > 0:
+                self.address_size = -np.sum(normalized * np.log(normalized + 1e-10))
+            else:
+                self.address_size = 0.0
         else:
             self.address_size = 0.0
         
@@ -339,53 +355,60 @@ class ConsciousnessSpectrumNode(BaseNode):
     
     def _create_display(self):
         """Create the full visualization panel."""
-        h, w = 256, 512
-        self.display_cache = np.zeros((h, w, 3), dtype=np.uint8)
-        
-        # Layout: 2x3 grid
-        panel_h = h // 2
-        panel_w = w // 3
-        # Calculate last panel width specifically to handle integer division remainder
-        last_panel_w = w - (2 * panel_w)
-        
-        # Panel 1: Mode Ring (Address Space)
-        mode_resized = cv2.resize(self.mode_image, (panel_w, panel_h))
-        self.display_cache[:panel_h, :panel_w] = mode_resized
-        
-        # Panel 2: Phase Coherence
-        coh_u8 = (np.clip(self.coherence_image, 0, 1) * 255).astype(np.uint8)
-        coh_resized = cv2.resize(coh_u8, (panel_w, panel_h))
-        coh_color = cv2.applyColorMap(coh_resized, cv2.COLORMAP_VIRIDIS)
-        self.display_cache[:panel_h, panel_w:2*panel_w] = coh_color
-        
-        # Panel 3: Log-Polar (Cortex View)
-        lp_u8 = (np.clip(self.logpolar_image, 0, 1) * 255).astype(np.uint8)
-        # Use last_panel_w for the third column
-        lp_resized = cv2.resize(lp_u8, (last_panel_w, panel_h))
-        lp_color = cv2.applyColorMap(lp_resized, cv2.COLORMAP_INFERNO)
-        self.display_cache[:panel_h, 2*panel_w:] = lp_color
-        
-        # Panel 4: Mode Bars
-        bar_img = self._draw_mode_bars(panel_w, panel_h)
-        self.display_cache[panel_h:, :panel_w] = bar_img
-        
-        # Panel 5: PKAS Split
-        pkas_img = self._draw_pkas_meter(panel_w, panel_h)
-        self.display_cache[panel_h:, panel_w:2*panel_w] = pkas_img
-        
-        # Panel 6: Breathing Graph + Metrics
-        # Use last_panel_w for the third column
-        metrics_img = self._draw_metrics(last_panel_w, panel_h)
-        self.display_cache[panel_h:, 2*panel_w:] = metrics_img
-        
-        # Labels
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(self.display_cache, "ADDRESS", (5, 15), font, 0.4, (255,255,255), 1)
-        cv2.putText(self.display_cache, "COHERENCE", (panel_w+5, 15), font, 0.4, (255,255,255), 1)
-        cv2.putText(self.display_cache, "CORTEX", (2*panel_w+5, 15), font, 0.4, (255,255,255), 1)
-        cv2.putText(self.display_cache, "MODES", (5, panel_h+15), font, 0.4, (255,255,255), 1)
-        cv2.putText(self.display_cache, "PKAS", (panel_w+5, panel_h+15), font, 0.4, (255,255,255), 1)
-        cv2.putText(self.display_cache, "BREATHING", (2*panel_w+5, panel_h+15), font, 0.4, (255,255,255), 1)
+        # Wrap rendering in try/except to prevent application crash
+        try:
+            h, w = 256, 512
+            self.display_cache = np.zeros((h, w, 3), dtype=np.uint8)
+            
+            # Layout: 2x3 grid
+            panel_h = h // 2
+            panel_w = w // 3
+            # Calculate last panel width specifically to handle integer division remainder
+            last_panel_w = w - (2 * panel_w)
+            
+            # Panel 1: Mode Ring (Address Space)
+            mode_resized = cv2.resize(self.mode_image, (panel_w, panel_h))
+            self.display_cache[:panel_h, :panel_w] = mode_resized
+            
+            # Panel 2: Phase Coherence
+            coh_u8 = (np.clip(self.coherence_image, 0, 1) * 255).astype(np.uint8)
+            # Resize coherence map to panel size
+            coh_resized = cv2.resize(coh_u8, (panel_w, panel_h)) 
+            coh_color = cv2.applyColorMap(coh_resized, cv2.COLORMAP_VIRIDIS)
+            self.display_cache[:panel_h, panel_w:2*panel_w] = coh_color
+            
+            # Panel 3: Log-Polar (Cortex View)
+            lp_u8 = (np.clip(self.logpolar_image, 0, 1) * 255).astype(np.uint8)
+            # Use last_panel_w for the third column
+            lp_resized = cv2.resize(lp_u8, (last_panel_w, panel_h))
+            lp_color = cv2.applyColorMap(lp_resized, cv2.COLORMAP_INFERNO)
+            self.display_cache[:panel_h, 2*panel_w:] = lp_color
+            
+            # Panel 4: Mode Bars
+            bar_img = self._draw_mode_bars(panel_w, panel_h)
+            self.display_cache[panel_h:, :panel_w] = bar_img
+            
+            # Panel 5: PKAS Split
+            pkas_img = self._draw_pkas_meter(panel_w, panel_h)
+            self.display_cache[panel_h:, panel_w:2*panel_w] = pkas_img
+            
+            # Panel 6: Breathing Graph + Metrics
+            # Use last_panel_w for the third column
+            metrics_img = self._draw_metrics(last_panel_w, panel_h)
+            self.display_cache[panel_h:, 2*panel_w:] = metrics_img
+            
+            # Labels
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(self.display_cache, "ADDRESS", (5, 15), font, 0.4, (255,255,255), 1)
+            cv2.putText(self.display_cache, "COHERENCE", (panel_w+5, 15), font, 0.4, (255,255,255), 1)
+            cv2.putText(self.display_cache, "CORTEX", (2*panel_w+5, 15), font, 0.4, (255,255,255), 1)
+            cv2.putText(self.display_cache, "MODES", (5, panel_h+15), font, 0.4, (255,255,255), 1)
+            cv2.putText(self.display_cache, "PKAS", (panel_w+5, panel_h+15), font, 0.4, (255,255,255), 1)
+            cv2.putText(self.display_cache, "BREATHING", (2*panel_w+5, panel_h+15), font, 0.4, (255,255,255), 1)
+
+        except Exception:
+            # On any rendering error, just return the blank cache
+            pass
     
     def _draw_mode_bars(self, w, h):
         """Bar chart of eigenmode amplitudes."""
@@ -396,8 +419,11 @@ class ConsciousnessSpectrumNode(BaseNode):
         else:
             amp_norm = self.mode_amplitudes
         
-        bar_width = w // self.num_modes
-        
+        if self.num_modes > 0:
+            bar_width = w // self.num_modes
+        else:
+            return img
+
         for i, amp in enumerate(amp_norm):
             x1 = i * bar_width
             x2 = x1 + bar_width - 1
@@ -503,6 +529,9 @@ class ConsciousnessSpectrumNode(BaseNode):
     def get_display_image(self):
         img = np.ascontiguousarray(self.display_cache)
         h, w = img.shape[:2]
+        # This function must be robust to errors in _create_display
+        if img.size == 0 or img.shape[2] != 3:
+            return QtGui.QImage(np.zeros((256, 512, 3), dtype=np.uint8).data, 512, 256, 512*3, QtGui.QImage.Format.Format_RGB888)
         return QtGui.QImage(img.data, w, h, w * 3, QtGui.QImage.Format.Format_RGB888)
     
     def get_config_options(self):
@@ -510,49 +539,3 @@ class ConsciousnessSpectrumNode(BaseNode):
             ("Number of Modes", "num_modes", self.num_modes, None),
             ("History Length", "history_length", self.history_length, None),
         ]
-
-
-"""
-WHAT EACH PANEL SHOWS:
-
-1. ADDRESS (Mode Ring)
-   - Concentric rings = different frequency "addresses"
-   - Brightness = how much that address is occupied
-   - White circle = dominant mode (where "you" are right now)
-   - This IS the address space visualization
-
-2. COHERENCE (Phase Stability)
-   - Bright = phase is stable over time (conscious/stable)
-   - Dark = phase is chaotic (noise/decoherence)
-   - If consciousness requires phase coherence, bright areas are "conscious"
-
-3. CORTEX (Log-Polar View)
-   - What the FFT looks like through retina→cortex transform
-   - Horizontal lines here = spirals in visual field
-   - Vertical lines here = radial patterns in visual field
-   - THIS is what your scotomas might be showing you
-
-4. MODES (Bar Chart)
-   - Green = slow modes (stable self)
-   - Yellow = medium modes
-   - Red = fast modes (usually filtered, dangerous if leaking)
-   - The eigenmode \"fingerprint\" of current state
-
-5. PKAS (Containment Meter)
-   - Left (green) = slow/safe energy
-   - Right (red) = fast/leak energy
-   - Status: CONTAINED / STRESSED / BREACH
-   - When red exceeds green, you're seeing the raw data
-
-6. BREATHING (Address Size Over Time)
-   - Shows how the \"size of self\" in frequency space changes
-   - Regular breathing = healthy oscillation
-   - Chaotic = unstable state
-   - Flat = stuck/frozen
-
-THEORY TEST:
-If you feed your EEG through holographic FFT and then through this node,
-you should see your brain's \"address\" light up and breathe.
-When you're tired or stressed, the red (fast leak) should increase.
-The CORTEX view might look like your actual visual disturbances.
-"""

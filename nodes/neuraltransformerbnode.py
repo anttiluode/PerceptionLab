@@ -528,11 +528,19 @@ class NeuralTransformerNode(BaseNode):
         self._update_outputs(current_phase)
     
     def _update_outputs(self, current_phase):
+        # --- VACCINE: HAZMAT SUIT FOR DATA ---
+        def clean_array(arr):
+            """Replaces NaNs (Not a Number) and Infs (Infinity) with 0.0"""
+            if arr is None: return arr
+            if not np.all(np.isfinite(arr)):
+                return np.nan_to_num(arr, nan=0.0, posinf=0.0, neginf=0.0)
+            return arr
+
         # Token stream (all tokens)
         if self.current_tokens:
             arr = np.array([[t['id'], t['amplitude'], t['phase']] 
-                           for t in self.current_tokens], dtype=np.float32)
-            self.outputs['token_stream'] = arr
+                        for t in self.current_tokens], dtype=np.float32)
+            self.outputs['token_stream'] = clean_array(arr)
         else:
             self.outputs['token_stream'] = np.zeros((1, 3), dtype=np.float32)
         
@@ -542,27 +550,28 @@ class NeuralTransformerNode(BaseNode):
             output_key = f'{region}_tokens'
             if region_tokens:
                 arr = np.array([[t['id'], t['amplitude'], t['phase']] 
-                               for t in region_tokens], dtype=np.float32)
-                self.outputs[output_key] = arr
+                            for t in region_tokens], dtype=np.float32)
+                self.outputs[output_key] = clean_array(arr)
             else:
                 self.outputs[output_key] = np.zeros((1, 3), dtype=np.float32)
         
         # Context vector
-        self.outputs['context_vector'] = self.context_vector.astype(np.float32)
+        self.outputs['context_vector'] = clean_array(self.context_vector.astype(np.float32))
         
-        # Interference (complex)
-        self.outputs['interference'] = self.interference_field
+        # Interference (complex) - THIS WAS THE SOURCE OF THE "DREAM BREAKING"
+        self.outputs['interference'] = clean_array(self.interference_field)
         
         # Theta phase
-        self.outputs['theta_phase'] = float(current_phase)
+        self.outputs['theta_phase'] = float(current_phase) if np.isfinite(current_phase) else 0.0
         
         # Sample trigger
         self.outputs['sample_trigger'] = 1.0 if self.is_sampling else 0.0
         
         # Attention matrix image
         attn_vis = cv2.resize(self.attention_weights.astype(np.float32), (256, 256), 
-                             interpolation=cv2.INTER_NEAREST)
-        attn_u8 = (attn_vis * 255).clip(0, 255).astype(np.uint8)
+                            interpolation=cv2.INTER_NEAREST)
+        # Clean visualization data too just in case
+        attn_u8 = (clean_array(attn_vis) * 255).clip(0, 255).astype(np.uint8)
         self._attention_img = cv2.applyColorMap(attn_u8, cv2.COLORMAP_VIRIDIS)
         self.outputs['attention_matrix'] = self._attention_img
     
