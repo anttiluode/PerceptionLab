@@ -30,17 +30,8 @@
         "is_loaded": true,
         "load_error": "",
         "needs_load": false,
-        "playback_idx": 990.0,
-        "current_tokens": [
-          {
-            "id": 15,
-            "region": "occipital",
-            "band": "delta",
-            "amplitude": 27.21624493419708,
-            "phase": 1.7128960277991232,
-            "frequency": 2.25
-          }
-        ]
+        "playback_idx": 1723.0,
+        "current_tokens": []
       },
       "custom_state_file": null
     },
@@ -66,9 +57,9 @@
         "posterior_entropy": 7.999999999344269,
         "mutual_information": 0,
         "information_rate": 0.0,
-        "surprise": 553.0491724817161,
+        "surprise": 787.2189509159106,
         "lr": 0.01,
-        "epoch": 990
+        "epoch": 1723
       },
       "custom_state_file": null
     },
@@ -86,7 +77,7 @@
         },
         "input_data": {},
         "node_title": "Constant Signal",
-        "value": 1
+        "value": 0.1
       },
       "custom_state_file": null
     }
