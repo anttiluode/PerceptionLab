@@ -1,0 +1,131 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -1357.0,
+      "pos_y": -623.0,
+      "width": 763.0,
+      "height": 501.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 711.0,
+        "current_tokens": [
+          {
+            "id": 15,
+            "region": "occipital",
+            "band": "delta",
+            "amplitude": 31.344458228555677,
+            "phase": 2.2449493666619285,
+            "frequency": 2.25
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "MoireFrequencyNode",
+      "pos_x": -574.0,
+      "pos_y": -644.0,
+      "width": 632.0,
+      "height": 530.0,
+      "config": {
+        "inputs": {
+          "theta_signal": "signal",
+          "alpha_signal": "signal",
+          "beta_signal": "signal",
+          "gamma_signal": "signal",
+          "field_input": "complex_spectrum",
+          "token_stream": "spectrum"
+        },
+        "node_title": "Moir\u00e9 Frequency (Cross-Band Interference)",
+        "field_size": 64,
+        "epoch": 711,
+        "history_len": 100,
+        "theta": 33.11742139823488,
+        "alpha": 11.62528472953102,
+        "beta": 37.97693108789072,
+        "gamma": 180.70800228398537,
+        "theta_phase": -1.985621313771795,
+        "alpha_phase": -2.2402211425657135,
+        "beta_phase": -2.0618464789509745,
+        "gamma_phase": 1.1899415759432668,
+        "binding_signal": 0.12895225675529892
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "interference",
+      "to_node_id": 1,
+      "to_port": "field_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_power",
+      "to_node_id": 1,
+      "to_port": "theta_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha_power",
+      "to_node_id": 1,
+      "to_port": "alpha_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta_power",
+      "to_node_id": 1,
+      "to_port": "beta_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma_power",
+      "to_node_id": 1,
+      "to_port": "gamma_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "interference",
+      "to_node_id": 1,
+      "to_port": "field_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "token_stream",
+      "to_node_id": 1,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    }
+  ]
+}
