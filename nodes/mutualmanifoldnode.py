@@ -77,6 +77,7 @@ class MutualInformationManifold(BaseNode):
             'token_stream': 'spectrum',
             'theta_phase': 'signal',
             'temperature': 'signal',
+            'structural_prior': 'spectrum',  # NEW: Raj modes from ConnectomePriorNode
         }
         
         self.outputs = {
@@ -87,6 +88,9 @@ class MutualInformationManifold(BaseNode):
             'posterior_entropy': 'signal',
             'information_rate': 'signal',
             'surprise_signal': 'signal',
+            'structure_deviation': 'signal',      # NEW: How much EEG deviates from structure
+            'riverbed_alignment': 'signal',       # NEW: How aligned is EEG with Raj modes
+            'deviation_spectrum': 'spectrum',     # NEW: Per-mode deviation
         }
         
         # === DUAL MANIFOLD SYSTEM ===
@@ -128,6 +132,13 @@ class MutualInformationManifold(BaseNode):
         # Surprise tracking
         self.expected_embedding = np.zeros(self.embed_dim)
         self.surprise = 0.0
+        
+        # === STRUCTURAL PRIOR TRACKING (Raj modes) ===
+        self.has_structural_prior = False
+        self.structural_embedding = np.zeros(self.embed_dim)
+        self.structure_deviation = 0.0
+        self.riverbed_alignment = 0.0
+        self.deviation_spectrum = np.zeros(self.n_eigenmodes)
         
         # === DISPLAY ===
         self._display = np.zeros((750, 1200, 3), dtype=np.uint8)
@@ -363,8 +374,15 @@ class MutualInformationManifold(BaseNode):
         temperature = float(temperature) if temperature else 0.5
         temperature = max(0.1, min(2.0, temperature))
         
+        # NEW: Get structural prior (Raj modes from ConnectomePriorNode)
+        structural_prior = self.get_blended_input('structural_prior', 'mean')
+        
         # === CONVERT TOKENS ===
         embedding = self._tokens_to_embedding(raw_tokens)
+        
+        # === CONVERT STRUCTURAL PRIOR ===
+        self.structural_embedding = self._tokens_to_embedding(structural_prior)
+        self.has_structural_prior = np.linalg.norm(self.structural_embedding) > 0.01
         
         has_input = np.linalg.norm(embedding) > 0.01
         
@@ -405,6 +423,34 @@ class MutualInformationManifold(BaseNode):
         if has_input:
             self._compute_surprise(embedding)
         
+        # === NEW: STRUCTURE-FUNCTION DEVIATION ===
+        if has_input and self.has_structural_prior:
+            # Compute how much EEG (water) deviates from structure (riverbed)
+            
+            # Direct deviation in embedding space
+            deviation_vector = embedding - self.structural_embedding
+            self.structure_deviation = np.linalg.norm(deviation_vector)
+            
+            # Alignment = cosine similarity (1 = perfectly aligned with riverbed)
+            dot_product = np.dot(embedding, self.structural_embedding)
+            norm_product = (np.linalg.norm(embedding) * np.linalg.norm(self.structural_embedding) + 1e-10)
+            self.riverbed_alignment = dot_product / norm_product
+            
+            # Per-mode deviation (project both onto eigenbasis)
+            eeg_projection = embedding @ self.eigenvectors
+            struct_projection = self.structural_embedding @ self.eigenvectors
+            self.deviation_spectrum = np.abs(eeg_projection - struct_projection)
+            
+        elif has_input:
+            # No structural prior - just measure EEG variance from learned eigenbasis
+            self.structure_deviation = np.linalg.norm(embedding)
+            self.riverbed_alignment = 0.0
+            self.deviation_spectrum = np.abs(embedding @ self.eigenvectors)
+        else:
+            self.structure_deviation = 0.0
+            self.riverbed_alignment = 0.0
+            self.deviation_spectrum = np.zeros(self.n_eigenmodes)
+        
         # === SET OUTPUTS ===
         self.outputs['mutual_information'] = float(self.mutual_information)
         self.outputs['prior_entropy'] = float(self.prior_entropy)
@@ -412,6 +458,11 @@ class MutualInformationManifold(BaseNode):
         self.outputs['information_rate'] = float(self.information_rate)
         self.outputs['surprise_signal'] = float(self.surprise)
         self.outputs['information_map'] = self.information_map.astype(np.float32)
+        
+        # NEW outputs
+        self.outputs['structure_deviation'] = float(self.structure_deviation)
+        self.outputs['riverbed_alignment'] = float(self.riverbed_alignment)
+        self.outputs['deviation_spectrum'] = self.deviation_spectrum.astype(np.float32)
         
         # === RENDER ===
         self._render_display(embedding, has_input)
@@ -562,40 +613,64 @@ class MutualInformationManifold(BaseNode):
         
         # Dynamic interpretation based on MI
         if self.mutual_information > 5:
-            state = "HIGH INFO: EEG strongly constrains state"
+            state = "HIGH INFO: EEG strongly constrains"
             color = (100, 255, 100)
         elif self.mutual_information > 2:
-            state = "MODERATE: Some constraints from EEG"
+            state = "MODERATE: Some constraints"
             color = (255, 255, 100)
         elif self.mutual_information > 0.5:
-            state = "LOW INFO: EEG weakly informative"
+            state = "LOW INFO: Weakly informative"
             color = (255, 180, 100)
         else:
-            state = "MINIMAL: EEG tells us almost nothing"
+            state = "MINIMAL: Almost nothing"
             color = (150, 150, 200)
         
-        cv2.putText(img, state, (interp_x + 10, interp_y + 50),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)
+        cv2.putText(img, state, (interp_x + 10, interp_y + 40),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.35, color, 1)
         
-        # Surprise interpretation
-        if self.surprise > 1.0:
-            surprise_text = "UNEXPECTED observation!"
-        elif self.surprise > 0.5:
-            surprise_text = "Somewhat surprising"
+        # NEW: Structure-function interpretation
+        if self.has_structural_prior:
+            cv2.putText(img, "WATER vs RIVERBED:", (interp_x + 10, interp_y + 60),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.35, (150, 200, 255), 1)
+            
+            cv2.putText(img, f"Deviation: {self.structure_deviation:.3f}", (interp_x + 10, interp_y + 78),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.3, (180, 180, 180), 1)
+            cv2.putText(img, f"Alignment: {self.riverbed_alignment:.3f}", (interp_x + 140, interp_y + 78),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.3, (180, 180, 180), 1)
+            
+            # Riverbed interpretation
+            if self.riverbed_alignment > 0.8:
+                riverbed_state = "ON RIVERBED (autopilot)"
+                riverbed_color = (100, 200, 255)
+            elif self.riverbed_alignment > 0.5:
+                riverbed_state = "NEAR RIVERBED"
+                riverbed_color = (150, 200, 200)
+            elif self.riverbed_alignment > 0.2:
+                riverbed_state = "DEVIATING from structure"
+                riverbed_color = (255, 200, 100)
+            else:
+                riverbed_state = "OFF RIVERBED - Novel!"
+                riverbed_color = (255, 100, 100)
+            
+            cv2.putText(img, riverbed_state, (interp_x + 10, interp_y + 96),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.35, riverbed_color, 1)
         else:
-            surprise_text = "Expected observation"
-        
-        cv2.putText(img, surprise_text, (interp_x + 10, interp_y + 80),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 150, 150), 1)
+            cv2.putText(img, "No structural_prior input", (interp_x + 10, interp_y + 65),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.3, (100, 100, 100), 1)
+            cv2.putText(img, "Connect eigenmode_spectrum", (interp_x + 10, interp_y + 80),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.3, (100, 100, 100), 1)
         
         # Input status
-        input_status = "Receiving EEG tokens" if has_input else "No input - running on prior"
+        input_status = "Receiving EEG" if has_input else "No EEG input"
         input_color = (100, 200, 100) if has_input else (200, 100, 100)
-        cv2.putText(img, input_status, (interp_x + 10, interp_y + 110),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.35, input_color, 1)
+        cv2.putText(img, input_status, (interp_x + 10, interp_y + 118),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.3, input_color, 1)
         
-        cv2.putText(img, f"Epoch: {self.epoch}", (interp_x + 10, interp_y + 135),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.35, (150, 150, 150), 1)
+        cv2.putText(img, f"Epoch: {self.epoch}", (interp_x + 140, interp_y + 118),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.3, (150, 150, 150), 1)
+        
+        cv2.putText(img, f"Surprise: {self.surprise:.3f}", (interp_x + 240, interp_y + 118),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 150, 150), 1)
         
         # === VERY BOTTOM: Philosophy ===
         cv2.putText(img, "I(X;Y) = H(prior) - H(posterior|Y) : Information = Uncertainty reduction", 
