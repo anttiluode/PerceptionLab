@@ -1,0 +1,267 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 80
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -1538.0,
+      "pos_y": -628.0,
+      "width": 576.0,
+      "height": 429.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\3.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 13248.0,
+        "current_tokens": [
+          {
+            "id": 1,
+            "region": "frontal",
+            "band": "theta",
+            "amplitude": 10.004086034922302,
+            "phase": 1.883194099720719,
+            "frequency": 6.0
+          },
+          {
+            "id": 6,
+            "region": "temporal",
+            "band": "theta",
+            "amplitude": 17.49357316211888,
+            "phase": -0.3604550715872325,
+            "frequency": 6.0
+          },
+          {
+            "id": 15,
+            "region": "occipital",
+            "band": "delta",
+            "amplitude": 17.458099273864423,
+            "phase": 1.3386668331733191,
+            "frequency": 2.25
+          },
+          {
+            "id": 16,
+            "region": "occipital",
+            "band": "theta",
+            "amplitude": 13.473331087781757,
+            "phase": -1.4119191837721423,
+            "frequency": 6.0
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "MoireFrequencyNode",
+      "pos_x": -933.0,
+      "pos_y": -645.0,
+      "width": 710.0,
+      "height": 491.0,
+      "config": {
+        "inputs": {
+          "theta_signal": "signal",
+          "alpha_signal": "signal",
+          "beta_signal": "signal",
+          "gamma_signal": "signal",
+          "field_input": "complex_spectrum",
+          "token_stream": "spectrum"
+        },
+        "node_title": "Moir\u00e9 Frequency (Cross-Band Interference)",
+        "field_size": 64,
+        "epoch": 32628,
+        "history_len": 100,
+        "theta": 114.85060775743709,
+        "alpha": 73.94779224212094,
+        "beta": 38.45993750998008,
+        "gamma": 74.0885443741221,
+        "theta_phase": 1.114357821089147,
+        "alpha_phase": 0.6505801120089795,
+        "beta_phase": -2.2664391830965913,
+        "gamma_phase": 2.2247382256242614,
+        "binding_signal": 0.06416756742020462
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ComplexToImageNode",
+      "pos_x": -158.0,
+      "pos_y": -477.0,
+      "width": 200.0,
+      "height": 181.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum",
+          "phase_scan": "signal",
+          "contrast": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "magnitude": "image",
+          "phase": "image"
+        },
+        "node_title": "Base Node",
+        "decoding_mode": "Magnitude",
+        "t": 4225
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "TemporalBlurNode",
+      "pos_x": 131.0,
+      "pos_y": -325.0,
+      "width": 568.0,
+      "height": 320.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Temporal Blur (Ghosting)",
+        "feedback": 0.98
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "TemporalBlurNode",
+      "pos_x": 141.0,
+      "pos_y": -637.0,
+      "width": 552.0,
+      "height": 306.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Temporal Blur (Ghosting)",
+        "feedback": 0.98
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "TemporalBlurNode",
+      "pos_x": 749.0,
+      "pos_y": -635.0,
+      "width": 531.0,
+      "height": 596.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Temporal Blur (Ghosting)",
+        "feedback": 0.98
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "interference",
+      "to_node_id": 1,
+      "to_port": "field_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_power",
+      "to_node_id": 1,
+      "to_port": "theta_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha_power",
+      "to_node_id": 1,
+      "to_port": "alpha_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta_power",
+      "to_node_id": 1,
+      "to_port": "beta_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma_power",
+      "to_node_id": 1,
+      "to_port": "gamma_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "interference",
+      "to_node_id": 1,
+      "to_port": "field_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "token_stream",
+      "to_node_id": 1,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "full_interference",
+      "to_node_id": 2,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "phase",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "magnitude",
+      "to_node_id": 4,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image_out",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
