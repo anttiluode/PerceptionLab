@@ -20,6 +20,7 @@ OUTPUTS:
 - token_stream: All active tokens (for external analysis)
 - interference: Complex field for further processing
 - theta_phase: Current phase (for synchronization)
+- [Cleaned] delta_power, theta_power, alpha_power, beta_power, gamma_power: Whole-brain instantaneous power (Signal)
 
 WHAT YOU SEE:
 - TOP: Token piano roll (FL Studio style) showing brain activity over time
@@ -81,6 +82,9 @@ REGION_COLORS = {
     'parietal': (255, 255, 100),
     'occipital': (100, 100, 255),
 }
+# Define all bands for whole-brain output
+SIGNAL_BANDS_WHOLE_BRAIN = list(BANDS.keys())
+
 
 class NeuralTransformerNode(BaseNode):
     NODE_CATEGORY = "Synthesis"
@@ -110,6 +114,13 @@ class NeuralTransformerNode(BaseNode):
             'interference': 'complex_spectrum',
             'theta_phase': 'signal',
             'sample_trigger': 'signal',  # 1.0 when sampling, 0.0 otherwise
+            
+            # --- Whole-Brain Band Power Outputs (All 5 bands - consolidated) ---
+            'delta_power': 'signal',
+            'theta_power': 'signal',
+            'alpha_power': 'signal',
+            'beta_power': 'signal',
+            'gamma_power': 'signal',
         }
         
         # === CONFIG ===
@@ -307,6 +318,57 @@ class NeuralTransformerNode(BaseNode):
             import traceback
             traceback.print_exc()
     
+    # ========== BAND POWER EXTRACTION ADDITIONS (Consolidated) ==========
+    
+    def _get_band_power_for_region(self, idx, region, band_name):
+        """Extract instantaneous power for a specific band and region at current position."""
+        low, high = BANDS[band_name]
+        window_len = 256 # Use the same window as tokens for local estimation
+        
+        if idx + window_len >= len(self.source_series['frontal']):
+            return 0.0
+        
+        series = self.source_series[region]
+        if series is None:
+            return 0.0
+        
+        window = series[idx:idx + window_len] * self.base_gain
+        nyq = self.fs / 2.0
+        
+        # Nyquist check
+        if high >= nyq:
+            high = nyq - 0.1
+        if low >= high:
+            return 0.0
+            
+        # Bandpass
+        b, a = butter(3, [low/nyq, high/nyq], btype='band')
+        band_signal = lfilter(b, a, window)
+        
+        # Hilbert to get instantaneous amplitude/power
+        analytic = hilbert(band_signal)
+        envelope = np.abs(analytic)
+        
+        # Return instantaneous power (amplitude squared) at the center of the window
+        mid = window_len // 2
+        amplitude = envelope[mid]
+        power = amplitude**2
+        
+        return float(power)
+    
+    def _extract_whole_brain_band_power(self, idx, band_name):
+        """Extract average instantaneous power across all regions for a specific band."""
+        powers = []
+        for region in REGIONS:
+            power = self._get_band_power_for_region(idx, region, band_name)
+            powers.append(power)
+        
+        if not powers:
+            return 0.0
+            
+        # Return the mean power across all regions
+        return np.mean(powers)
+        
     # ========== TOKEN EXTRACTION ==========
     
     def _extract_tokens(self, idx, threshold_mult=1.5):
@@ -536,6 +598,14 @@ class NeuralTransformerNode(BaseNode):
                 return np.nan_to_num(arr, nan=0.0, posinf=0.0, neginf=0.0)
             return arr
 
+        idx = int(self.playback_idx)
+                
+        # --- Whole-Brain Band Power Outputs (All 5 bands) ---
+        for band in SIGNAL_BANDS_WHOLE_BRAIN:
+            power = self._extract_whole_brain_band_power(idx, band)
+            output_key = f'{band}_power'
+            self.outputs[output_key] = clean_array(power)
+
         # Token stream (all tokens)
         if self.current_tokens:
             arr = np.array([[t['id'], t['amplitude'], t['phase']] 
@@ -568,8 +638,13 @@ class NeuralTransformerNode(BaseNode):
         self.outputs['sample_trigger'] = 1.0 if self.is_sampling else 0.0
         
         # Attention matrix image
-        attn_vis = cv2.resize(self.attention_weights.astype(np.float32), (256, 256), 
-                            interpolation=cv2.INTER_NEAREST)
+        attn = self.attention_weights
+        if attn.shape[0] > 0 and attn.shape[1] > 0:
+            attn_vis = cv2.resize(attn.astype(np.float32), (256, 256), 
+                                interpolation=cv2.INTER_NEAREST)
+        else:
+            attn_vis = np.zeros((256, 256), dtype=np.float32)
+            
         # Clean visualization data too just in case
         attn_u8 = (clean_array(attn_vis) * 255).clip(0, 255).astype(np.uint8)
         self._attention_img = cv2.applyColorMap(attn_u8, cv2.COLORMAP_VIRIDIS)
