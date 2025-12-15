@@ -1,0 +1,307 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 90
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -930.0,
+      "pos_y": -269.0,
+      "width": 443.0,
+      "height": 226.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 1982.0,
+        "current_tokens": []
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -671.0,
+      "pos_y": 133.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 0.1
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ConnectomePriorNode",
+      "pos_x": -450.0,
+      "pos_y": -349.0,
+      "width": 1148.0,
+      "height": 632.0,
+      "config": {
+        "inputs": {
+          "token_stream": "spectrum",
+          "frontal_tokens": "spectrum",
+          "temporal_tokens": "spectrum",
+          "parietal_tokens": "spectrum",
+          "occipital_tokens": "spectrum",
+          "theta_phase": "signal",
+          "temperature": "signal",
+          "modulate": "signal"
+        },
+        "node_title": "Connectome Prior (Raj Modes)",
+        "region_names": [
+          "lh_bankssts",
+          "lh_caudalanteriorcingulate",
+          "lh_caudalmiddlefrontal",
+          "lh_cuneus",
+          "lh_entorhinal",
+          "lh_fusiform",
+          "lh_inferiorparietal",
+          "lh_inferiortemporal",
+          "lh_isthmuscingulate",
+          "lh_lateraloccipital",
+          "lh_lateralorbitofrontal",
+          "lh_lingual",
+          "lh_medialorbitofrontal",
+          "lh_middletemporal",
+          "lh_parahippocampal",
+          "lh_paracentral",
+          "lh_parsopercularis",
+          "lh_parsorbitalis",
+          "lh_parstriangularis",
+          "lh_pericalcarine",
+          "lh_postcentral",
+          "lh_posteriorcingulate",
+          "lh_precentral",
+          "lh_precuneus",
+          "lh_rostralanteriorcingulate",
+          "lh_rostralmiddlefrontal",
+          "lh_superiorfrontal",
+          "lh_superiorparietal",
+          "lh_superiortemporal",
+          "lh_supramarginal",
+          "lh_frontalpole",
+          "lh_temporalpole",
+          "lh_transversetemporal",
+          "lh_insula",
+          "rh_bankssts",
+          "rh_caudalanteriorcingulate",
+          "rh_caudalmiddlefrontal",
+          "rh_cuneus",
+          "rh_entorhinal",
+          "rh_fusiform",
+          "rh_inferiorparietal",
+          "rh_inferiortemporal",
+          "rh_isthmuscingulate",
+          "rh_lateraloccipital",
+          "rh_lateralorbitofrontal",
+          "rh_lingual",
+          "rh_medialorbitofrontal",
+          "rh_middletemporal",
+          "rh_parahippocampal",
+          "rh_paracentral",
+          "rh_parsopercularis",
+          "rh_parsorbitalis",
+          "rh_parstriangularis",
+          "rh_pericalcarine",
+          "rh_postcentral",
+          "rh_posteriorcingulate",
+          "rh_precentral",
+          "rh_precuneus",
+          "rh_rostralanteriorcingulate",
+          "rh_rostralmiddlefrontal",
+          "rh_superiorfrontal",
+          "rh_superiorparietal",
+          "rh_superiortemporal",
+          "rh_supramarginal",
+          "rh_frontalpole",
+          "rh_temporalpole",
+          "rh_transversetemporal",
+          "rh_insula"
+        ],
+        "n_regions": 68,
+        "n_modes": 16,
+        "epoch": 4335,
+        "has_eeg_input": false,
+        "structure_vs_function": 0.0,
+        "dominant_mode": 2
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "MutualInformationManifold",
+      "pos_x": 786.0,
+      "pos_y": -388.0,
+      "width": 952.0,
+      "height": 509.0,
+      "config": {
+        "inputs": {
+          "token_stream": "spectrum",
+          "theta_phase": "signal",
+          "temperature": "signal"
+        },
+        "node_title": "Mutual Information Manifold",
+        "embed_dim": 64,
+        "n_eigenmodes": 16,
+        "manifold_size": 256,
+        "latent_dim": 32,
+        "prior_entropy": 7.999999999344269,
+        "posterior_entropy": 7.390968636966839,
+        "mutual_information": 0.6090313623774302,
+        "information_rate": 0.03951571213697136,
+        "surprise": 0.3534097041711355,
+        "lr": 0.01,
+        "epoch": 2915
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "HolographicIFFTNode",
+      "pos_x": 799.0,
+      "pos_y": 134.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_spectrum": "complex_spectrum"
+        },
+        "outputs": {
+          "reconstructed_image": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 1030.0,
+      "pos_y": 139.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "token_stream",
+      "to_node_id": 2,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "frontal_tokens",
+      "to_node_id": 2,
+      "to_port": "frontal_tokens",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "temporal_tokens",
+      "to_node_id": 2,
+      "to_port": "temporal_tokens",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "parietal_tokens",
+      "to_node_id": 2,
+      "to_port": "parietal_tokens",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "occipital_tokens",
+      "to_node_id": 2,
+      "to_port": "occipital_tokens",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_phase",
+      "to_node_id": 2,
+      "to_port": "theta_phase",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "temperature",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "eigenmode_spectrum",
+      "to_node_id": 3,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_phase",
+      "to_node_id": 3,
+      "to_port": "theta_phase",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "temperature",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "structural_field",
+      "to_node_id": 4,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "reconstructed_image",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
