@@ -1,0 +1,211 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -1038.0,
+      "pos_y": -385.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 905.0,
+        "current_tokens": []
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ClusterMutationNodeV2",
+      "pos_x": -583.0,
+      "pos_y": -499.0,
+      "width": 1222.0,
+      "height": 756.0,
+      "config": {
+        "inputs": {
+          "theta_signal": "signal",
+          "alpha_signal": "signal",
+          "beta_signal": "signal",
+          "gamma_signal": "signal",
+          "token_stream": "spectrum",
+          "temperature": "signal",
+          "coupling_strength": "signal",
+          "lattice_zoom": "signal",
+          "lattice_freq": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "display": "image",
+          "mutation_field": "complex_spectrum",
+          "exchange_matrix": "spectrum",
+          "compatibility_matrix": "spectrum",
+          "mutation_trajectory": "spectrum",
+          "casimir_invariant": "signal",
+          "mutation_events": "signal",
+          "compatibility_score": "signal",
+          "state_vars": "spectrum",
+          "lattice_field": "complex_spectrum"
+        },
+        "input_data": {
+          "theta_signal": [
+            17.61921849152779
+          ],
+          "alpha_signal": [
+            26.07285086611657
+          ],
+          "beta_signal": [
+            50.55607302650675
+          ],
+          "gamma_signal": [
+            75.52804955019744
+          ],
+          "token_stream": [],
+          "temperature": [],
+          "coupling_strength": [],
+          "lattice_zoom": [
+            0.21
+          ],
+          "lattice_freq": [
+            70.0
+          ],
+          "reset": []
+        },
+        "node_title": "Cluster Mutation v2 (State/Obs Split)",
+        "n_variables": 4,
+        "field_size": 64,
+        "epoch": 905,
+        "eta": 0.1,
+        "mutation_threshold": 0.5,
+        "mutation_count": 21,
+        "last_mutation_vertex": 2,
+        "mutations_this_epoch": [],
+        "casimir": 6.080158253799847,
+        "history_len": 50,
+        "t_param": 1.0,
+        "lattice_zoom": 0.25,
+        "lattice_freq": 16.0,
+        "compatibility": 0.19740594518146293
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -1198.0,
+      "pos_y": 65.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 0.1
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -968.0,
+      "pos_y": 56.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 0.3
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -817.0,
+      "pos_y": -10.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 100
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "theta_power",
+      "to_node_id": 1,
+      "to_port": "theta_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha_power",
+      "to_node_id": 1,
+      "to_port": "alpha_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta_power",
+      "to_node_id": 1,
+      "to_port": "beta_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma_power",
+      "to_node_id": 1,
+      "to_port": "gamma_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "lattice_zoom",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "lattice_freq",
+      "learned_weight": 1.0
+    }
+  ]
+}
