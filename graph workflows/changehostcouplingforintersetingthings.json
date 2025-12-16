@@ -1,0 +1,270 @@
+{
+  "global_settings": {
+    "coupling": 12,
+    "speed": 20
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -1147.0,
+      "pos_y": -383.0,
+      "width": 377.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 11579.0,
+        "current_tokens": [
+          {
+            "id": 4,
+            "region": "frontal",
+            "band": "gamma",
+            "amplitude": 29.76346363234858,
+            "phase": -1.464830048013604,
+            "frequency": 50.0
+          },
+          {
+            "id": 15,
+            "region": "occipital",
+            "band": "delta",
+            "amplitude": 16.25020297236296,
+            "phase": 1.2801770687942686,
+            "frequency": 2.25
+          },
+          {
+            "id": 16,
+            "region": "occipital",
+            "band": "theta",
+            "amplitude": 13.937416347913032,
+            "phase": -1.0735998100881983,
+            "frequency": 6.0
+          },
+          {
+            "id": 17,
+            "region": "occipital",
+            "band": "alpha",
+            "amplitude": 13.627300887662201,
+            "phase": 1.413876204133708,
+            "frequency": 10.5
+          },
+          {
+            "id": 18,
+            "region": "occipital",
+            "band": "beta",
+            "amplitude": 17.049436170680416,
+            "phase": 1.105952421717851,
+            "frequency": 21.5
+          },
+          {
+            "id": 19,
+            "region": "occipital",
+            "band": "gamma",
+            "amplitude": 23.210628290420615,
+            "phase": -1.6040597526494116,
+            "frequency": 50.0
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -712.0,
+      "pos_y": -205.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 10
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -742.0,
+      "pos_y": 55.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "AttractorSwarmNode",
+      "pos_x": -338.0,
+      "pos_y": -461.0,
+      "width": 1218.0,
+      "height": 711.0,
+      "config": {
+        "inputs": {
+          "theta_signal": "signal",
+          "alpha_signal": "signal",
+          "beta_signal": "signal",
+          "gamma_signal": "signal",
+          "token_stream": "spectrum",
+          "global_coupling": "signal",
+          "adaptation_rate": "signal",
+          "lattice_zoom": "signal",
+          "lattice_freq": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "display": "image",
+          "swarm_field": "complex_spectrum",
+          "coupling_matrix": "spectrum",
+          "coalition_labels": "spectrum",
+          "dominant_attractor": "signal",
+          "global_symmetry": "signal",
+          "anisotropy": "signal",
+          "criticality_score": "signal"
+        },
+        "node_title": "Attractor Swarm (Multi-Observer Optics)",
+        "N": 4,
+        "field_size": 64,
+        "epoch": 10674,
+        "history_len": 100,
+        "adaptation_rate": 0.12,
+        "symmetry_target": 0.5,
+        "lattice_zoom": 1.2,
+        "lattice_freq": 4.8,
+        "attractor_names": [
+          "\u03b8-Slow",
+          "\u03b1-Mid",
+          "\u03b2-Fast",
+          "\u03b3-Ultra"
+        ],
+        "attractor_colors": [
+          [
+            100,
+            150,
+            255
+          ],
+          [
+            100,
+            255,
+            150
+          ],
+          [
+            255,
+            200,
+            100
+          ],
+          [
+            255,
+            100,
+            150
+          ]
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -750.0,
+      "pos_y": -427.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 40
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "theta_power",
+      "to_node_id": 3,
+      "to_port": "theta_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha_power",
+      "to_node_id": 3,
+      "to_port": "alpha_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta_power",
+      "to_node_id": 3,
+      "to_port": "beta_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma_power",
+      "to_node_id": 3,
+      "to_port": "gamma_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "token_stream",
+      "to_node_id": 3,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "adaptation_rate",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "lattice_zoom",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "lattice_freq",
+      "learned_weight": 1.0
+    }
+  ]
+}
