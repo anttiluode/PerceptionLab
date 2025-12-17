@@ -1,0 +1,190 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SpectralSwarmNode",
+      "pos_x": -561.0,
+      "pos_y": -46.0,
+      "width": 855.0,
+      "height": 391.0,
+      "config": {
+        "inputs": {
+          "eeg_signal": "signal",
+          "eeg_spectrum": "spectrum",
+          "token_stream": "spectrum",
+          "num_bands": "signal",
+          "freq_min": "signal",
+          "freq_max": "signal",
+          "global_coupling": "signal",
+          "adaptation_rate": "signal",
+          "lattice_zoom": "signal",
+          "lattice_freq": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "display": "image",
+          "combined_field": "complex_spectrum",
+          "band_powers": "spectrum",
+          "coupling_matrix": "spectrum",
+          "symmetry_score": "signal",
+          "anisotropy": "signal",
+          "criticality": "signal",
+          "phase_label": "signal",
+          "num_active_bands": "signal"
+        },
+        "node_title": "3. The Collective Unconscious (Swarm)",
+        "freq_min": 1.0,
+        "freq_max": 45.0,
+        "sample_rate": 160.0,
+        "global_coupling": 0.8,
+        "adaptation_rate": 0.01,
+        "lattice_zoom": 2.0,
+        "lattice_freq": 4.0,
+        "field_size": 64,
+        "buffer_size": 512,
+        "_current_N": 4,
+        "bandwidth": 11.0,
+        "symmetry_score": 0,
+        "anisotropy": 0.015628252397616563,
+        "criticality": 0.0,
+        "phase_label": 0,
+        "epoch": 3597
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "GalaxyFieldNode",
+      "pos_x": 376.0,
+      "pos_y": -145.0,
+      "width": 500.0,
+      "height": 500.0,
+      "config": {
+        "inputs": {
+          "energy": "signal",
+          "spin": "signal",
+          "seed_image": "image"
+        },
+        "outputs": {
+          "field": "image",
+          "memory": "image",
+          "total_energy": "signal"
+        },
+        "input_data": {
+          "energy": [],
+          "spin": [
+            0.012201727714939948
+          ],
+          "seed_image": []
+        },
+        "node_title": "5. THE UNIVERSE",
+        "grid_size": 256,
+        "dt": 0.05,
+        "time": 167.85000000000392
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -1085.0,
+      "pos_y": -98.0,
+      "width": 480.0,
+      "height": 215.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 3588.0,
+        "current_tokens": [
+          {
+            "id": 11,
+            "region": "parietal",
+            "band": "theta",
+            "amplitude": 8.14688028023129,
+            "phase": -2.9379934653539905,
+            "frequency": 6.0
+          },
+          {
+            "id": 17,
+            "region": "occipital",
+            "band": "alpha",
+            "amplitude": 11.057998969033072,
+            "phase": -0.035065530295013275,
+            "frequency": 10.5
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 925.0,
+      "pos_y": -158.0,
+      "width": 579.0,
+      "height": 562.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "anisotropy",
+      "to_node_id": 1,
+      "to_port": "spin",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "token_stream",
+      "to_node_id": 0,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "frontal_tokens",
+      "to_node_id": 0,
+      "to_port": "eeg_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "field",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
