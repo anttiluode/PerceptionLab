@@ -1,11 +1,11 @@
 """
-EphapticPerturbationNode (v1.2 - Added Flow Visualization Output)
+EphapticPerturbationNode (v1.3 - Fixed Remap Crash)
 -----------------------------------------------------------------
 Ephaptic fields don't transmit information. They gently DEFORM the
 fractal structure of the noise field, like wind on water.
 
-v1.2: Added 'flow_visualization' output - that beautiful church glass
-      window effect (webcam + flow overlay).
+v1.3: Added explicit float32 casting to 'map_x' and 'map_y' to prevent
+      OpenCV assertion failures when inputs are float64.
 """
 
 import numpy as np
@@ -47,6 +47,7 @@ class EphapticPerturbationNode(BaseNode):
         self.deformation_strength_value = 0.0
         self.perturbed_field_output = None 
         self.flow_viz_output = None  # The beautiful window
+        self.grid_size = 256 # Default safety
 
     def _calculate_optical_flow(self, frame):
         """Calculates dense optical flow"""
@@ -78,14 +79,19 @@ class EphapticPerturbationNode(BaseNode):
         
         # Create a mapping grid
         grid_x, grid_y = np.meshgrid(np.arange(w), np.arange(h))
+        
+        # Force float32 for grid
         grid_x = grid_x.astype(np.float32)
         grid_y = grid_y.astype(np.float32)
 
         # Apply the flow field as a perturbation
-        map_x = grid_x + flow[:, :, 0] * strength
-        map_y = grid_y + flow[:, :, 1] * strength
+        # [FIX] Force result to float32. 
+        # Python math might promote this to float64 if strength is a double, which crashes cv2.remap
+        map_x = (grid_x + flow[:, :, 0] * strength).astype(np.float32)
+        map_y = (grid_y + flow[:, :, 1] * strength).astype(np.float32)
         
         # Remap the field
+        # cv2.remap REQUIRES map1 and map2 to be CV_32FC1 (float32)
         perturbed = cv2.remap(field, map_x, map_y, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_WRAP)
         return perturbed
 
@@ -150,7 +156,7 @@ class EphapticPerturbationNode(BaseNode):
             # If no source, just have a gentle random drift
             if self.flow_field is None:
                 self.flow_field = np.zeros((self.grid_size, self.grid_size, 2), dtype=np.float32)
-            self.flow_field += (np.random.randn(self.grid_size, self.grid_size, 2) * 0.1)
+            self.flow_field += (np.random.randn(self.grid_size, self.grid_size, 2) * 0.1).astype(np.float32)
             self.flow_field *= self.temporal_smoothing
             self.deformation_strength_value = 0.0
             self.flow_viz_output = None
@@ -158,7 +164,7 @@ class EphapticPerturbationNode(BaseNode):
         # 3. Apply perturbation
         # Use modulation signal if present, otherwise use internal value
         strength = modulation if modulation is not None else self.deformation_strength_value
-        strength *= self.perturbation_strength # Scale by main knob
+        strength = float(strength) * self.perturbation_strength # Ensure float
         
         perturbed_field = self._warp_field(noise_field, self.flow_field, strength)
         self.perturbed_field_output = perturbed_field
