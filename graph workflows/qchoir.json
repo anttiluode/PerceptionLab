@@ -1,0 +1,185 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 60
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "ChaoticFieldNode",
+      "pos_x": -341.0,
+      "pos_y": 334.0,
+      "width": 250.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "state_in": "spectrum",
+          "bias_vector": "spectrum",
+          "measurement_trigger": "signal",
+          "chaos_strength": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "field_state": "spectrum",
+          "collapsed_state": "spectrum",
+          "coherence": "signal",
+          "energy": "signal"
+        },
+        "input_data": {
+          "state_in": [],
+          "bias_vector": [],
+          "measurement_trigger": [],
+          "chaos_strength": [],
+          "reset": []
+        },
+        "node_title": "1. THE CONDUCTOR (Chaos)",
+        "dimensions": 16,
+        "chaos_strength": 0.5,
+        "coherence_level": 0.43750960177929976,
+        "energy_level": 2179.990122993329,
+        "sigma": 10.0,
+        "rho": 28.0,
+        "beta": 2.6666666666666665,
+        "max_history": 50
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "BlochQubitNode",
+      "pos_x": -448.0,
+      "pos_y": 23.0,
+      "width": 250.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "ry_angle": "signal",
+          "rz_angle": "signal"
+        },
+        "outputs": {
+          "bloch_x": "signal",
+          "bloch_y": "signal",
+          "bloch_z": "signal",
+          "qubit_state": "spectrum"
+        },
+        "input_data": {
+          "ry_angle": [
+            0.43955784136387566
+          ],
+          "rz_angle": []
+        },
+        "node_title": "2. THE SINGER (Qubit)"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "LatentAssemblerNode",
+      "pos_x": 0.0,
+      "pos_y": 0.0,
+      "width": 250.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "latent_base": "spectrum",
+          "in_0": "signal",
+          "in_1": "signal",
+          "in_2": "signal",
+          "in_3": "signal",
+          "in_4": "signal",
+          "in_5": "signal",
+          "in_6": "signal",
+          "in_7": "signal",
+          "in_8": "signal",
+          "in_9": "signal",
+          "in_10": "signal",
+          "in_11": "signal",
+          "in_12": "signal",
+          "in_13": "signal",
+          "in_14": "signal",
+          "in_15": "signal"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "node_title": "3. HARMONIC MAPPER",
+        "latent_dim": 16
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "SpectralSynthesizerNode",
+      "pos_x": 327.0,
+      "pos_y": 83.0,
+      "width": 300.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "dna_55": "spectrum",
+          "master_gain": "signal"
+        },
+        "outputs": {
+          "visualizer": "image",
+          "audio_signal": "signal",
+          "spectrum": "spectrum",
+          "fft_image": "image"
+        },
+        "node_title": "4. AUDIO OUTPUT",
+        "base_freq": 110.0,
+        "master_gain": 0.5,
+        "num_modes": 55,
+        "active": true,
+        "sample_rate": 44100,
+        "chunk_size": 1024,
+        "time_counter": 52.599999999998296,
+        "fft_buffer_size": 2048
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "coherence",
+      "to_node_id": 1,
+      "to_port": "ry_angle",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "bloch_x",
+      "to_node_id": 2,
+      "to_port": "in_0",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "bloch_y",
+      "to_node_id": 2,
+      "to_port": "in_1",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "bloch_z",
+      "to_node_id": 2,
+      "to_port": "in_2",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "field_state",
+      "to_node_id": 2,
+      "to_port": "latent_base",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "latent_out",
+      "to_node_id": 3,
+      "to_port": "dna_55",
+      "learned_weight": 1.0
+    }
+  ]
+}
