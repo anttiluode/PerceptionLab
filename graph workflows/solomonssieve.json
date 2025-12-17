@@ -1,0 +1,156 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 50
+  },
+  "nodes": [
+    {
+      "id": 1,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": -900,
+      "pos_y": -200,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "node_title": "1. Harmonic Source (EEG)",
+        "selected_region": "Occipital",
+        "playback_speed": 1.0
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "NoiseGeneratorNode",
+      "pos_x": -900,
+      "pos_y": 50,
+      "width": 200,
+      "height": 180,
+      "config": {
+        "node_title": "2. Entropy Source (Noise)",
+        "noise_type": "white",
+        "speed": 0.5
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "EEGProcessorNode",
+      "pos_x": -600,
+      "pos_y": -200,
+      "width": 250,
+      "height": 200,
+      "config": {
+        "node_title": "3. Signal Processor",
+        "base_scale": 1000.0
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "ClusterMutationNodeV2",
+      "pos_x": -300,
+      "pos_y": -300,
+      "width": 300,
+      "height": 300,
+      "config": {
+        "node_title": "4. Algebraic Geometry",
+        "field_size": 128,
+        "n_variables": 4
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "SelfConsistentResonanceNode",
+      "pos_x": 50,
+      "pos_y": 0,
+      "width": 300,
+      "height": 300,
+      "config": {
+        "node_title": "5. THE CRYSTAL (Resonance)",
+        "size": 128,
+        "feedback_gain": 0.5
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "SixFoldHarmonyNode",
+      "pos_x": 400,
+      "pos_y": 0,
+      "width": 250,
+      "height": 250,
+      "config": {
+        "node_title": "6. STAR DETECTOR"
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "DisplayNode",
+      "pos_x": 700,
+      "pos_y": 0,
+      "width": 350,
+      "height": 350,
+      "config": {
+        "node_title": "7. CRYSTAL MONITOR"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "raw_signal",
+      "to_node_id": 3,
+      "to_port": "raw_in"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "theta_out",
+      "to_node_id": 4,
+      "to_port": "theta_signal"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "alpha_out",
+      "to_node_id": 4,
+      "to_port": "alpha_signal"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "gamma_out",
+      "to_node_id": 4,
+      "to_port": "gamma_signal"
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "latent_out",
+      "to_node_id": 5,
+      "to_port": "frequency_input"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 5,
+      "to_port": "reset"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "eigenfrequencies",
+      "to_node_id": 6,
+      "to_port": "eigenmode_shape"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "harmony_index",
+      "to_node_id": 5,
+      "to_port": "feedback_modulation"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "structure",
+      "to_node_id": 7,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "harmony_view",
+      "to_node_id": 7,
+      "to_port": "image_in"
+    }
+  ]
+}
