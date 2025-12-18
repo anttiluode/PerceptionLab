@@ -1,0 +1,374 @@
+{
+  "global_settings": {
+    "coupling": 9,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SpectralSwarmNode",
+      "pos_x": -563.0,
+      "pos_y": 62.0,
+      "width": 855.0,
+      "height": 391.0,
+      "config": {
+        "inputs": {
+          "eeg_signal": "signal",
+          "eeg_spectrum": "spectrum",
+          "token_stream": "spectrum",
+          "num_bands": "signal",
+          "freq_min": "signal",
+          "freq_max": "signal",
+          "global_coupling": "signal",
+          "adaptation_rate": "signal",
+          "lattice_zoom": "signal",
+          "lattice_freq": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "display": "image",
+          "combined_field": "complex_spectrum",
+          "band_powers": "spectrum",
+          "coupling_matrix": "spectrum",
+          "symmetry_score": "signal",
+          "anisotropy": "signal",
+          "criticality": "signal",
+          "phase_label": "signal",
+          "num_active_bands": "signal"
+        },
+        "node_title": "3. The Collective Unconscious (Swarm)",
+        "freq_min": 1.0,
+        "freq_max": 45.0,
+        "sample_rate": 160.0,
+        "global_coupling": 0.8,
+        "adaptation_rate": 0.01,
+        "lattice_zoom": 0.36,
+        "lattice_freq": 9.0,
+        "field_size": 64,
+        "buffer_size": 512,
+        "_current_N": 4,
+        "bandwidth": 11.0,
+        "symmetry_score": 0.16456809346793477,
+        "anisotropy": 0.004883672189820563,
+        "criticality": 0.16376439684653363,
+        "phase_label": 0,
+        "epoch": 10530
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "GalaxyFieldNode",
+      "pos_x": 358.0,
+      "pos_y": -146.0,
+      "width": 500.0,
+      "height": 500.0,
+      "config": {
+        "inputs": {
+          "energy": "signal",
+          "spin": "signal",
+          "seed_image": "image"
+        },
+        "outputs": {
+          "field": "image",
+          "memory": "image",
+          "total_energy": "signal"
+        },
+        "input_data": {
+          "energy": [],
+          "spin": [
+            0.002341471485158497
+          ],
+          "seed_image": []
+        },
+        "node_title": "5. THE UNIVERSE",
+        "grid_size": 256,
+        "dt": 0.05,
+        "time": 514.5000000000798
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "NeuralTransformerNode",
+      "pos_x": -1085.0,
+      "pos_y": -98.0,
+      "width": 480.0,
+      "height": 215.0,
+      "config": {
+        "inputs": {
+          "temperature": "float",
+          "gate_threshold": "float"
+        },
+        "input_data": {
+          "temperature": [],
+          "gate_threshold": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\450\\2.edf",
+        "base_gain": 20.0,
+        "base_speed": 1.0,
+        "embed_dim": 64,
+        "n_tokens_vocab": 20,
+        "fs": 160.0,
+        "is_loaded": true,
+        "load_error": "",
+        "needs_load": false,
+        "playback_idx": 10521.0,
+        "current_tokens": [
+          {
+            "id": 0,
+            "region": "frontal",
+            "band": "delta",
+            "amplitude": 22.55296351690958,
+            "phase": 2.5217945939346693,
+            "frequency": 2.25
+          },
+          {
+            "id": 13,
+            "region": "parietal",
+            "band": "beta",
+            "amplitude": 17.712049108646482,
+            "phase": 2.096345465196812,
+            "frequency": 21.5
+          }
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 947.0,
+      "pos_y": -162.0,
+      "width": 472.0,
+      "height": 489.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "EquivalenceNode",
+      "pos_x": 524.0,
+      "pos_y": 368.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "force_spectrum_out": "spectrum"
+        },
+        "node_title": "Equivalence (E=m*c^2)",
+        "spectrum_size": 512
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "SpectralSynthesizerNode",
+      "pos_x": 1022.0,
+      "pos_y": 368.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "dna_55": "spectrum",
+          "master_gain": "signal"
+        },
+        "outputs": {
+          "visualizer": "image",
+          "audio_signal": "signal",
+          "spectrum": "spectrum",
+          "fft_image": "image"
+        },
+        "node_title": "Spectral Synthesizer",
+        "base_freq": 110.0,
+        "master_gain": 1.0,
+        "num_modes": 55,
+        "active": true,
+        "sample_rate": 44100,
+        "chunk_size": 1024,
+        "time_counter": 104.2333333333287,
+        "fft_buffer_size": 2048
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -993.0,
+      "pos_y": 126.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 4
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "EquivalenceNode",
+      "pos_x": 1489.0,
+      "pos_y": 343.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "force_spectrum_out": "spectrum"
+        },
+        "node_title": "Equivalence (E=m*c^2)",
+        "spectrum_size": 512
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 8,
+      "class_name": "AttractorVisionNode",
+      "pos_x": 1463.0,
+      "pos_y": -200.0,
+      "width": 842.0,
+      "height": 518.0,
+      "config": {
+        "inputs": {
+          "field_state": "complex_spectrum",
+          "attractor_basin": "spectrum",
+          "constraint_field": "spectrum",
+          "temperature": "signal",
+          "theta_phase": "signal"
+        },
+        "node_title": "Attractor Vision (Exclusion Field)",
+        "epoch": 1803,
+        "field_size": 64,
+        "embed_dim": 32,
+        "exclusion_entropy": 8.148026290176213,
+        "vision_clarity": 1.151316663896897
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 9,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -992.0,
+      "pos_y": 316.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 100
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "anisotropy",
+      "to_node_id": 1,
+      "to_port": "spin",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "token_stream",
+      "to_node_id": 0,
+      "to_port": "token_stream",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "frontal_tokens",
+      "to_node_id": 0,
+      "to_port": "eeg_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "field",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "field",
+      "to_node_id": 4,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "force_spectrum_out",
+      "to_node_id": 5,
+      "to_port": "dna_55",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "magnitude_view",
+      "to_node_id": 7,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "force_spectrum_out",
+      "to_node_id": 8,
+      "to_port": "constraint_field",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "force_spectrum_out",
+      "to_node_id": 8,
+      "to_port": "attractor_basin",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "combined_field",
+      "to_node_id": 8,
+      "to_port": "field_state",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "lattice_zoom",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "lattice_freq",
+      "learned_weight": 1.0
+    }
+  ]
+}
