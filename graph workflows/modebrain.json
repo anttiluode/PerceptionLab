@@ -1,0 +1,165 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SourceLocalizationNode",
+      "pos_x": -152.0,
+      "pos_y": -69.0,
+      "width": 1019.0,
+      "height": 430.0,
+      "config": {
+        "inputs": {
+          "gain_mod": "signal",
+          "speed_mod": "signal"
+        },
+        "outputs": {
+          "source_image": "image",
+          "eigenmode_image": "image",
+          "lh_image": "image",
+          "rh_image": "image",
+          "mode_spectrum": "spectrum",
+          "complex_modes": "complex_spectrum",
+          "band_spectrum": "spectrum",
+          "full_spectrum": "spectrum",
+          "mode_1": "signal",
+          "mode_2": "signal",
+          "mode_3": "signal",
+          "mode_4": "signal",
+          "mode_5": "signal",
+          "mode_6": "signal",
+          "mode_7": "signal",
+          "mode_8": "signal",
+          "mode_9": "signal",
+          "mode_10": "signal",
+          "delta_power": "signal",
+          "theta_power": "signal",
+          "alpha_power": "signal",
+          "beta_power": "signal",
+          "gamma_power": "signal",
+          "raw_source": "signal",
+          "dominant_mode": "signal"
+        },
+        "input_data": {
+          "gain_mod": [],
+          "speed_mod": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\docshouse\\450\\2.edf",
+        "source_spacing": "oct5",
+        "inverse_method": "sLORETA",
+        "n_eigenmodes": 20,
+        "n_output_modes": 10,
+        "time_window": 0.5,
+        "amplification": 1000000,
+        "bands": {
+          "delta": [
+            1,
+            4
+          ],
+          "theta": [
+            4,
+            8
+          ],
+          "alpha": [
+            8,
+            13
+          ],
+          "beta": [
+            13,
+            30
+          ],
+          "gamma": [
+            30,
+            45
+          ]
+        },
+        "is_loaded": true,
+        "is_initialized": true,
+        "load_error": "",
+        "n_lh_vertices": 1026,
+        "n_rh_vertices": 1026,
+        "fs": 100.0,
+        "playback_idx": 4300,
+        "frame_count": 9162,
+        "_loading": false,
+        "_last_path": "E:\\docshouse\\450\\2.edf"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ComplexFieldViewerNode",
+      "pos_x": 993.0,
+      "pos_y": -62.0,
+      "width": 524.0,
+      "height": 610.0,
+      "config": {
+        "inputs": {
+          "complex_modes": "complex_spectrum",
+          "modulation": "signal"
+        },
+        "outputs": {
+          "interference_field": "image",
+          "magnitude_field": "image",
+          "phase_field": "image",
+          "field_energy": "signal",
+          "field_entropy": "signal",
+          "peak_x": "signal",
+          "peak_y": "signal",
+          "vortex_count": "signal",
+          "complex_field_out": "complex_spectrum"
+        },
+        "node_title": "Base Node",
+        "field_size": 200,
+        "n_modes": 10,
+        "colormap": "twilight",
+        "display_mode": "interference",
+        "spatial_scale": 1.0,
+        "temporal_smoothing": 0.3,
+        "_energy": 7.053307993433047e+17,
+        "_entropy": 10.437257766723633,
+        "_peak_x": 0.12,
+        "_peak_y": 0.105,
+        "_vortex_count": 28,
+        "frame_count": 1220
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "DisplayNode",
+      "pos_x": 1560.0,
+      "pos_y": -27.0,
+      "width": 700.0,
+      "height": 569.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "complex_modes",
+      "to_node_id": 1,
+      "to_port": "complex_modes",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "eigenmode_image",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
