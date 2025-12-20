@@ -1,0 +1,346 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "ModeDynamicsNode",
+      "pos_x": 1306.0,
+      "pos_y": -59.0,
+      "width": 765.0,
+      "height": 398.0,
+      "config": {
+        "inputs": {
+          "mode_1": "signal",
+          "mode_2": "signal",
+          "mode_3": "signal",
+          "mode_4": "signal",
+          "mode_5": "signal",
+          "mode_6": "signal",
+          "mode_7": "signal",
+          "mode_8": "signal",
+          "mode_9": "signal",
+          "mode_10": "signal",
+          "alpha_power": "signal",
+          "theta_power": "signal"
+        },
+        "outputs": {
+          "dynamics_image": "image",
+          "transition_matrix": "image",
+          "persistence_spectrum": "spectrum",
+          "mode_velocity": "signal",
+          "low_high_lag": "signal",
+          "attack_ratio": "signal",
+          "state_stability": "signal",
+          "dominant_trajectory": "signal",
+          "mode_entropy": "signal",
+          "coupling_strength": "signal"
+        },
+        "input_data": {
+          "mode_1": [
+            1863545.884039337
+          ],
+          "mode_2": [
+            35878.690579337876
+          ],
+          "mode_3": [
+            -1153448.145562624
+          ],
+          "mode_4": [
+            1667973.2394047119
+          ],
+          "mode_5": [
+            1036154.2798456815
+          ],
+          "mode_6": [
+            -133849.39573434167
+          ],
+          "mode_7": [
+            1527409.0517759311
+          ],
+          "mode_8": [
+            -1179423.3773163916
+          ],
+          "mode_9": [
+            395663.2170384689
+          ],
+          "mode_10": [
+            741771.9616823619
+          ],
+          "alpha_power": [
+            178.94267971151407
+          ],
+          "theta_power": [
+            141.20035463217152
+          ]
+        },
+        "node_title": "Base Node",
+        "history_length": 200,
+        "decay_window": 30,
+        "transition_threshold": 0.3,
+        "n_modes": 10,
+        "frame_count": 3586
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ModePhaseAnalyzerNode",
+      "pos_x": 2104.0,
+      "pos_y": -48.0,
+      "width": 516.0,
+      "height": 383.0,
+      "config": {
+        "inputs": {
+          "mode_spectrum": "spectrum"
+        },
+        "outputs": {
+          "phase_image": "image",
+          "interference_field": "image",
+          "phase_lag_matrix": "image",
+          "complex_modes": "complex_spectrum",
+          "phase_spectrum": "spectrum",
+          "phase_coherence": "signal",
+          "lead_mode": "signal",
+          "lag_mode": "signal",
+          "phase_velocity": "signal",
+          "mean_phase": "signal",
+          "low_high_phase_diff": "signal"
+        },
+        "node_title": "Base Node",
+        "n_modes": 10,
+        "history_length": 64,
+        "field_size": 128,
+        "frame_count": 2836
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ComplexFieldViewerNode",
+      "pos_x": 2677.0,
+      "pos_y": 42.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "complex_modes": "complex_spectrum",
+          "modulation": "signal"
+        },
+        "outputs": {
+          "interference_field": "image",
+          "magnitude_field": "image",
+          "phase_field": "image",
+          "field_energy": "signal",
+          "field_entropy": "signal",
+          "peak_x": "signal",
+          "peak_y": "signal",
+          "vortex_count": "signal",
+          "complex_field_out": "complex_spectrum"
+        },
+        "node_title": "Base Node",
+        "field_size": 200,
+        "n_modes": 10,
+        "colormap": "twilight",
+        "display_mode": "interference",
+        "spatial_scale": 1.0,
+        "temporal_smoothing": 0.3,
+        "_energy": 7.956711414473687e+17,
+        "_entropy": 10.451622009277344,
+        "_peak_x": 0.495,
+        "_peak_y": 0.49,
+        "_vortex_count": 24,
+        "frame_count": 1692
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "SourceLocalizationNode",
+      "pos_x": 523.0,
+      "pos_y": -84.0,
+      "width": 722.0,
+      "height": 427.0,
+      "config": {
+        "inputs": {
+          "gain_mod": "signal",
+          "speed_mod": "signal"
+        },
+        "outputs": {
+          "source_image": "image",
+          "eigenmode_image": "image",
+          "lh_image": "image",
+          "rh_image": "image",
+          "mode_spectrum": "spectrum",
+          "complex_modes": "complex_spectrum",
+          "band_spectrum": "spectrum",
+          "full_spectrum": "spectrum",
+          "mode_1": "signal",
+          "mode_2": "signal",
+          "mode_3": "signal",
+          "mode_4": "signal",
+          "mode_5": "signal",
+          "mode_6": "signal",
+          "mode_7": "signal",
+          "mode_8": "signal",
+          "mode_9": "signal",
+          "mode_10": "signal",
+          "delta_power": "signal",
+          "theta_power": "signal",
+          "alpha_power": "signal",
+          "beta_power": "signal",
+          "gamma_power": "signal",
+          "raw_source": "signal",
+          "dominant_mode": "signal"
+        },
+        "input_data": {
+          "gain_mod": [],
+          "speed_mod": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "E:\\docshouse\\450\\2.edf",
+        "source_spacing": "oct5",
+        "inverse_method": "sLORETA",
+        "n_eigenmodes": 20,
+        "n_output_modes": 10,
+        "time_window": 0.5,
+        "amplification": 1000000,
+        "bands": {
+          "delta": [
+            1,
+            4
+          ],
+          "theta": [
+            4,
+            8
+          ],
+          "alpha": [
+            8,
+            13
+          ],
+          "beta": [
+            13,
+            30
+          ],
+          "gamma": [
+            30,
+            45
+          ]
+        },
+        "is_loaded": true,
+        "is_initialized": true,
+        "load_error": "",
+        "n_lh_vertices": 1026,
+        "n_rh_vertices": 1026,
+        "fs": 100.0,
+        "playback_idx": 5050,
+        "frame_count": 1337,
+        "_loading": false,
+        "_last_path": "E:\\docshouse\\450\\2.edf"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "complex_modes",
+      "to_node_id": 2,
+      "to_port": "complex_modes",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_1",
+      "to_node_id": 0,
+      "to_port": "mode_1",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_2",
+      "to_node_id": 0,
+      "to_port": "mode_2",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_3",
+      "to_node_id": 0,
+      "to_port": "mode_3",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_4",
+      "to_node_id": 0,
+      "to_port": "mode_4",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_5",
+      "to_node_id": 0,
+      "to_port": "mode_5",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_6",
+      "to_node_id": 0,
+      "to_port": "mode_6",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_7",
+      "to_node_id": 0,
+      "to_port": "mode_7",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_8",
+      "to_node_id": 0,
+      "to_port": "mode_8",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_9",
+      "to_node_id": 0,
+      "to_port": "mode_9",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_10",
+      "to_node_id": 0,
+      "to_port": "mode_10",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "alpha_power",
+      "to_node_id": 0,
+      "to_port": "alpha_power",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "theta_power",
+      "to_node_id": 0,
+      "to_port": "theta_power",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "mode_spectrum",
+      "to_node_id": 1,
+      "to_port": "mode_spectrum",
+      "learned_weight": 1.0
+    }
+  ]
+}
