@@ -174,6 +174,10 @@ class SourceLocalizationNode(BaseNode):
         # Initialize MNE
         if MNE_AVAILABLE:
             self._init_mne()
+        
+        # Threading for heavy computation
+        self._loading_thread = None
+        self._loading = False
     
     def _init_mne(self):
         """Initialize MNE fsaverage data"""
@@ -195,8 +199,26 @@ class SourceLocalizationNode(BaseNode):
             self.load_error = f"MNE init error: {e}"
             print(f"[SourceLocalization] {self.load_error}")
     
+    def _load_eeg_threaded(self):
+        """Background thread for loading EEG"""
+        self._loading = True
+        try:
+            self._load_eeg_impl()
+        finally:
+            self._loading = False
+    
     def _load_eeg(self):
-        """Load EEG file and set up source localization"""
+        """Start loading EEG in background thread"""
+        if self._loading:
+            return False
+        
+        import threading
+        self._loading_thread = threading.Thread(target=self._load_eeg_threaded, daemon=True)
+        self._loading_thread.start()
+        return True
+    
+    def _load_eeg_impl(self):
+        """Load EEG file and set up source localization (runs in background)"""
         if not self.edf_path or not Path(self.edf_path).exists():
             self.load_error = "No valid EEG file path"
             return False
@@ -518,24 +540,30 @@ class SourceLocalizationNode(BaseNode):
             vertno = surf['vertno']
             rr = surf['rr'][vertno]
             
-            # Spherical projection
-            x, y, z = rr.T
-            r = np.sqrt(x**2 + y**2 + z**2)
-            theta = np.arctan2(y, x)
-            phi = np.arccos(z / (r + 1e-10))
+            # Use Y-Z projection (lateral view) instead of spherical
+            # This avoids wraparound artifacts
+            y = rr[:, 1]  # anterior-posterior
+            z = rr[:, 2]  # superior-inferior
             
             # Normalize to [0, 1]
-            theta_norm = (theta + np.pi) / (2 * np.pi)
-            phi_norm = phi / np.pi
+            y_min, y_max = y.min(), y.max()
+            z_min, z_max = z.min(), z.max()
             
-            # Map to pixel coordinates
+            y_norm = (y - y_min) / (y_max - y_min + 1e-10)
+            z_norm = (z - z_min) / (z_max - z_min + 1e-10)
+            
+            # Map to pixel coordinates with padding
             pad = 0.05
-            if hemi == 'lh':
-                px = (pad + (1 - 2*pad) * theta_norm * (half_W - 1)).astype(np.int32)
-            else:
-                px = (half_W + pad + (1 - 2*pad) * theta_norm * (half_W - 1)).astype(np.int32)
             
-            py = (pad + (1 - 2*pad) * (1 - phi_norm) * (H - 1)).astype(np.int32)
+            if hemi == 'lh':
+                # Left hemisphere goes on left side of image
+                px = (pad * half_W + (1 - 2*pad) * y_norm * (half_W - 1)).astype(np.int32)
+            else:
+                # Right hemisphere goes on right side
+                px = (half_W + pad * half_W + (1 - 2*pad) * y_norm * (half_W - 1)).astype(np.int32)
+            
+            # Z maps to vertical (flip so superior is at top)
+            py = ((1 - z_norm) * (1 - 2*pad) * (H - 1) + pad * H).astype(np.int32)
             
             px = np.clip(px, 0, W - 1)
             py = np.clip(py, 0, H - 1)
@@ -546,15 +574,16 @@ class SourceLocalizationNode(BaseNode):
         """Process one frame of source-localized data"""
         self.frame_count += 1
         
-        # Check if we need to load
-        if not self.is_loaded and self.edf_path:
+        # Check if we need to load (and not already loading)
+        if not self.is_loaded and self.edf_path and not self._loading:
             if hasattr(self, '_last_path') and self._last_path != self.edf_path:
                 self._load_eeg()
             elif not hasattr(self, '_last_path'):
                 self._load_eeg()
             self._last_path = self.edf_path
         
-        if not self.is_loaded or self.source_data is None:
+        # If still loading or not loaded, just return
+        if self._loading or not self.is_loaded or self.source_data is None:
             return
         
         # Get modulation
@@ -814,21 +843,36 @@ class SourceLocalizationNode(BaseNode):
             return QtGui.QImage(img.data, w, h, 3*w, QtGui.QImage.Format.Format_RGB888)
         
         # Status display
-        w, h = 200, 100
+        w, h = 300, 150
         img = np.zeros((h, w, 3), dtype=np.uint8)
         
-        if self.load_error:
+        if self._loading:
+            # Show loading animation
+            cv2.putText(img, "Loading EEG...", (20, 40),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 255, 100), 1)
+            cv2.putText(img, "This takes 30-60 seconds", (20, 70),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1)
+            cv2.putText(img, "(BEM + Forward + Inverse)", (20, 90),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1)
+            # Animated dots
+            dots = "." * ((self.frame_count // 10) % 4)
+            cv2.putText(img, dots, (180, 40),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 255, 100), 1)
+        elif self.load_error:
             cv2.putText(img, "Error:", (10, 30),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 100, 100), 1)
-            cv2.putText(img, self.load_error[:30], (10, 50),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.3, (200, 200, 200), 1)
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 100, 100), 1)
+            # Word wrap error message
+            error_lines = [self.load_error[i:i+35] for i in range(0, len(self.load_error), 35)]
+            for i, line in enumerate(error_lines[:3]):
+                cv2.putText(img, line, (10, 55 + i*20),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.35, (200, 200, 200), 1)
         elif not self.is_loaded:
-            cv2.putText(img, "Set edf_path", (10, 40),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1)
-            cv2.putText(img, "in config", (10, 60),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1)
+            cv2.putText(img, "Set edf_path in config", (20, 50),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150, 150, 150), 1)
+            cv2.putText(img, "then restart playback", (20, 75),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150, 150, 150), 1)
         else:
-            cv2.putText(img, "Processing...", (10, 50),
+            cv2.putText(img, "Ready - press Start", (20, 50),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 200, 100), 1)
         
         img = np.ascontiguousarray(img)
