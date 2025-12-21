@@ -1,0 +1,219 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "TemporalBlurNode",
+      "pos_x": 2601.0,
+      "pos_y": 157.0,
+      "width": 654.0,
+      "height": 461.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Temporal Blur (Ghosting)",
+        "feedback": 0.99
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "EphapticFieldNode2",
+      "pos_x": 1549.0,
+      "pos_y": 477.0,
+      "width": 401.0,
+      "height": 237.0,
+      "config": {
+        "inputs": {
+          "mode_spectrum": "spectrum",
+          "band_spectrum": "spectrum",
+          "full_spectrum": "spectrum",
+          "complex_modes": "complex_spectrum",
+          "source_image": "image",
+          "learning_rate": "signal",
+          "field_strength": "signal",
+          "threshold_mod": "signal",
+          "coupling_mod": "signal",
+          "reset": "signal",
+          "freeze": "signal"
+        },
+        "outputs": {
+          "ephaptic_field": "image",
+          "thought_field": "image",
+          "weight_map": "image",
+          "spike_map": "image",
+          "potential_map": "image",
+          "gradient_field": "image",
+          "combined_view": "image",
+          "field_fft": "image",
+          "firing_rate": "signal",
+          "synchrony": "signal",
+          "field_energy": "signal",
+          "field_stability": "signal",
+          "learning_delta": "signal",
+          "complexity": "signal",
+          "autonomy": "signal",
+          "dominant_mode": "signal",
+          "eigenfrequencies": "spectrum",
+          "field_spectrum": "spectrum"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "center": 64,
+        "input_mode": "complex_modes",
+        "use_source_image": false,
+        "plateau_duration": 10,
+        "plateau_boost": 0.3,
+        "n_long_range": 512,
+        "threshold": 0.3,
+        "refractory_period": 4,
+        "leak": 0.01,
+        "coupling": 0.1,
+        "input_gain": 0.9,
+        "field_tau": 0.95,
+        "field_coupling": 0.15,
+        "field_diffusion": 0.3,
+        "base_learning_rate": 0.1,
+        "weight_decay": 0.001,
+        "long_range_strength": 0.8,
+        "projection_mode": "eigenbasis",
+        "temporal_modulation": true,
+        "phase_coupling": true,
+        "max_history": 50,
+        "t": 16665
+      },
+      "custom_state_file": "ephaptic_state_1.npz"
+    },
+    {
+      "id": 2,
+      "class_name": "SourceLocalizationNode",
+      "pos_x": 457.0,
+      "pos_y": 114.0,
+      "width": 211.0,
+      "height": 246.0,
+      "config": {
+        "inputs": {
+          "gain_mod": "signal",
+          "speed_mod": "signal"
+        },
+        "outputs": {
+          "source_image": "image",
+          "eigenmode_image": "image",
+          "lh_image": "image",
+          "rh_image": "image",
+          "mode_spectrum": "spectrum",
+          "complex_modes": "complex_spectrum",
+          "band_spectrum": "spectrum",
+          "full_spectrum": "spectrum",
+          "mode_1": "signal",
+          "mode_2": "signal",
+          "mode_3": "signal",
+          "mode_4": "signal",
+          "mode_5": "signal",
+          "mode_6": "signal",
+          "mode_7": "signal",
+          "mode_8": "signal",
+          "mode_9": "signal",
+          "mode_10": "signal",
+          "delta_power": "signal",
+          "theta_power": "signal",
+          "alpha_power": "signal",
+          "beta_power": "signal",
+          "gamma_power": "signal",
+          "raw_source": "signal",
+          "dominant_mode": "signal"
+        },
+        "input_data": {
+          "gain_mod": [],
+          "speed_mod": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "e:\\docshouse\\450\\1.edf",
+        "source_spacing": "oct5",
+        "inverse_method": "sLORETA",
+        "n_eigenmodes": 20,
+        "n_output_modes": 10,
+        "time_window": 0.5,
+        "amplification": 1000000,
+        "bands": {
+          "delta": [
+            1,
+            4
+          ],
+          "theta": [
+            4,
+            8
+          ],
+          "alpha": [
+            8,
+            13
+          ],
+          "beta": [
+            13,
+            30
+          ],
+          "gamma": [
+            30,
+            45
+          ]
+        },
+        "is_loaded": true,
+        "is_initialized": true,
+        "load_error": "",
+        "n_lh_vertices": 1026,
+        "n_rh_vertices": 1026,
+        "fs": 100.0,
+        "playback_idx": 5400,
+        "frame_count": 16617,
+        "_loading": false,
+        "_last_path": "e:\\docshouse\\450\\1.edf"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 2,
+      "from_port": "mode_spectrum",
+      "to_node_id": 1,
+      "to_port": "mode_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "band_spectrum",
+      "to_node_id": 1,
+      "to_port": "band_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "full_spectrum",
+      "to_node_id": 1,
+      "to_port": "full_spectrum",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "complex_modes",
+      "to_node_id": 1,
+      "to_port": "complex_modes",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "gradient_field",
+      "to_node_id": 0,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
