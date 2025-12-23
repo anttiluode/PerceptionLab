@@ -1,63 +1,60 @@
 """
-RadialIntegrationNode - The Consciousness Cochlea
-==================================================
+HolographicInterferenceNode - Pribram's Dream
+==============================================
 
-"What stands at the center when all waves have summed?"
+"The smallest unit is not the neuron. It's the interference fringe."
 
-The biological cochlea unfolds frequency into space - a linear Fourier transform
-in flesh, reading high-to-low along the basilar membrane spiral.
+Karl Pribram proposed that the brain stores information holographically -
+as interference patterns between waves at every scale. We've been stuck
+on 4-5 frequency bands (delta, theta, alpha, beta, gamma) like they're
+fundamental. They're not. They're just the peaks we named.
 
-This node does something different: RADIAL integration from edge toward center.
-Like a cochlea folded into a disc, or a thalamocortical loop collapsing 
-probability distributions to a "best estimate."
+The actual EEG contains a CONTINUOUS spectrum. Every frequency interferes
+with every other frequency. The number of interference patterns scales
+as N*(N-1)/2 where N is the number of frequencies.
 
-The hypothesis:
-- Chaos lives at the edges (high frequency, differentiated, features)
-- Qualia emerges at the center (integrated, bound, unified)
-- The transform between them is a standing wave that peaks at resonance
+This node goes to town:
+- Decomposes EEG into HUNDREDS of frequency bins (not 4, not 16, but 256+)
+- Computes ALL pairwise interference patterns
+- Renders the result as a massive holographic field (up to 4K/8K)
+- The output IS the hologram - the interference pattern of your brain's waves
 
-From Wright & Bourke: O(P,t) ↔ o(±p², t - |P-p|/ν)
-The p² term compresses - points opposite each other map to the same location.
-This is a 2-to-1 projection. Information collapses.
+With 256 frequency bins, we get 32,640 unique interference pairs.
+Each pair creates a beat frequency and a phase relationship.
+Together they form a holographic encoding of the original signal.
 
-From Antti's insight: Energy radiates from center in concentric rings.
-What if we reverse the flow? Integrate INWARD?
-
-MECHANISM:
-1. Sample the input field in concentric rings (like cochlear tonotopy)
-2. Each ring integrates its content (sum, mean, or phase-locked average)
-3. Rings propagate inward with time delays (like traveling waves)
-4. The CENTER accumulates what survives integration
-5. Resonant modes appear as stable patterns at specific radii
-
-The "qualia point" is the center - where all frequencies have been
-integrated, all phases have been summed, all chaos has collapsed.
+WHY THIS MIGHT NOT BE RIDICULOUS:
+- Holography requires reference + signal beam interference
+- EEG bands naturally provide multiple "beams" at different frequencies
+- The brain's dendritic trees ARE doing this computation spatially
+- We just never look at it this way because we collapse to 5 bands
 
 INPUTS:
-- chaos_field: The differentiated input (from gradient, ephaptic field, etc.)
-- phase_field: Optional phase information for phase-locked integration
-- integration_strength: How much each ring collapses information
-- wave_speed: How fast integration propagates inward
-- resonance_q: Quality factor - how sharply tuned the resonances are
+- raw_eeg: Raw EEG signal (or use internal file)
+- resolution_scale: How large to make the output (1=1K, 2=2K, 4=4K, 8=8K)
+- freq_resolution: How many frequency bins (64, 128, 256, 512)
+- interference_mode: How to compute interference ('beat', 'phase', 'complex')
+- time_window: Analysis window in seconds
 
 OUTPUTS:
-- qualia_point: The central integrated value (scalar or small region)
-- radial_profile: Integration level at each radius (the "basilar membrane")
-- standing_wave: The resonant pattern that emerges
-- collapsed_field: The full field after radial integration
-- resonance_spectrum: Which radial frequencies resonate
-- binding_map: Where integration is strongest
+- hologram: The massive interference pattern image
+- spectrum: The frequency decomposition
+- beat_matrix: The matrix of beat frequencies
+- phase_matrix: The matrix of phase relationships
+- dominant_interference: Strongest interference pair
+- total_energy: Total spectral energy
+- complexity: Measure of interference pattern complexity
 
 Created: December 2025
-For Antti's quest to find the transform from chaos to qualia
+For Antti's quest to find what's really in the signal
 """
 
 import numpy as np
 import cv2
-from scipy.fft import fft, ifft, fft2, ifft2, fftshift
-from scipy.ndimage import gaussian_filter, map_coordinates
-from scipy.signal import hilbert
-from collections import deque
+from scipy.fft import fft, fftfreq, rfft, rfftfreq
+from scipy.signal import butter, filtfilt, hilbert, stft
+from scipy.ndimage import gaussian_filter, zoom
+import os
 
 import __main__
 try:
@@ -68,554 +65,583 @@ except AttributeError:
         def get_blended_input(self, name, mode): return None
     import PyQt6.QtGui as QtGui
 
+try:
+    import mne
+    MNE_AVAILABLE = True
+except ImportError:
+    MNE_AVAILABLE = False
 
-class RadialIntegrationNode(BaseNode):
+
+class HolographicInterferenceNode2(BaseNode):
     """
-    The Consciousness Cochlea - integrates from edge to center,
-    collapsing chaos into qualia through radial wave propagation.
+    Decomposes EEG into massive frequency spread and computes
+    all pairwise interference patterns as a holographic field.
     """
     NODE_CATEGORY = "Consciousness"
-    NODE_TITLE = "Radial Integration"
-    NODE_COLOR = QtGui.QColor(255, 100, 150)  # Rose - the heart of it
+    NODE_TITLE = "Holographic Interference"
+    NODE_COLOR = QtGui.QColor(255, 0, 255)  # Magenta - beyond the visible
     
     def __init__(self):
         super().__init__()
         
         self.inputs = {
-            'chaos_field': 'image',          # The differentiated input
-            'phase_field': 'image',          # Optional phase for coherent integration
-            'integration_strength': 'signal', # How much to collapse per ring
-            'wave_speed': 'signal',          # Propagation speed inward
-            'resonance_q': 'signal',         # Quality factor of resonances
-            'center_x': 'signal',            # Optional center offset
-            'center_y': 'signal',
+            'raw_eeg': 'signal',           # External EEG signal
+            'resolution_scale': 'signal',   # 1=1K, 2=2K, 4=4K, 8=8K
+            'freq_resolution': 'signal',    # Number of frequency bins
+            'time_window': 'signal',        # Analysis window
+            'reference_freq': 'signal',     # Reference beam frequency (0=auto)
             'reset': 'signal'
         }
         
         self.outputs = {
-            # Core outputs
-            'qualia_point': 'signal',        # The central integrated value
-            'qualia_region': 'image',        # Small region around center
-            'radial_profile': 'spectrum',    # Integration vs radius
-            'standing_wave': 'image',        # The resonant pattern
-            'collapsed_field': 'image',      # Full integrated field
+            # Main outputs
+            'hologram': 'image',            # The massive interference field
+            'hologram_small': 'image',      # Downsampled for preview
+            'spectrum_image': 'image',      # Frequency decomposition visual
             
-            # Analysis
-            'resonance_spectrum': 'spectrum', # Radial frequency content
-            'binding_map': 'image',          # Where integration is strongest
-            'phase_coherence_radial': 'spectrum', # Phase lock by radius
-            'traveling_wave': 'image',       # The inward wave visualization
-            
-            # Combined view
-            'combined_view': 'image',
+            # Matrices
+            'beat_matrix': 'image',         # Beat frequencies between all pairs
+            'phase_matrix': 'image',        # Phase relationships
+            'coherence_matrix': 'image',    # Coherence between frequency pairs
             
             # Signals
-            'peak_radius': 'signal',         # Where resonance peaks
-            'center_energy': 'signal',       # Energy at center
-            'integration_completeness': 'signal', # How collapsed is it
-            'dominant_ring': 'signal'        # Which ring dominates
+            'dominant_beat': 'signal',      # Strongest beat frequency
+            'total_energy': 'signal',       # Total spectral energy
+            'complexity': 'signal',         # Entropy of interference pattern
+            'peak_frequency': 'signal',     # Dominant frequency
+            'n_interferences': 'signal',    # Number of interference pairs computed
+            
+            # Spectrum for downstream
+            'full_spectrum': 'spectrum'     # All frequency bin powers
         }
         
-        self.size = 128
-        self.center = self.size // 2
-        self.n_rings = 64  # Number of concentric integration rings
+        # === CONFIGURATION ===
+        self.edf_path = ""
+        self.selected_region = "All"
         
-        # Build coordinate grids
-        y, x = np.ogrid[:self.size, :self.size]
-        self.y_grid, self.x_grid = np.mgrid[:self.size, :self.size]
-        self.r_grid = np.sqrt((x - self.center)**2 + (y - self.center)**2)
-        self.theta_grid = np.arctan2(y - self.center, x - self.center)
+        # Resolution settings
+        self.base_resolution = 1024        # Base output size (1K)
+        self.resolution_scale = 1          # Multiplier (1, 2, 4, 8)
+        self.output_resolution = 1024      # Actual output size
         
-        # Ring masks for integration
-        self._build_ring_system()
+        # Frequency decomposition settings
+        self.n_freq_bins = 256             # Number of frequency bins
+        self.freq_min = 0.5                # Minimum frequency Hz
+        self.freq_max = 100.0              # Maximum frequency Hz (beyond gamma!)
+        self.freq_spacing = 'log'          # 'linear' or 'log' spacing
+        
+        # Interference computation
+        self.interference_mode = 'complex' # 'beat', 'phase', 'complex'
+        self.use_hilbert = True            # Use analytic signal for phase
+        
+        # Time parameters
+        self.window_size = 2.0             # Seconds
+        self.fs = 256.0                    # Sampling rate
         
         # === STATE ===
-        # The "basilar membrane" - accumulated integration at each radius
-        self.radial_accumulator = np.zeros(self.n_rings)
-        self.radial_phase = np.zeros(self.n_rings)
+        # EEG data
+        self.raw_mne = None
+        self.eeg_buffer = np.zeros(int(self.fs * self.window_size))
+        self.current_time = 0.0
         
-        # Standing wave state
-        self.standing_wave = np.zeros((self.size, self.size))
-        self.standing_wave_complex = np.zeros((self.size, self.size), dtype=np.complex128)
+        # Frequency analysis
+        self.freq_bins = np.logspace(np.log10(self.freq_min), 
+                                      np.log10(self.freq_max), 
+                                      self.n_freq_bins)
+        self.freq_amplitudes = np.zeros(self.n_freq_bins)
+        self.freq_phases = np.zeros(self.n_freq_bins)
         
-        # Traveling wave buffer (for visualization)
-        self.wave_history = deque(maxlen=32)
+        # Interference matrices
+        self.beat_matrix = np.zeros((self.n_freq_bins, self.n_freq_bins))
+        self.phase_matrix = np.zeros((self.n_freq_bins, self.n_freq_bins))
+        self.coherence_matrix = np.zeros((self.n_freq_bins, self.n_freq_bins))
         
         # Output fields
-        self.collapsed_field = np.zeros((self.size, self.size))
-        self.binding_map = np.zeros((self.size, self.size))
-        self.qualia_region = np.zeros((16, 16))
+        self.hologram = np.zeros((self.output_resolution, self.output_resolution))
+        self.hologram_small = np.zeros((256, 256))
         
         # Metrics
-        self.qualia_point = 0.0
-        self.peak_radius = 0.0
-        self.center_energy = 0.0
+        self.dominant_beat = 0.0
+        self.total_energy = 0.0
+        self.complexity = 0.0
+        self.peak_frequency = 0.0
         
-        # === PARAMETERS ===
-        self.base_integration = 0.3      # How much to integrate per ring
-        self.base_wave_speed = 2.0       # Rings per timestep inward
-        self.base_resonance_q = 5.0      # Resonance sharpness
-        self.damping = 0.95              # Wave damping
-        self.phase_coupling = 0.5        # How much phase matters
+        # Precompute interference basis
+        self._precompute_interference_basis()
         
-        # Resonance frequencies (which ring distances resonate)
-        self.resonance_radii = [8, 16, 24, 32]  # Will find these adaptively
-        
+        self._last_path = ""
         self.t = 0
     
-    def _build_ring_system(self):
-        """Build the concentric ring system for cochlea-like sampling."""
-        self.ring_masks = []
-        self.ring_indices = []
+    def _precompute_interference_basis(self):
+        """
+        Precompute the spatial basis functions for interference patterns.
+        Each frequency pair creates a specific spatial pattern.
+        """
+        # For efficiency, we compute patterns at lower resolution and upsample
+        basis_res = min(256, self.output_resolution)
         
-        max_r = self.center
-        ring_width = max_r / self.n_rings
+        # Coordinate grids
+        x = np.linspace(-1, 1, basis_res)
+        y = np.linspace(-1, 1, basis_res)
+        self.X, self.Y = np.meshgrid(x, y)
+        self.R = np.sqrt(self.X**2 + self.Y**2)
+        self.THETA = np.arctan2(self.Y, self.X)
         
-        for i in range(self.n_rings):
-            r_inner = i * ring_width
-            r_outer = (i + 1) * ring_width
-            mask = (self.r_grid >= r_inner) & (self.r_grid < r_outer)
-            self.ring_masks.append(mask)
-            
-            # Store indices for fast sampling
-            indices = np.where(mask)
-            self.ring_indices.append(indices)
-        
-        # Build radial coordinate for each pixel (which ring it belongs to)
-        self.ring_assignment = np.clip(
-            (self.r_grid / (self.center / self.n_rings)).astype(int),
-            0, self.n_rings - 1
-        )
+        # Precompute some common patterns
+        # (full precomputation of all pairs would use too much memory)
+        self.radial_basis = np.exp(-self.R**2 * 2)  # Gaussian envelope
     
-    def _sample_ring(self, field, ring_idx, phase_field=None):
-        """
-        Sample a ring and compute its integrated value.
-        This is like a hair cell reading the basilar membrane displacement.
-        """
-        mask = self.ring_masks[ring_idx]
-        if np.sum(mask) == 0:
-            return 0.0, 0.0
+    def _update_freq_bins(self):
+        """Update frequency bin array based on settings."""
+        if self.freq_spacing == 'log':
+            self.freq_bins = np.logspace(
+                np.log10(max(0.1, self.freq_min)), 
+                np.log10(self.freq_max), 
+                self.n_freq_bins
+            )
+        else:
+            self.freq_bins = np.linspace(self.freq_min, self.freq_max, self.n_freq_bins)
         
-        values = field[mask]
-        
-        # Basic integration: mean value
-        mean_val = np.mean(values)
-        
-        # If we have phase information, do phase-coherent integration
-        if phase_field is not None:
-            phases = phase_field[mask]
-            # Phase-locked average: weight by phase coherence
-            phasors = np.exp(1j * phases)
-            coherence = np.abs(np.mean(phasors))
-            mean_phasor = np.mean(phasors)
-            phase = np.angle(mean_phasor)
-            
-            # Coherent integration amplifies aligned phases
-            mean_val = mean_val * (1 + self.phase_coupling * coherence)
-            return mean_val, phase
-        
-        return mean_val, 0.0
+        # Resize matrices
+        self.freq_amplitudes = np.zeros(self.n_freq_bins)
+        self.freq_phases = np.zeros(self.n_freq_bins)
+        self.beat_matrix = np.zeros((self.n_freq_bins, self.n_freq_bins))
+        self.phase_matrix = np.zeros((self.n_freq_bins, self.n_freq_bins))
+        self.coherence_matrix = np.zeros((self.n_freq_bins, self.n_freq_bins))
     
-    def _propagate_inward(self, radial_values, radial_phases, speed):
-        """
-        Propagate integration wave inward, like traveling wave on basilar membrane.
-        But reversed - from edge toward center.
-        """
-        n = len(radial_values)
-        new_values = np.zeros(n)
-        new_phases = np.zeros(n)
+    def _load_edf(self):
+        """Load EEG file."""
+        if not MNE_AVAILABLE or not os.path.exists(self.edf_path):
+            return False
         
-        # Integration propagates from outer to inner rings
-        shift = int(speed)
-        frac = speed - shift
+        try:
+            raw = mne.io.read_raw_edf(self.edf_path, preload=True, verbose=False)
+            raw.resample(self.fs, verbose=False)
+            self.raw_mne = raw
+            self._last_path = self.edf_path
+            self.current_time = 0.0
+            print(f"[Holographic] Loaded: {self.edf_path}")
+            return True
+        except Exception as e:
+            print(f"[Holographic] Load error: {e}")
+            return False
+    
+    def _get_eeg_window(self):
+        """Get current EEG window from file or input."""
+        if self.raw_mne is not None:
+            start = int(self.current_time * self.fs)
+            end = start + int(self.window_size * self.fs)
+            
+            if end >= self.raw_mne.n_times:
+                self.current_time = 0.0
+                start = 0
+                end = int(self.window_size * self.fs)
+            
+            data, _ = self.raw_mne[:, start:end]
+            
+            # Average across channels
+            if data.ndim > 1:
+                data = np.mean(data, axis=0)
+            
+            # Advance time
+            self.current_time += 1.0 / 30.0
+            
+            return data
+        
+        return self.eeg_buffer
+    
+    def _decompose_frequencies(self, signal):
+        """
+        Decompose signal into frequency bins using filter bank.
+        Extract amplitude and phase for each bin.
+        """
+        n = len(signal)
+        if n < 10:
+            return
+        
+        nyq = self.fs / 2.0
+        
+        for i, freq in enumerate(self.freq_bins):
+            # Define narrow bandpass around this frequency
+            bw = max(0.5, freq * 0.1)  # 10% bandwidth, min 0.5 Hz
+            low = max(0.1, freq - bw/2) / nyq
+            high = min(0.99, (freq + bw/2) / nyq)
+            
+            if low >= high or low <= 0 or high >= 1:
+                self.freq_amplitudes[i] = 0
+                self.freq_phases[i] = 0
+                continue
+            
+            try:
+                b, a = butter(2, [low, high], btype='band')
+                filtered = filtfilt(b, a, signal)
+                
+                # Get amplitude
+                self.freq_amplitudes[i] = np.sqrt(np.mean(filtered**2))
+                
+                # Get phase using Hilbert transform
+                if self.use_hilbert and len(filtered) > 10:
+                    analytic = hilbert(filtered)
+                    self.freq_phases[i] = np.angle(np.mean(analytic))
+                else:
+                    self.freq_phases[i] = 0.0
+                    
+            except Exception:
+                self.freq_amplitudes[i] = 0
+                self.freq_phases[i] = 0
+    
+    def _compute_interference_matrices(self):
+        """
+        Compute all pairwise interference patterns.
+        This is O(N^2) but we're going for it.
+        """
+        n = self.n_freq_bins
         
         for i in range(n):
-            # Source rings (outer)
-            src_idx = min(i + shift, n - 1)
-            src_idx_next = min(i + shift + 1, n - 1)
-            
-            # Interpolated value
-            outer_val = radial_values[src_idx] * (1 - frac) + radial_values[src_idx_next] * frac
-            outer_phase = radial_phases[src_idx] * (1 - frac) + radial_phases[src_idx_next] * frac
-            
-            # Integration: accumulate from outer rings with damping
-            # Inner rings accumulate more (they receive from all outer rings)
-            accumulation_factor = 1.0 + (n - i) / n * self.base_integration
-            
-            new_values[i] = (
-                self.radial_accumulator[i] * self.damping + 
-                outer_val * accumulation_factor * (1 - self.damping)
-            )
-            new_phases[i] = outer_phase
-        
-        return new_values, new_phases
+            for j in range(i+1, n):
+                # Beat frequency
+                beat = abs(self.freq_bins[i] - self.freq_bins[j])
+                self.beat_matrix[i, j] = beat
+                self.beat_matrix[j, i] = beat
+                
+                # Phase difference
+                phase_diff = self.freq_phases[i] - self.freq_phases[j]
+                self.phase_matrix[i, j] = phase_diff
+                self.phase_matrix[j, i] = -phase_diff
+                
+                # Coherence (product of amplitudes, weighted by phase alignment)
+                coherence = (self.freq_amplitudes[i] * self.freq_amplitudes[j] * 
+                            np.cos(phase_diff / 2)**2)
+                self.coherence_matrix[i, j] = coherence
+                self.coherence_matrix[j, i] = coherence
     
-    def _apply_resonance(self, radial_values, q_factor):
+    def _render_hologram(self):
         """
-        Apply resonance - certain radii resonate and amplify.
-        Like the basilar membrane's frequency selectivity.
+        Render the holographic interference pattern.
+        Each frequency pair contributes a spatial pattern.
         """
-        resonant_values = radial_values.copy()
+        # Work at basis resolution, then upsample
+        basis_res = min(256, self.output_resolution)
+        hologram = np.zeros((basis_res, basis_res))
         
-        # Find peaks in the radial profile (natural resonances)
-        # These are where the system wants to ring
-        profile_smooth = gaussian_filter(radial_values, sigma=2)
+        n = self.n_freq_bins
         
-        # Resonance amplification at specific radii
-        for res_r in self.resonance_radii:
-            if res_r < self.n_rings:
-                # Gaussian resonance peak
-                resonance = np.exp(-((np.arange(self.n_rings) - res_r)**2) / (2 * (q_factor**2)))
-                resonant_values += radial_values * resonance * 0.5
-        
-        return resonant_values
-    
-    def _reconstruct_field(self, radial_values, radial_phases):
-        """
-        Reconstruct 2D field from radial profile.
-        This creates the "collapsed" view - chaos integrated to structure.
-        """
-        field = np.zeros((self.size, self.size))
-        
-        for i in range(self.n_rings):
-            mask = self.ring_masks[i]
-            # Each ring gets its integrated value
-            # Optionally modulated by phase
-            if self.phase_coupling > 0:
-                phase_mod = np.cos(self.theta_grid[mask] + radial_phases[i])
-                field[mask] = radial_values[i] * (1 + 0.3 * phase_mod)
-            else:
-                field[mask] = radial_values[i]
-        
-        return field
-    
-    def _compute_standing_wave(self, field):
-        """
-        Compute standing wave pattern from the integration dynamics.
-        Standing waves appear where inward and "reflected" waves interfere.
-        """
-        # Analytic signal for phase extraction
-        rows_analytic = np.zeros_like(field, dtype=np.complex128)
-        for i in range(self.size):
-            rows_analytic[i, :] = hilbert(field[i, :])
-        
-        # Radial analytic signal (approximate)
-        # This captures the standing wave pattern
-        self.standing_wave_complex = self.standing_wave_complex * 0.9 + rows_analytic * 0.1
-        self.standing_wave = np.abs(self.standing_wave_complex)
-    
-    def _compute_binding_map(self, field, phase_field):
-        """
-        Where is integration strongest? Where do features bind?
-        """
-        # Binding is strong where:
-        # 1. Local variance is low (features have merged)
-        # 2. Phase coherence is high (things are synchronized)
-        
-        # Local variance
-        field_blur = gaussian_filter(field, sigma=3)
-        field_var = gaussian_filter((field - field_blur)**2, sigma=3)
-        low_variance = 1.0 / (1.0 + field_var * 10)
-        
-        # Phase coherence (if available)
-        if phase_field is not None:
-            phase_blur = gaussian_filter(np.cos(phase_field), sigma=3)
-            coherence = np.abs(phase_blur)
+        # Limit pairs for performance (top coherence pairs)
+        flat_coherence = self.coherence_matrix.flatten()
+        if np.max(flat_coherence) > 0:
+            threshold = np.percentile(flat_coherence[flat_coherence > 0], 90)
         else:
-            coherence = np.ones_like(field)
+            threshold = 0
         
-        self.binding_map = low_variance * coherence
+        pair_count = 0
+        max_pairs = 500  # Limit for performance
+        
+        for i in range(n):
+            for j in range(i+1, n):
+                if self.coherence_matrix[i, j] < threshold:
+                    continue
+                if pair_count >= max_pairs:
+                    break
+                
+                # Get interference parameters
+                f1, f2 = self.freq_bins[i], self.freq_bins[j]
+                a1, a2 = self.freq_amplitudes[i], self.freq_amplitudes[j]
+                p1, p2 = self.freq_phases[i], self.freq_phases[j]
+                
+                beat = abs(f1 - f2)
+                phase_diff = p1 - p2
+                amp = np.sqrt(a1 * a2)
+                
+                if amp < 1e-10:
+                    continue
+                
+                # Create spatial interference pattern
+                # This is where the holography happens:
+                # Two "beams" at different frequencies create fringes
+                
+                # Spatial frequency of fringes (proportional to beat frequency)
+                k = beat * 0.5  # Scale factor for visualization
+                
+                # Angle based on frequency ratio (creates different orientations)
+                angle = (f1 / f2) * np.pi
+                
+                # The interference pattern
+                pattern = amp * np.cos(
+                    k * (self.X * np.cos(angle) + self.Y * np.sin(angle)) * 10 +
+                    phase_diff +
+                    (f1 + f2) * self.R * 0.5  # Radial component
+                )
+                
+                # Apply envelope
+                pattern *= self.radial_basis
+                
+                hologram += pattern
+                pair_count += 1
+            
+            if pair_count >= max_pairs:
+                break
+        
+        # Normalize
+        if hologram.max() != hologram.min():
+            hologram = (hologram - hologram.min()) / (hologram.max() - hologram.min())
+        
+        # Upsample to output resolution if needed
+        if self.output_resolution > basis_res:
+            scale = self.output_resolution / basis_res
+            hologram = zoom(hologram, scale, order=1)
+        
+        self.hologram = hologram
+        
+        # Create small preview
+        if self.output_resolution > 256:
+            self.hologram_small = cv2.resize(hologram, (256, 256))
+        else:
+            self.hologram_small = hologram.copy()
     
-    def _find_resonance_spectrum(self, radial_values):
-        """
-        FFT of radial profile gives resonance spectrum.
-        Which radial frequencies are present?
-        """
-        spectrum = np.abs(fft(radial_values))[:self.n_rings // 2]
-        return spectrum
+    def _compute_metrics(self):
+        """Compute output metrics."""
+        # Find dominant beat frequency
+        max_idx = np.unravel_index(np.argmax(self.coherence_matrix), 
+                                    self.coherence_matrix.shape)
+        if max_idx[0] != max_idx[1]:
+            self.dominant_beat = abs(self.freq_bins[max_idx[0]] - 
+                                     self.freq_bins[max_idx[1]])
+        
+        # Total spectral energy
+        self.total_energy = np.sum(self.freq_amplitudes**2)
+        
+        # Peak frequency
+        self.peak_frequency = self.freq_bins[np.argmax(self.freq_amplitudes)]
+        
+        # Complexity (entropy of hologram)
+        hist, _ = np.histogram(self.hologram.flatten(), bins=256, density=True)
+        hist = hist[hist > 0]
+        self.complexity = -np.sum(hist * np.log2(hist + 1e-10))
     
     def step(self):
         self.t += 1
         
         # === GET INPUTS ===
-        chaos = self.get_blended_input('chaos_field', 'first')
-        phase = self.get_blended_input('phase_field', 'first')
-        
-        int_strength = self.get_blended_input('integration_strength', 'sum')
-        wave_spd = self.get_blended_input('wave_speed', 'sum')
-        res_q = self.get_blended_input('resonance_q', 'sum')
-        
-        cx = self.get_blended_input('center_x', 'sum')
-        cy = self.get_blended_input('center_y', 'sum')
-        
+        raw_in = self.get_blended_input('raw_eeg', 'sum')
+        res_scale = self.get_blended_input('resolution_scale', 'sum')
+        freq_res = self.get_blended_input('freq_resolution', 'sum')
+        time_win = self.get_blended_input('time_window', 'sum')
         reset = self.get_blended_input('reset', 'sum')
         
         if reset is not None and reset > 0.5:
-            self.radial_accumulator.fill(0)
-            self.radial_phase.fill(0)
-            self.standing_wave.fill(0)
+            self.current_time = 0.0
             return
         
-        if chaos is None:
+        # Update settings from inputs
+        if res_scale is not None:
+            new_scale = int(np.clip(res_scale, 1, 8))
+            if new_scale != self.resolution_scale:
+                self.resolution_scale = new_scale
+                self.output_resolution = self.base_resolution * new_scale
+                self._precompute_interference_basis()
+        
+        if freq_res is not None:
+            new_n = int(np.clip(freq_res, 32, 512))
+            if new_n != self.n_freq_bins:
+                self.n_freq_bins = new_n
+                self._update_freq_bins()
+        
+        # Load EEG file if path changed
+        if self.edf_path and self.edf_path != self._last_path:
+            self._load_edf()
+        
+        # Get EEG data
+        if raw_in is not None:
+            # External input - add to buffer
+            self.eeg_buffer = np.roll(self.eeg_buffer, -1)
+            self.eeg_buffer[-1] = raw_in
+            signal = self.eeg_buffer
+        else:
+            signal = self._get_eeg_window()
+        
+        if signal is None or len(signal) < 10:
             return
         
-        # Apply parameters
-        if int_strength is not None:
-            self.base_integration = np.clip(int_strength, 0.01, 1.0)
-        if wave_spd is not None:
-            self.base_wave_speed = np.clip(wave_spd, 0.1, 10.0)
-        if res_q is not None:
-            self.base_resonance_q = np.clip(res_q, 1.0, 20.0)
+        # === DECOMPOSE INTO FREQUENCIES ===
+        self._decompose_frequencies(signal)
         
-        # Normalize input
-        if chaos.dtype == np.uint8:
-            chaos = chaos.astype(np.float32) / 255.0
-        if len(chaos.shape) == 3:
-            chaos = np.mean(chaos, axis=2)
-        if chaos.shape[0] != self.size:
-            chaos = cv2.resize(chaos, (self.size, self.size))
+        # === COMPUTE INTERFERENCE ===
+        self._compute_interference_matrices()
         
-        # Handle optional phase field
-        phase_field = None
-        if phase is not None:
-            if phase.dtype == np.uint8:
-                phase = phase.astype(np.float32) / 255.0 * 2 * np.pi - np.pi
-            if phase.shape[0] != self.size:
-                phase = cv2.resize(phase, (self.size, self.size))
-            phase_field = phase
+        # === RENDER HOLOGRAM ===
+        self._render_hologram()
         
-        # === SAMPLE ALL RINGS (cochlea-like) ===
-        ring_values = np.zeros(self.n_rings)
-        ring_phases = np.zeros(self.n_rings)
-        
-        for i in range(self.n_rings):
-            val, ph = self._sample_ring(chaos, i, phase_field)
-            ring_values[i] = val
-            ring_phases[i] = ph
-        
-        # Store current state for traveling wave visualization
-        self.wave_history.append(ring_values.copy())
-        
-        # === PROPAGATE INWARD ===
-        self.radial_accumulator, self.radial_phase = self._propagate_inward(
-            ring_values, ring_phases, self.base_wave_speed
-        )
-        
-        # === APPLY RESONANCE ===
-        resonant_profile = self._apply_resonance(
-            self.radial_accumulator, self.base_resonance_q
-        )
-        
-        # === RECONSTRUCT COLLAPSED FIELD ===
-        self.collapsed_field = self._reconstruct_field(resonant_profile, self.radial_phase)
-        
-        # === COMPUTE STANDING WAVE ===
-        self._compute_standing_wave(self.collapsed_field)
-        
-        # === COMPUTE BINDING MAP ===
-        self._compute_binding_map(self.collapsed_field, phase_field)
-        
-        # === EXTRACT QUALIA POINT (the center) ===
-        center_region = self.collapsed_field[
-            self.center-8:self.center+8,
-            self.center-8:self.center+8
-        ]
-        self.qualia_region = center_region.copy()
-        self.qualia_point = float(np.mean(center_region))
-        self.center_energy = float(np.sum(center_region**2))
-        
-        # === FIND PEAK RESONANCE RADIUS ===
-        self.peak_radius = float(np.argmax(resonant_profile))
-        
-        # === UPDATE ADAPTIVE RESONANCES ===
-        # Find natural peaks in the profile
-        profile_smooth = gaussian_filter(resonant_profile, sigma=2)
-        gradient = np.gradient(profile_smooth)
-        peaks = []
-        for i in range(1, len(gradient) - 1):
-            if gradient[i-1] > 0 and gradient[i+1] < 0:
-                peaks.append(i)
-        if len(peaks) >= 4:
-            self.resonance_radii = peaks[:4]
+        # === COMPUTE METRICS ===
+        self._compute_metrics()
     
     def get_output(self, port_name):
-        if port_name == 'qualia_point':
-            return float(self.qualia_point)
+        if port_name == 'hologram':
+            return (self.hologram * 255).astype(np.uint8)
         
-        elif port_name == 'qualia_region':
-            region = self.qualia_region
-            if region.max() > region.min():
-                norm = (region - region.min()) / (region.max() - region.min())
-            else:
-                norm = region
-            return (norm * 255).astype(np.uint8)
+        elif port_name == 'hologram_small':
+            return (self.hologram_small * 255).astype(np.uint8)
         
-        elif port_name == 'radial_profile':
-            return self.radial_accumulator.astype(np.float32)
+        elif port_name == 'spectrum_image':
+            # Visualize frequency decomposition
+            h = 128
+            w = min(512, self.n_freq_bins)
+            img = np.zeros((h, w), dtype=np.uint8)
+            
+            if self.freq_amplitudes.max() > 0:
+                amps_norm = self.freq_amplitudes / self.freq_amplitudes.max()
+                # Resample if needed
+                if len(amps_norm) != w:
+                    amps_norm = np.interp(
+                        np.linspace(0, len(amps_norm)-1, w),
+                        np.arange(len(amps_norm)),
+                        amps_norm
+                    )
+                
+                for i, a in enumerate(amps_norm):
+                    bar_h = int(a * (h - 10))
+                    img[h-bar_h:h, i] = 200
+            
+            return img
         
-        elif port_name == 'standing_wave':
-            return self._normalize_to_uint8(self.standing_wave)
+        elif port_name == 'beat_matrix':
+            mat = self.beat_matrix.copy()
+            if mat.max() > 0:
+                mat = mat / mat.max()
+            # Resize for visibility
+            mat_vis = cv2.resize(mat, (256, 256))
+            return (mat_vis * 255).astype(np.uint8)
         
-        elif port_name == 'collapsed_field':
-            return self._normalize_to_uint8(self.collapsed_field)
+        elif port_name == 'phase_matrix':
+            mat = (self.phase_matrix + np.pi) / (2 * np.pi)
+            mat_vis = cv2.resize(mat, (256, 256))
+            return (mat_vis * 255).astype(np.uint8)
         
-        elif port_name == 'resonance_spectrum':
-            return self._find_resonance_spectrum(self.radial_accumulator).astype(np.float32)
+        elif port_name == 'coherence_matrix':
+            mat = self.coherence_matrix.copy()
+            if mat.max() > 0:
+                mat = mat / mat.max()
+            mat_vis = cv2.resize(mat, (256, 256))
+            return (mat_vis * 255).astype(np.uint8)
         
-        elif port_name == 'binding_map':
-            return self._normalize_to_uint8(self.binding_map)
+        elif port_name == 'dominant_beat':
+            return float(self.dominant_beat)
         
-        elif port_name == 'phase_coherence_radial':
-            # Phase coherence at each radius
-            coherence = np.abs(np.exp(1j * self.radial_phase))
-            return coherence.astype(np.float32)
+        elif port_name == 'total_energy':
+            return float(self.total_energy)
         
-        elif port_name == 'traveling_wave':
-            return self._render_traveling_wave()
+        elif port_name == 'complexity':
+            return float(self.complexity)
         
-        elif port_name == 'combined_view':
-            return self._render_combined()
+        elif port_name == 'peak_frequency':
+            return float(self.peak_frequency)
         
-        elif port_name == 'peak_radius':
-            return float(self.peak_radius)
+        elif port_name == 'n_interferences':
+            n = self.n_freq_bins
+            return float(n * (n - 1) / 2)
         
-        elif port_name == 'center_energy':
-            return float(self.center_energy)
-        
-        elif port_name == 'integration_completeness':
-            # How much has chaos collapsed?
-            if len(self.wave_history) > 0:
-                outer = np.mean([w[-10:].mean() for w in self.wave_history])
-                inner = np.mean([w[:10].mean() for w in self.wave_history])
-                if outer > 0:
-                    return float(inner / outer)
-            return 0.0
-        
-        elif port_name == 'dominant_ring':
-            return float(np.argmax(self.radial_accumulator))
+        elif port_name == 'full_spectrum':
+            return self.freq_amplitudes.astype(np.float32)
         
         return None
     
-    def _normalize_to_uint8(self, arr):
-        arr = np.nan_to_num(arr)
-        if arr.max() == arr.min():
-            return np.zeros((self.size, self.size), dtype=np.uint8)
-        norm = (arr - arr.min()) / (arr.max() - arr.min())
-        return (norm * 255).astype(np.uint8)
-    
-    def _render_traveling_wave(self):
-        """Visualize the traveling wave history."""
-        h, w = 64, self.n_rings
-        img = np.zeros((h, w), dtype=np.uint8)
-        
-        if len(self.wave_history) > 0:
-            history = np.array(list(self.wave_history))
-            # Normalize
-            if history.max() > history.min():
-                history = (history - history.min()) / (history.max() - history.min())
-            # Resize to fit
-            history_resized = cv2.resize(history, (w, h))
-            img = (history_resized * 255).astype(np.uint8)
-        
-        return cv2.applyColorMap(img, cv2.COLORMAP_MAGMA)
-    
-    def _render_combined(self):
-        """Render 2x3 combined view."""
-        h, w = self.size, self.size
-        display = np.zeros((h * 2, w * 3, 3), dtype=np.uint8)
-        
-        # Row 1: Collapsed Field, Standing Wave, Binding Map
-        collapsed_img = self._normalize_to_uint8(self.collapsed_field)
-        display[:h, :w] = cv2.applyColorMap(collapsed_img, cv2.COLORMAP_VIRIDIS)
-        
-        standing_img = self._normalize_to_uint8(self.standing_wave)
-        display[:h, w:2*w] = cv2.applyColorMap(standing_img, cv2.COLORMAP_PLASMA)
-        
-        binding_img = self._normalize_to_uint8(self.binding_map)
-        display[:h, 2*w:] = cv2.applyColorMap(binding_img, cv2.COLORMAP_HOT)
-        
-        # Row 2: Radial Profile, Traveling Wave, Qualia Region (enlarged)
-        # Radial profile as bars
-        profile_img = np.zeros((h, w, 3), dtype=np.uint8)
-        profile = self.radial_accumulator / (self.radial_accumulator.max() + 1e-10)
-        for i in range(min(self.n_rings, w)):
-            bar_h = int(profile[i] * h * 0.9)
-            x = int(i * w / self.n_rings)
-            color = cv2.applyColorMap(np.array([[int(profile[i] * 255)]], dtype=np.uint8), 
-                                       cv2.COLORMAP_TWILIGHT)[0, 0].tolist()
-            cv2.rectangle(profile_img, (x, h - bar_h), (x + w//self.n_rings, h), color, -1)
-        # Mark resonance radii
-        for res_r in self.resonance_radii:
-            x = int(res_r * w / self.n_rings)
-            cv2.line(profile_img, (x, 0), (x, 20), (0, 255, 255), 1)
-        display[h:, :w] = profile_img
-        
-        # Traveling wave
-        travel_img = self._render_traveling_wave()
-        travel_resized = cv2.resize(travel_img, (w, h))
-        display[h:, w:2*w] = travel_resized
-        
-        # Qualia region (enlarged)
-        if self.qualia_region.size > 0:
-            qualia_norm = self.qualia_region.copy()
-            if qualia_norm.max() > qualia_norm.min():
-                qualia_norm = (qualia_norm - qualia_norm.min()) / (qualia_norm.max() - qualia_norm.min())
-            qualia_img = (qualia_norm * 255).astype(np.uint8)
-            qualia_colored = cv2.applyColorMap(qualia_img, cv2.COLORMAP_INFERNO)
-            qualia_large = cv2.resize(qualia_colored, (w, h), interpolation=cv2.INTER_NEAREST)
-            display[h:, 2*w:] = qualia_large
-        
-        return display
-    
     def get_display_image(self):
-        display = self._render_combined()
-        h, w = self.size, self.size
+        # Composite display: hologram + spectrum + info
+        h, w = 256, 384
+        display = np.zeros((h, w, 3), dtype=np.uint8)
         
-        # Labels
+        # Hologram (left 256x256)
+        holo_vis = (self.hologram_small * 255).astype(np.uint8)
+        holo_color = cv2.applyColorMap(holo_vis, cv2.COLORMAP_TWILIGHT_SHIFTED)
+        display[:256, :256] = holo_color
+        
+        # Spectrum (right panel)
+        spec_h = 100
+        if self.freq_amplitudes.max() > 0:
+            amps_norm = self.freq_amplitudes / self.freq_amplitudes.max()
+            bar_w = 128 // len(amps_norm) if len(amps_norm) < 128 else 1
+            for i in range(min(128, len(amps_norm))):
+                idx = int(i * len(amps_norm) / 128)
+                bar_h = int(amps_norm[idx] * spec_h)
+                x = 256 + i
+                display[spec_h-bar_h:spec_h, x] = [100, 255, 100]
+        
+        # Info text
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(display, "Collapsed Field", (5, 15), font, 0.35, (255,255,255), 1)
-        cv2.putText(display, "Standing Wave", (w+5, 15), font, 0.35, (255,255,255), 1)
-        cv2.putText(display, "Binding Map", (2*w+5, 15), font, 0.35, (255,255,255), 1)
-        cv2.putText(display, "Radial Profile", (5, h+15), font, 0.35, (255,255,255), 1)
-        cv2.putText(display, "Traveling Wave", (w+5, h+15), font, 0.35, (255,255,255), 1)
-        cv2.putText(display, "QUALIA POINT", (2*w+5, h+15), font, 0.35, (0,255,255), 1)
+        cv2.putText(display, f"Bins: {self.n_freq_bins}", (260, 120), 
+                   font, 0.35, (255,255,255), 1)
+        cv2.putText(display, f"Pairs: {int(self.n_freq_bins*(self.n_freq_bins-1)/2)}", 
+                   (260, 140), font, 0.35, (255,255,255), 1)
+        cv2.putText(display, f"Peak: {self.peak_frequency:.1f}Hz", (260, 160), 
+                   font, 0.35, (255,255,255), 1)
+        cv2.putText(display, f"Beat: {self.dominant_beat:.1f}Hz", (260, 180), 
+                   font, 0.35, (255,255,255), 1)
+        cv2.putText(display, f"Complex: {self.complexity:.2f}", (260, 200), 
+                   font, 0.35, (255,255,255), 1)
+        cv2.putText(display, f"Res: {self.output_resolution}", (260, 220), 
+                   font, 0.35, (200,200,200), 1)
         
-        # Stats
-        q = self.qualia_point
-        peak = self.peak_radius
-        energy = self.center_energy
+        # Title
+        cv2.putText(display, "HOLOGRAPHIC", (5, 15), font, 0.4, (255,0,255), 1)
+        cv2.putText(display, "INTERFERENCE", (5, 30), font, 0.4, (255,0,255), 1)
         
-        stats = f"Qualia:{q:.3f} Peak@r={peak:.0f} CenterE:{energy:.2f}"
-        cv2.putText(display, stats, (5, h*2-5), font, 0.3, (200,200,200), 1)
-        
-        # Draw center marker on collapsed field
-        cv2.circle(display, (self.center, self.center), 3, (255, 255, 0), 1)
-        
-        return QtGui.QImage(display.data, display.shape[1], display.shape[0],
-                           display.shape[1] * 3, QtGui.QImage.Format.Format_RGB888)
+        return QtGui.QImage(display.data, w, h, w * 3, 
+                           QtGui.QImage.Format.Format_RGB888)
     
     def get_config_options(self):
+        spacing_opts = [('log', 'log'), ('linear', 'linear')]
+        mode_opts = [('complex', 'complex'), ('beat', 'beat'), ('phase', 'phase')]
+        region_opts = [
+            ('All', 'All'),
+            ('Occipital', 'Occipital'),
+            ('Temporal', 'Temporal'),
+            ('Parietal', 'Parietal'),
+            ('Frontal', 'Frontal'),
+            ('Central', 'Central')
+        ]
+        
         return [
-            ("Integration Strength", "base_integration", self.base_integration, None),
-            ("Wave Speed (inward)", "base_wave_speed", self.base_wave_speed, None),
-            ("Resonance Q", "base_resonance_q", self.base_resonance_q, None),
-            ("Damping", "damping", self.damping, None),
-            ("Phase Coupling", "phase_coupling", self.phase_coupling, None),
-            ("Number of Rings", "n_rings", self.n_rings, None),
+            ("EDF File Path", "edf_path", self.edf_path, None),
+            ("Brain Region", "selected_region", self.selected_region, region_opts),
+            ("Frequency Bins", "n_freq_bins", self.n_freq_bins, None),
+            ("Min Frequency (Hz)", "freq_min", self.freq_min, None),
+            ("Max Frequency (Hz)", "freq_max", self.freq_max, None),
+            ("Frequency Spacing", "freq_spacing", self.freq_spacing, spacing_opts),
+            ("Resolution Scale (1-8)", "resolution_scale", self.resolution_scale, None),
+            ("Window Size (s)", "window_size", self.window_size, None),
+            ("Interference Mode", "interference_mode", self.interference_mode, mode_opts),
+            ("Use Hilbert Phase", "use_hilbert", self.use_hilbert, 
+             [('True', True), ('False', False)]),
         ]
     
     def set_config_options(self, options):
-        rebuild_rings = False
+        rebuild = False
         for key, value in options.items():
-            if key == 'n_rings':
+            if key == 'n_freq_bins':
                 new_n = int(value)
-                if new_n != self.n_rings:
-                    self.n_rings = new_n
-                    rebuild_rings = True
+                if new_n != self.n_freq_bins:
+                    self.n_freq_bins = new_n
+                    rebuild = True
+            elif key == 'resolution_scale':
+                new_scale = int(np.clip(float(value), 1, 8))
+                if new_scale != self.resolution_scale:
+                    self.resolution_scale = new_scale
+                    self.output_resolution = self.base_resolution * new_scale
+                    self._precompute_interference_basis()
+            elif key in ('freq_min', 'freq_max', 'freq_spacing'):
+                old_val = getattr(self, key)
+                if key in ('freq_min', 'freq_max'):
+                    setattr(self, key, float(value))
+                else:
+                    setattr(self, key, value)
+                if old_val != getattr(self, key):
+                    rebuild = True
             elif hasattr(self, key):
-                setattr(self, key, type(getattr(self, key))(value))
+                if isinstance(getattr(self, key), bool):
+                    setattr(self, key, value in (True, 'True', 'true', '1', 1))
+                elif isinstance(getattr(self, key), float):
+                    setattr(self, key, float(value))
+                else:
+                    setattr(self, key, value)
         
-        if rebuild_rings:
-            self._build_ring_system()
-            self.radial_accumulator = np.zeros(self.n_rings)
-            self.radial_phase = np.zeros(self.n_rings)
+        if rebuild:
+            self._update_freq_bins()
