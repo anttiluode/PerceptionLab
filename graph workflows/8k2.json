@@ -1,0 +1,137 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "HolographicInterferenceNode2",
+      "pos_x": 1193.0,
+      "pos_y": 96.0,
+      "width": 507.0,
+      "height": 659.0,
+      "config": {
+        "inputs": {
+          "raw_eeg": "signal",
+          "resolution_scale": "signal",
+          "freq_resolution": "signal",
+          "time_window": "signal",
+          "reference_freq": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "hologram": "image",
+          "hologram_small": "image",
+          "spectrum_image": "image",
+          "beat_matrix": "image",
+          "phase_matrix": "image",
+          "coherence_matrix": "image",
+          "dominant_beat": "signal",
+          "total_energy": "signal",
+          "complexity": "signal",
+          "peak_frequency": "signal",
+          "n_interferences": "signal",
+          "full_spectrum": "spectrum"
+        },
+        "input_data": {
+          "raw_eeg": [],
+          "resolution_scale": [],
+          "freq_resolution": [],
+          "time_window": [],
+          "reference_freq": [],
+          "reset": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "e:\\docshouse\\450\\2.edf",
+        "selected_region": "All",
+        "base_resolution": 1024,
+        "resolution_scale": 1,
+        "output_resolution": 1024,
+        "n_freq_bins": 256,
+        "freq_min": 0.5,
+        "freq_max": 100,
+        "freq_spacing": "log",
+        "interference_mode": "complex",
+        "use_hilbert": true,
+        "window_size": 2,
+        "fs": 256.0,
+        "current_time": 49.099999999999774,
+        "dominant_beat": 0.11546941313485193,
+        "total_energy": 5.598495750669946e-09,
+        "complexity": -373.4719754906189,
+        "peak_frequency": 0.5,
+        "_last_path": "e:\\docshouse\\450\\2.edf",
+        "t": 1473
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "GradientFFTCompletionNode",
+      "pos_x": 1827.0,
+      "pos_y": 118.0,
+      "width": 560.0,
+      "height": 592.0,
+      "config": {
+        "inputs": {
+          "gradient_field": "image",
+          "gradient_x": "image",
+          "gradient_y": "image",
+          "original_field": "image",
+          "dc_injection": "signal",
+          "low_freq_boost": "signal",
+          "phase_seed_mode": "signal",
+          "iterations": "signal",
+          "regularization": "signal",
+          "ring_1_boost": "signal",
+          "ring_2_boost": "signal",
+          "ring_3_boost": "signal",
+          "ring_4_boost": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "completed_fft": "image",
+          "completed_phase": "image",
+          "reconstructed_field": "image",
+          "hidden_structure": "image",
+          "residual": "image",
+          "low_freq_content": "image",
+          "phase_coherence_map": "image",
+          "combined_view": "image",
+          "total_energy": "signal",
+          "low_freq_energy": "signal",
+          "high_freq_energy": "signal",
+          "phase_coherence": "signal",
+          "completion_confidence": "signal",
+          "frequency_spectrum": "spectrum"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "center": 64,
+        "base_dc": 0.5,
+        "base_low_boost": 2.0,
+        "base_iterations": 10,
+        "base_regularization": 0.1,
+        "ring_boosts": [
+          2.0,
+          1.5,
+          1.0,
+          0.8
+        ],
+        "phase_mode": 1,
+        "t": 1212
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "hologram",
+      "to_node_id": 1,
+      "to_port": "gradient_field",
+      "learned_weight": 1.0
+    }
+  ]
+}
