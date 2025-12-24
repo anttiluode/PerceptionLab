@@ -56,13 +56,13 @@
         "use_hilbert": false,
         "window_size": 0.065,
         "fs": 256.0,
-        "current_time": 5.2333333333333245,
-        "dominant_beat": 1.1980610629641362,
-        "total_energy": 4.916870213094157e-11,
-        "complexity": -1606.5006690665773,
-        "peak_frequency": 57.063910501643,
+        "current_time": 0.4333333333333333,
+        "dominant_beat": 1.2488959230824008,
+        "total_energy": 1.9461745670886887e-11,
+        "complexity": -1726.0567767802354,
+        "peak_frequency": 59.48518600906884,
         "_last_path": "e:\\docshouse\\450\\2.edf",
-        "t": 6127
+        "t": 6390
       },
       "custom_state_file": null
     },
@@ -118,13 +118,13 @@
         "use_hilbert": true,
         "window_size": 0.13,
         "fs": 256.0,
-        "current_time": 5.2333333333333245,
-        "dominant_beat": 1.1980610629641362,
-        "total_energy": 7.651271160491257e-11,
-        "complexity": -1489.0470750285062,
-        "peak_frequency": 57.063910501643,
+        "current_time": 0.4333333333333333,
+        "dominant_beat": 1.2488959230824008,
+        "total_energy": 4.0745648397767456e-11,
+        "complexity": -1452.1313963248542,
+        "peak_frequency": 59.48518600906884,
         "_last_path": "e:\\docshouse\\450\\2.edf",
-        "t": 982
+        "t": 1245
       },
       "custom_state_file": null
     },
@@ -243,13 +243,13 @@
         "use_hilbert": true,
         "window_size": 0.5,
         "fs": 256.0,
-        "current_time": 5.2333333333333245,
-        "dominant_beat": 0.9937248044799816,
-        "total_energy": 2.4606415134860876e-10,
-        "complexity": -1272.8261977421444,
-        "peak_frequency": 48.32505461651217,
+        "current_time": 0.4333333333333333,
+        "dominant_beat": 0.010497537343936658,
+        "total_energy": 2.658828181828204e-10,
+        "complexity": -433.7496811136311,
+        "peak_frequency": 0.5,
         "_last_path": "e:\\docshouse\\450\\2.edf",
-        "t": 675
+        "t": 938
       },
       "custom_state_file": null
     },
@@ -299,8 +299,8 @@
     {
       "id": 8,
       "class_name": "EigenCrystalViewerNode",
-      "pos_x": 2863.0,
-      "pos_y": 87.0,
+      "pos_x": 2844.0,
+      "pos_y": 90.0,
       "width": 706.0,
       "height": 649.0,
       "config": {
@@ -329,7 +329,24 @@
         "phase_rate": 0.05,
         "tension_rate": 0.1,
         "threshold": 0.6,
-        "current_coherence": 0.6568063214612655
+        "output_layer_idx": 0,
+        "current_coherence": 0.8123188744421568
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 9,
+      "class_name": "DisplayNode",
+      "pos_x": 3592.0,
+      "pos_y": 59.0,
+      "width": 634.0,
+      "height": 676.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
       },
       "custom_state_file": null
     }
@@ -389,6 +406,13 @@
       "from_port": "interference_out",
       "to_node_id": 8,
       "to_port": "complex_spectrum_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "eigen_image",
+      "to_node_id": 9,
+      "to_port": "image_in",
       "learned_weight": 1.0
     }
   ]
