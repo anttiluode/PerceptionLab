@@ -43,7 +43,7 @@
           "reset": []
         },
         "node_title": "Base Node",
-        "edf_path": "e:\\docshouse\\450\\3.edf",
+        "edf_path": "e:\\docshouse\\450\\2.edf",
         "selected_region": "Frontal",
         "base_resolution": 1024,
         "resolution_scale": 1,
@@ -56,13 +56,13 @@
         "use_hilbert": false,
         "window_size": 0.065,
         "fs": 256.0,
-        "current_time": 10.166666666666641,
-        "dominant_beat": 0.9144743789789231,
-        "total_energy": 7.502758222323358e-12,
-        "complexity": -1478.5240325323157,
-        "peak_frequency": 44.471089088575674,
-        "_last_path": "e:\\docshouse\\450\\3.edf",
-        "t": 6695
+        "current_time": 8.366666666666648,
+        "dominant_beat": 1.0798432517501695,
+        "total_energy": 2.2841607090941935e-11,
+        "complexity": -1786.568825661767,
+        "peak_frequency": 52.513013545440934,
+        "_last_path": "e:\\docshouse\\450\\2.edf",
+        "t": 6946
       },
       "custom_state_file": null
     },
@@ -105,7 +105,7 @@
           "reset": []
         },
         "node_title": "Base Node",
-        "edf_path": "e:\\docshouse\\450\\3.edf",
+        "edf_path": "e:\\docshouse\\450\\2.edf",
         "selected_region": "Occipital",
         "base_resolution": 1024,
         "resolution_scale": 1,
@@ -118,13 +118,13 @@
         "use_hilbert": true,
         "window_size": 0.13,
         "fs": 256.0,
-        "current_time": 10.166666666666641,
-        "dominant_beat": 1.2488959230824008,
-        "total_energy": 2.6287007971642625e-11,
-        "complexity": -1527.116355314034,
-        "peak_frequency": 60.73408193215124,
-        "_last_path": "e:\\docshouse\\450\\3.edf",
-        "t": 1550
+        "current_time": 8.366666666666648,
+        "dominant_beat": 1.1256620187140314,
+        "total_energy": 4.3594281501963676e-11,
+        "complexity": -1338.6210811876379,
+        "peak_frequency": 53.61552818691274,
+        "_last_path": "e:\\docshouse\\450\\2.edf",
+        "t": 1801
       },
       "custom_state_file": null
     },
@@ -230,7 +230,7 @@
           "reset": []
         },
         "node_title": "Base Node",
-        "edf_path": "e:\\docshouse\\450\\3.edf",
+        "edf_path": "e:\\docshouse\\450\\2.edf",
         "selected_region": "Temporal",
         "base_resolution": 1024,
         "resolution_scale": 1,
@@ -243,13 +243,13 @@
         "use_hilbert": true,
         "window_size": 0.5,
         "fs": 256.0,
-        "current_time": 10.166666666666641,
-        "dominant_beat": 0.010497537343936658,
-        "total_energy": 2.0209037538217415e-10,
-        "complexity": -332.93401521004404,
-        "peak_frequency": 0.5,
-        "_last_path": "e:\\docshouse\\450\\3.edf",
-        "t": 1243
+        "current_time": 8.366666666666648,
+        "dominant_beat": 1.2488959230824008,
+        "total_energy": 1.8060043299254143e-10,
+        "complexity": -638.507663569208,
+        "peak_frequency": 59.48518600906884,
+        "_last_path": "e:\\docshouse\\450\\2.edf",
+        "t": 1494
       },
       "custom_state_file": null
     },
@@ -330,7 +330,7 @@
         "tension_rate": 0.1,
         "threshold": 0.6,
         "output_layer_idx": 0,
-        "current_coherence": 0.6375859956194462
+        "current_coherence": 0.8073177921475553
       },
       "custom_state_file": null
     },
