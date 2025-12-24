@@ -1,11 +1,12 @@
 """
-Eigen Crystal Viewer Node
-=========================
+Eigen Crystal Viewer Node - V6 (High-Res Smoothing)
+===================================================
 Displays eigenmode crystals from complex spectrum input.
-Matches the Crystal Cave visualization style.
 
-Takes complex spectrum and shows its eigenmode structure
-through FFT-based crystal rendering.
+V6 FIX: 
+- Changed Upscaling from "Nearest Neighbor" (Blocky) to "Bicubic" (Smooth).
+  The Seed layer is only 32x32 pixels. Bicubic interpolation smooths
+  the jagged edges into organic gradients, making it look "High Res".
 """
 
 import numpy as np
@@ -26,11 +27,6 @@ except AttributeError:
 class EigenCrystalViewerNode(BaseNode):
     """
     Eigen Crystal Viewer - Shows eigenmode crystals from complex spectra.
-    
-    Matches Crystal Cave's visualization by using the same eigenmode computation:
-    eigenmode = abs(fftshift(fft2(complex_structure)))
-    
-    Takes interference output and renders beautiful crystal patterns.
     """
     
     NODE_CATEGORY = "Intelligence"
@@ -41,21 +37,21 @@ class EigenCrystalViewerNode(BaseNode):
         super().__init__()
         
         self.inputs = {
-            'complex_spectrum_in': 'complex_spectrum',  # From interference
-            'image_in': 'image',                        # Alternative input
-            'settle_steps': 'signal',                   # Settling iterations
-            'diffusion': 'signal',                      # Diffusion strength
-            'phase_rate': 'signal',                     # Phase evolution rate
+            'complex_spectrum_in': 'complex_spectrum',  
+            'image_in': 'image',                        
+            'settle_steps': 'signal',                   
+            'diffusion': 'signal',                      
+            'phase_rate': 'signal',                     
         }
         
         self.outputs = {
-            'eigen_image': 'image',             # Main eigenmode image
-            'structure_image': 'image',         # Structure field
-            'spectrum_out': 'spectrum',         # Radial spectrum
-            'coherence': 'signal',              # Phase coherence
+            'eigen_image': 'image',             # The Spectral Crystal
+            'structure_image': 'image',         # The Spatial Rings
+            'spectrum_out': 'spectrum',         
+            'coherence': 'signal',              
         }
         
-        # Layer sizes (like Crystal Cave)
+        # Layer sizes 
         self.layer_sizes = [32, 64, 128]
         self.n_layers = 3
         
@@ -65,6 +61,9 @@ class EigenCrystalViewerNode(BaseNode):
         self.phase_rate = 0.05
         self.tension_rate = 0.1
         self.threshold = 0.6
+        
+        # Configuration
+        self.output_layer_idx = 0  # 0=Seed(Small), 1=Growth(Med), 2=Field(Large)
         
         # Initialize layers
         self.layers = []
@@ -85,33 +84,27 @@ class EigenCrystalViewerNode(BaseNode):
         self.output_spectrum = np.zeros(64, dtype=np.float32)
         
     def _init_structure(self, size):
-        """Initialize complex structure field with small noise."""
         structure = np.ones((size, size), dtype=np.complex128)
         structure += (np.random.randn(size, size) + 
                      1j * np.random.randn(size, size)) * 0.1
         return structure
     
     def _make_r_grid(self, size):
-        """Create radial distance grid."""
         center = size // 2
         y, x = np.ogrid[:size, :size]
         return np.sqrt((x - center)**2 + (y - center)**2)
     
     def compute_eigenmode(self, layer):
-        """Compute eigenmode of layer - EXACTLY like Crystal Cave."""
         return np.abs(fftshift(fft2(layer['structure'])))
     
     def compute_coherence(self, layer):
-        """Compute phase coherence."""
         phase = np.angle(layer['structure'])
         return float(np.abs(np.mean(np.exp(1j * phase))))
     
     def spectrum_to_chord(self, spectrum, n_harmonics=5):
-        """Convert spectrum to harmonic chord."""
         if spectrum is None or len(spectrum) == 0:
             return np.ones(n_harmonics) * 0.5
         
-        # Flatten if 2D
         if spectrum.ndim > 1:
             spectrum = np.mean(np.abs(spectrum), axis=0)
         
@@ -136,7 +129,6 @@ class EigenCrystalViewerNode(BaseNode):
         return chord
     
     def project_chord_to_rings(self, layer, chord):
-        """Project chord to concentric rings on layer grid."""
         size = layer['size']
         center = layer['center']
         r_grid = layer['r_grid']
@@ -153,57 +145,42 @@ class EigenCrystalViewerNode(BaseNode):
         return pattern
     
     def settle_layer(self, layer, chord):
-        """Let layer settle under chord input."""
         size = layer['size']
         
-        # Reset structure with small noise
         layer['structure'] = self._init_structure(size)
         layer['tension'][:] = 0
         
         for step in range(self.settle_steps):
-            # Project chord to 2D input pattern
             input_2d = self.project_chord_to_rings(layer, chord)
             
-            # Normalize
             if input_2d.max() > 1e-9:
                 input_2d = input_2d / input_2d.max()
             
-            # Current eigenmode
             eigen = self.compute_eigenmode(layer)
             eigen_norm = eigen / (eigen.max() + 1e-9)
             
-            # Tension = where input doesn't match eigenmode
             resistance = input_2d * (1.0 - eigen_norm)
             layer['tension'] += resistance * self.tension_rate
             
-            # Critical avalanche
             critical = layer['tension'] > self.threshold
             n_critical = np.sum(critical)
             
             if n_critical > 0:
-                # Phase flip at critical points
                 layer['structure'][critical] *= -1
-                
-                # Reset tension
                 layer['tension'][critical] = 0
-                
-                # Diffusion
                 layer['structure'] = (
                     gaussian_filter(np.real(layer['structure']), self.diffusion) +
                     1j * gaussian_filter(np.imag(layer['structure']), self.diffusion)
                 )
             
-            # Phase evolution
             layer['structure'] *= np.exp(1j * self.phase_rate)
             
-            # Normalize magnitude
             mag = np.abs(layer['structure'])
             layer['structure'][mag > 1.0] /= mag[mag > 1.0]
         
         return self.compute_coherence(layer), self.compute_eigenmode(layer)
     
     def eigenmode_to_spectrum(self, eigenmode):
-        """Convert 2D eigenmode to 1D radial spectrum."""
         size = eigenmode.shape[0]
         center = size // 2
         y, x = np.ogrid[:size, :size]
@@ -220,8 +197,6 @@ class EigenCrystalViewerNode(BaseNode):
         return spectrum
     
     def step(self):
-        """Process input through settling layers."""
-        # Get inputs
         complex_in = self.get_blended_input('complex_spectrum_in', 'first')
         image_in = self.get_blended_input('image_in', 'first')
         
@@ -229,7 +204,6 @@ class EigenCrystalViewerNode(BaseNode):
         diff = self.get_blended_input('diffusion', 'sum')
         phase = self.get_blended_input('phase_rate', 'sum')
         
-        # Update parameters
         if settle is not None:
             self.settle_steps = int(np.clip(settle, 5, 100))
         if diff is not None:
@@ -237,11 +211,9 @@ class EigenCrystalViewerNode(BaseNode):
         if phase is not None:
             self.phase_rate = float(np.clip(phase, 0.01, 0.2))
         
-        # Get input chord
         if complex_in is not None:
             chord = self.spectrum_to_chord(complex_in)
         elif image_in is not None:
-            # Convert image to spectrum first
             if image_in.ndim == 3:
                 gray = np.mean(image_in, axis=2)
             else:
@@ -254,7 +226,6 @@ class EigenCrystalViewerNode(BaseNode):
         else:
             chord = np.ones(5, dtype=np.float32) * 0.5
         
-        # Process through layers
         total_coherence = 0.0
         current_chord = chord.copy()
         
@@ -265,7 +236,6 @@ class EigenCrystalViewerNode(BaseNode):
             self.eigenmodes[i] = eigenmode
             self.structures[i] = np.abs(layer['structure'])
             
-            # Extract spectrum for next layer
             spectrum = self.eigenmode_to_spectrum(eigenmode)
             current_chord = self.spectrum_to_chord(spectrum)
         
@@ -273,16 +243,45 @@ class EigenCrystalViewerNode(BaseNode):
         self.output_spectrum = self.eigenmode_to_spectrum(self.eigenmodes[-1])
     
     def get_output(self, port_name):
+        idx = self.output_layer_idx
+        if idx >= len(self.layer_sizes): idx = 0
+        
         if port_name == 'eigen_image':
-            eigen = self.eigenmodes[-1]
+            eigen = self.eigenmodes[idx]
             if eigen.max() > 0:
-                eigen = eigen / eigen.max()
-            return (eigen * 255).astype(np.uint8)
+                eigen_log = np.log(1 + eigen)
+                eigen_norm = eigen_log / (eigen_log.max() + 1e-9)
+                
+                # --- V6 FIX: High-Quality Bicubic Upscaling ---
+                target_size = 256
+                eigen_upscaled = cv2.resize(
+                    eigen_norm.astype(np.float32), 
+                    (target_size, target_size), 
+                    interpolation=cv2.INTER_CUBIC
+                )
+                
+                eigen_uint8 = (eigen_upscaled * 255).astype(np.uint8)
+                return cv2.applyColorMap(eigen_uint8, cv2.COLORMAP_JET)
+                
+            return np.zeros((256, 256, 3), dtype=np.uint8)
+            
         elif port_name == 'structure_image':
-            struct = self.structures[-1]
+            struct = self.structures[idx]
             if struct.max() > 0:
-                struct = struct / struct.max()
-            return (struct * 255).astype(np.uint8)
+                struct_norm = struct / (struct.max() + 1e-9)
+                
+                # --- V6 FIX: High-Quality Bicubic Upscaling ---
+                target_size = 256
+                struct_upscaled = cv2.resize(
+                    struct_norm.astype(np.float32), 
+                    (target_size, target_size), 
+                    interpolation=cv2.INTER_CUBIC
+                )
+                
+                struct_uint8 = (struct_upscaled * 255).astype(np.uint8)
+                return cv2.applyColorMap(struct_uint8, cv2.COLORMAP_TWILIGHT)
+            return np.zeros((256, 256, 3), dtype=np.uint8)
+            
         elif port_name == 'spectrum_out':
             return self.output_spectrum
         elif port_name == 'coherence':
@@ -290,63 +289,65 @@ class EigenCrystalViewerNode(BaseNode):
         return None
     
     def get_display_image(self):
-        """Create visualization matching Crystal Cave style."""
-        # 3 rows (layers) x 3 columns (struct, blank, eigen)
         panel_size = 100
         margin = 2
-        
         col_width = panel_size + margin
         width = col_width * 3
-        height = col_width * 3 + 30  # Extra for status
+        height = col_width * 3 + 30 
         
         display = np.zeros((height, width, 3), dtype=np.uint8)
         
         for row, layer in enumerate(self.layers):
             y_start = row * col_width
             
-            # Panel 1: Structure (magnitude)
+            # Panel 1: Structure (Twilight)
             struct_mag = np.abs(layer['structure'])
             struct_mag = struct_mag / (struct_mag.max() + 1e-9)
             struct_img = cv2.resize(struct_mag.astype(np.float32), (panel_size, panel_size))
             struct_color = cv2.applyColorMap((struct_img * 255).astype(np.uint8), cv2.COLORMAP_TWILIGHT)
             display[y_start:y_start+panel_size, 0:panel_size] = struct_color
             
-            # Panel 2: Empty (like Crystal Cave's scars, but we don't have training)
-            # Leave black or show tension
+            # Panel 2: Tension (Bone)
             tension_img = cv2.resize(layer['tension'].astype(np.float32), (panel_size, panel_size))
             if tension_img.max() > 0:
                 tension_img = tension_img / tension_img.max()
             tension_color = cv2.applyColorMap((tension_img * 255).astype(np.uint8), cv2.COLORMAP_BONE)
             display[y_start:y_start+panel_size, col_width:col_width+panel_size] = tension_color
             
-            # Panel 3: Eigenmode (the crystal!)
+            # Panel 3: Eigenmode (Jet)
             eigen = self.compute_eigenmode(layer)
             eigen_log = np.log(1 + eigen)
             eigen_norm = eigen_log / (eigen_log.max() + 1e-9)
             eigen_img = cv2.resize(eigen_norm.astype(np.float32), (panel_size, panel_size))
             eigen_color = cv2.applyColorMap((eigen_img * 255).astype(np.uint8), cv2.COLORMAP_JET)
             display[y_start:y_start+panel_size, col_width*2:col_width*2+panel_size] = eigen_color
+            
+            if row == self.output_layer_idx:
+                cv2.rectangle(display, (0, y_start), (width, y_start+panel_size), (255, 255, 255), 1)
         
-        # Labels
-        cv2.putText(display, "Struct", (10, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1)
-        cv2.putText(display, "Tension", (col_width + 10, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1)
-        cv2.putText(display, "Eigen", (col_width*2 + 10, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(display, "Struct", (10, 15), font, 0.4, (150, 150, 150), 1)
+        cv2.putText(display, "Tension", (col_width + 10, 15), font, 0.4, (150, 150, 150), 1)
+        cv2.putText(display, "Eigen", (col_width*2 + 10, 15), font, 0.4, (150, 150, 150), 1)
         
-        # Status
         status_y = height - 15
-        cv2.putText(display, f"Coh: {self.current_coherence:.2f}", (10, status_y),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
-        cv2.putText(display, f"Steps: {self.settle_steps}", (100, status_y),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
-        cv2.putText(display, f"Diff: {self.diffusion:.2f}", (200, status_y),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
+        cv2.putText(display, f"Coh: {self.current_coherence:.2f}", (10, status_y), font, 0.4, (200, 200, 200), 1)
         
-        display = np.ascontiguousarray(display)
-        return QtGui.QImage(display.data, width, height, width * 3,
-                           QtGui.QImage.Format.Format_RGB888)
+        layers = ["Seed", "Grow", "Field"]
+        selected = layers[min(self.output_layer_idx, 2)]
+        cv2.putText(display, f"Out: {selected}", (100, status_y), font, 0.4, (100, 255, 100), 1)
+        
+        return display 
     
     def get_config_options(self):
+        layer_opts = [
+            ('Seed (Small - 32px)', 0), 
+            ('Growth (Med - 64px)', 1), 
+            ('Field (Large - 128px)', 2)
+        ]
+        
         return [
+            ("Output Layer", "output_layer_idx", self.output_layer_idx, layer_opts),
             ("Settle Steps", "settle_steps", self.settle_steps, None),
             ("Diffusion", "diffusion", self.diffusion, None),
             ("Phase Rate", "phase_rate", self.phase_rate, None),
