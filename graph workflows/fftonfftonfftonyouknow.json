@@ -1,0 +1,311 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "HolographicInterferenceNode2",
+      "pos_x": 1191.0,
+      "pos_y": 61.0,
+      "width": 403.0,
+      "height": 362.0,
+      "config": {
+        "inputs": {
+          "raw_eeg": "signal",
+          "resolution_scale": "signal",
+          "freq_resolution": "signal",
+          "time_window": "signal",
+          "reference_freq": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "hologram": "image",
+          "hologram_small": "image",
+          "spectrum_image": "image",
+          "beat_matrix": "image",
+          "phase_matrix": "image",
+          "coherence_matrix": "image",
+          "dominant_beat": "signal",
+          "total_energy": "signal",
+          "complexity": "signal",
+          "peak_frequency": "signal",
+          "n_interferences": "signal",
+          "full_spectrum": "spectrum"
+        },
+        "input_data": {
+          "raw_eeg": [],
+          "resolution_scale": [],
+          "freq_resolution": [],
+          "time_window": [],
+          "reference_freq": [],
+          "reset": []
+        },
+        "node_title": "Base Node",
+        "edf_path": "e:\\docshouse\\450\\3.edf",
+        "selected_region": "Parietal",
+        "base_resolution": 1024,
+        "resolution_scale": 1,
+        "output_resolution": 1024,
+        "n_freq_bins": 256,
+        "freq_min": 0.5,
+        "freq_max": 100,
+        "freq_spacing": "log",
+        "interference_mode": "complex",
+        "use_hilbert": false,
+        "window_size": 0.063,
+        "fs": 256.0,
+        "current_time": 65.43333333333219,
+        "dominant_beat": 1.2751165862649572,
+        "total_energy": 2.894997464952955e-12,
+        "complexity": -2047.573234263761,
+        "peak_frequency": 62.0091985184162,
+        "_last_path": "e:\\docshouse\\450\\3.edf",
+        "t": 3436
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "GradientFFTCompletionNode",
+      "pos_x": 1243.0,
+      "pos_y": 447.0,
+      "width": 322.0,
+      "height": 206.0,
+      "config": {
+        "inputs": {
+          "gradient_field": "image",
+          "gradient_x": "image",
+          "gradient_y": "image",
+          "original_field": "image",
+          "dc_injection": "signal",
+          "low_freq_boost": "signal",
+          "phase_seed_mode": "signal",
+          "iterations": "signal",
+          "regularization": "signal",
+          "ring_1_boost": "signal",
+          "ring_2_boost": "signal",
+          "ring_3_boost": "signal",
+          "ring_4_boost": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "completed_fft": "image",
+          "completed_phase": "image",
+          "reconstructed_field": "image",
+          "hidden_structure": "image",
+          "residual": "image",
+          "low_freq_content": "image",
+          "phase_coherence_map": "image",
+          "combined_view": "image",
+          "total_energy": "signal",
+          "low_freq_energy": "signal",
+          "high_freq_energy": "signal",
+          "phase_coherence": "signal",
+          "completion_confidence": "signal",
+          "frequency_spectrum": "spectrum"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "center": 64,
+        "base_dc": 0.5,
+        "base_low_boost": 0,
+        "base_iterations": 10,
+        "base_regularization": 0.001,
+        "ring_boosts": [
+          2.0,
+          1.5,
+          1.0,
+          0.8
+        ],
+        "phase_mode": "1",
+        "t": 3175,
+        "ring_boost_0": 2,
+        "ring_boost_1": 1.5,
+        "ring_boost_2": 1,
+        "ring_boost_3": 0.8
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 1670.0,
+      "pos_y": 45.0,
+      "width": 200.0,
+      "height": 211.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 1662.0,
+      "pos_y": 255.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "ComplexInterferenceNode",
+      "pos_x": 1638.0,
+      "pos_y": 443.0,
+      "width": 301.0,
+      "height": 256.0,
+      "config": {
+        "inputs": {
+          "complex_a": "complex_spectrum",
+          "complex_b": "complex_spectrum",
+          "mode_select": "signal",
+          "mix_ratio": "signal"
+        },
+        "outputs": {
+          "interference_out": "complex_spectrum",
+          "magnitude_view": "image"
+        },
+        "node_title": "Base Node",
+        "size": 128
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "ComplexSignalProcessorNode",
+      "pos_x": 1912.0,
+      "pos_y": 57.0,
+      "width": 200.0,
+      "height": 209.0,
+      "config": {
+        "inputs": {
+          "complex_in": "complex_spectrum",
+          "phase_rotate": "signal",
+          "magnitude": "signal",
+          "freq_shift_x": "signal",
+          "freq_shift_y": "signal",
+          "phase_noise": "signal",
+          "band_center": "signal",
+          "band_width": "signal",
+          "spatial_rotate": "signal",
+          "contrast": "signal",
+          "mix": "signal"
+        },
+        "outputs": {
+          "complex_out": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image",
+          "diff_view": "image"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "noise_seed": 0,
+        "debug_signals": {
+          "phase": 0.5,
+          "mag": 0.5,
+          "freqX": 0.5,
+          "freqY": 0.5,
+          "noise": 0.0,
+          "bandC": 0.5,
+          "bandW": 1.0,
+          "rot": 0.5,
+          "contr": 0.5,
+          "mix": 1.0
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 2148.0,
+      "pos_y": 94.0,
+      "width": 437.0,
+      "height": 514.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "hologram",
+      "to_node_id": 1,
+      "to_port": "gradient_field",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "hidden_structure",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "reconstructed_field",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "complex_spectrum",
+      "to_node_id": 4,
+      "to_port": "complex_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "complex_spectrum",
+      "to_node_id": 4,
+      "to_port": "complex_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "interference_out",
+      "to_node_id": 5,
+      "to_port": "complex_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "magnitude_view",
+      "to_node_id": 6,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
