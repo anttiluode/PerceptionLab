@@ -56,13 +56,13 @@
         "use_hilbert": false,
         "window_size": 0.065,
         "fs": 256.0,
-        "current_time": 45.76666666666663,
+        "current_time": 49.93333333333306,
         "dominant_beat": 1.2751165862649572,
-        "total_energy": 2.3602434961697397e-11,
-        "complexity": -1719.8707496512418,
-        "peak_frequency": 62.0091985184162,
+        "total_energy": 2.1413181509529998e-11,
+        "complexity": -1612.2764420821868,
+        "peak_frequency": 60.73408193215124,
         "_last_path": "e:\\docshouse\\450\\2.edf",
-        "t": 5621
+        "t": 5746
       },
       "custom_state_file": null
     },
@@ -118,13 +118,13 @@
         "use_hilbert": true,
         "window_size": 0.13,
         "fs": 256.0,
-        "current_time": 14.133333333333294,
-        "dominant_beat": 1.2751165862649572,
-        "total_energy": 1.002921928783438e-10,
-        "complexity": -1391.0635823715734,
-        "peak_frequency": 60.73408193215124,
+        "current_time": 18.300000000000068,
+        "dominant_beat": 1.3856210840922358,
+        "total_energy": 1.7004101247433537e-11,
+        "complexity": -1526.8390794867228,
+        "peak_frequency": 67.38305642032086,
         "_last_path": "e:\\docshouse\\450\\2.edf",
-        "t": 476
+        "t": 601
       },
       "custom_state_file": null
     },
@@ -241,15 +241,15 @@
         "freq_spacing": "log",
         "interference_mode": "complex",
         "use_hilbert": true,
-        "window_size": 0.05,
+        "window_size": 0.5,
         "fs": 256.0,
-        "current_time": 2.1000000000000023,
-        "dominant_beat": 0.010497537343936658,
-        "total_energy": 0.0,
-        "complexity": -2048.000000000144,
-        "peak_frequency": 0.5,
+        "current_time": 6.266666666666654,
+        "dominant_beat": 1.2488959230824008,
+        "total_energy": 1.2041109387841805e-10,
+        "complexity": -1345.5398905174836,
+        "peak_frequency": 59.48518600906884,
         "_last_path": "e:\\docshouse\\450\\2.edf",
-        "t": 169
+        "t": 294
       },
       "custom_state_file": null
     },
