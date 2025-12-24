@@ -56,13 +56,13 @@
         "use_hilbert": false,
         "window_size": 0.065,
         "fs": 256.0,
-        "current_time": 8.366666666666648,
-        "dominant_beat": 1.0798432517501695,
-        "total_energy": 2.2841607090941935e-11,
-        "complexity": -1786.568825661767,
-        "peak_frequency": 52.513013545440934,
+        "current_time": 46.833333333333236,
+        "dominant_beat": 1.2751165862649572,
+        "total_energy": 6.350897344865222e-11,
+        "complexity": -1797.535214037082,
+        "peak_frequency": 62.0091985184162,
         "_last_path": "e:\\docshouse\\450\\2.edf",
-        "t": 6946
+        "t": 8100
       },
       "custom_state_file": null
     },
@@ -118,13 +118,13 @@
         "use_hilbert": true,
         "window_size": 0.13,
         "fs": 256.0,
-        "current_time": 8.366666666666648,
-        "dominant_beat": 1.1256620187140314,
-        "total_energy": 4.3594281501963676e-11,
-        "complexity": -1338.6210811876379,
-        "peak_frequency": 53.61552818691274,
+        "current_time": 46.833333333333236,
+        "dominant_beat": 1.0798432517501695,
+        "total_energy": 9.430503719110468e-11,
+        "complexity": -1754.7788502961826,
+        "peak_frequency": 51.433170293690765,
         "_last_path": "e:\\docshouse\\450\\2.edf",
-        "t": 1801
+        "t": 2955
       },
       "custom_state_file": null
     },
@@ -243,13 +243,13 @@
         "use_hilbert": true,
         "window_size": 0.5,
         "fs": 256.0,
-        "current_time": 8.366666666666648,
-        "dominant_beat": 1.2488959230824008,
-        "total_energy": 1.8060043299254143e-10,
-        "complexity": -638.507663569208,
-        "peak_frequency": 59.48518600906884,
+        "current_time": 46.833333333333236,
+        "dominant_beat": 1.0798432517501695,
+        "total_energy": 1.3329099303687645e-10,
+        "complexity": -1083.446473470605,
+        "peak_frequency": 52.513013545440934,
         "_last_path": "e:\\docshouse\\450\\2.edf",
-        "t": 1494
+        "t": 2648
       },
       "custom_state_file": null
     },
@@ -276,8 +276,8 @@
     {
       "id": 7,
       "class_name": "ComplexInterferenceNode",
-      "pos_x": 2054.0,
-      "pos_y": 94.0,
+      "pos_x": 2405.0,
+      "pos_y": 82.0,
       "width": 762.0,
       "height": 655.0,
       "config": {
@@ -299,10 +299,10 @@
     {
       "id": 8,
       "class_name": "EigenCrystalViewerNode",
-      "pos_x": 2844.0,
-      "pos_y": 90.0,
-      "width": 706.0,
-      "height": 649.0,
+      "pos_x": 3149.0,
+      "pos_y": 70.0,
+      "width": 200.0,
+      "height": 201.0,
       "config": {
         "inputs": {
           "complex_spectrum_in": "complex_spectrum",
@@ -330,17 +330,17 @@
         "tension_rate": 0.1,
         "threshold": 0.6,
         "output_layer_idx": 0,
-        "current_coherence": 0.8073177921475553
+        "current_coherence": 0.8414862240627854
       },
       "custom_state_file": null
     },
     {
       "id": 9,
       "class_name": "HolographicFFTNode",
-      "pos_x": 3567.0,
-      "pos_y": 82.0,
-      "width": 584.0,
-      "height": 664.0,
+      "pos_x": 3152.0,
+      "pos_y": 292.0,
+      "width": 200.0,
+      "height": 180.0,
       "config": {
         "inputs": {
           "image_in": "image"
@@ -357,10 +357,10 @@
     {
       "id": 10,
       "class_name": "HolographicIFFTNode",
-      "pos_x": 4206.0,
-      "pos_y": 89.0,
-      "width": 604.0,
-      "height": 634.0,
+      "pos_x": 3336.0,
+      "pos_y": 69.0,
+      "width": 683.0,
+      "height": 684.0,
       "config": {
         "inputs": {
           "complex_spectrum": "complex_spectrum"
