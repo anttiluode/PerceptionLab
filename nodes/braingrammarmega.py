@@ -1,6 +1,6 @@
 """
-Brain Grammar Mega Node
-=======================
+Brain Grammar MEGA Node - FIXED
+================================
 
 ALL-IN-ONE brain grammar analysis.
 
@@ -11,9 +11,14 @@ Combines:
 - Grammar cracking (attractors, vocabulary, syntax, forbidden)
 - Transfer entropy and topology
 - Prediction and surprise metrics
-- Big comprehensive visualization
+- Comprehensive visualization
 
-No inter-node communication needed. Just load an EDF and see the grammar.
+FIXES from previous version:
+- Correct time stepping (overlap windows properly)
+- Log transform on band powers (matching original analysis)
+- Smoothed band powers for stability
+- Better attractor detection thresholds
+- Improved syntax rule detection
 
 Author: The unified brain grammar tool for Antti
 """
@@ -46,7 +51,7 @@ try:
     SKLEARN_AVAILABLE = True
 except ImportError:
     SKLEARN_AVAILABLE = False
-    print("Warning: sklearn not available - using simple clustering")
+    print("Warning: sklearn not available")
 
 
 # Brain regions
@@ -63,41 +68,32 @@ EEG_REGIONS = {
 class BrainGrammarMegaNode(BaseNode):
     """
     The all-in-one brain grammar analyzer.
-    
-    Load EDF → Extract bands → Cluster states → Crack grammar → Predict → Visualize
-    
-    Everything in one node. No communication issues.
     """
     
     NODE_CATEGORY = "Analysis"
     NODE_TITLE = "Brain Grammar MEGA"
-    NODE_COLOR = QtGui.QColor(255, 150, 50)  # Orange - mega power
+    NODE_COLOR = QtGui.QColor(255, 150, 50)
     
     def __init__(self):
         super().__init__()
         
-        # No required inputs - originator node
         self.inputs = {
-            'external_trigger': 'signal',  # Optional: trigger analysis
+            'external_trigger': 'signal',
         }
         
         self.outputs = {
-            # Band powers
             'delta': 'signal',
             'theta': 'signal',
             'alpha': 'signal',
             'beta': 'signal',
             'gamma': 'signal',
             'latent_out': 'spectrum',
-            # State
             'current_state': 'signal',
             'state_sequence': 'spectrum',
-            # Grammar metrics
             'forbidden_count': 'signal',
             'transfer_entropy': 'signal',
             'n_cycles': 'signal',
             'syntax_strength': 'signal',
-            # Prediction
             'predicted_state': 'signal',
             'surprise': 'signal',
             'conformity': 'signal',
@@ -114,6 +110,7 @@ class BrainGrammarMegaNode(BaseNode):
         self.n_states = 15
         self.window_size = 0.5  # seconds
         self.sfreq = 100.0
+        self.step_size = 1.0 / 30.0  # ~33ms steps (matching frame rate)
         
         self.bands = {
             'delta': (1, 4),
@@ -127,6 +124,7 @@ class BrainGrammarMegaNode(BaseNode):
         self.raw = None
         self.current_time = 0.0
         self.band_powers = {band: 0.0 for band in self.bands}
+        self.band_powers_smooth = {band: 0.0 for band in self.bands}  # Smoothed
         self.latent_vector = np.zeros(6, dtype=np.float32)
         
         # ===== CLUSTERING =====
@@ -204,6 +202,7 @@ class BrainGrammarMegaNode(BaseNode):
             
             fname = os.path.basename(self.edf_file_path)[:20]
             self.node_title = f"Grammar MEGA ({fname})"
+            print(f"Loaded: {len(raw.ch_names)} channels, {raw.n_times/self.sfreq:.1f}s")
             return True
             
         except Exception as e:
@@ -228,11 +227,13 @@ class BrainGrammarMegaNode(BaseNode):
         self.analysis_count = 0
         self.prediction_correct = 0
         self.prediction_total = 0
+        self.last_state = None
+        self.band_powers_smooth = {band: 0.0 for band in self.bands}
     
     # ==================== BAND EXTRACTION ====================
     
     def _extract_bands(self, data):
-        """Extract band powers from EEG data."""
+        """Extract band powers from EEG data with log transform and smoothing."""
         
         if data.size == 0:
             return None
@@ -242,7 +243,6 @@ class BrainGrammarMegaNode(BaseNode):
         
         for band_name, (low, high) in self.bands.items():
             try:
-                # Bandpass filter
                 low_n = max(low / nyq, 0.01)
                 high_n = min(high / nyq, 0.99)
                 
@@ -251,20 +251,25 @@ class BrainGrammarMegaNode(BaseNode):
                 else:
                     b, a = signal.butter(4, [low_n, high_n], btype='band')
                     filtered = signal.filtfilt(b, a, data)
-                    power = float(np.mean(filtered ** 2))
+                    # LOG TRANSFORM - critical for matching original behavior
+                    power = float(np.log1p(np.mean(filtered ** 2)))
                 
-                self.band_powers[band_name] = power * self.base_scale
-                features.append(power)
+                # Smooth the band powers (0.8 old + 0.2 new)
+                self.band_powers_smooth[band_name] = (
+                    self.band_powers_smooth[band_name] * 0.8 + power * 0.2
+                )
+                self.band_powers[band_name] = self.band_powers_smooth[band_name] * self.base_scale
+                features.append(self.band_powers_smooth[band_name])
                 
             except Exception:
                 self.band_powers[band_name] = 0.0
                 features.append(0.0)
         
-        # Add raw power
-        raw_power = float(np.mean(data ** 2))
+        # Raw power (also log transformed)
+        raw_power = float(np.log1p(np.mean(data ** 2)))
         features.append(raw_power)
         
-        self.latent_vector = np.array(features, dtype=np.float32)
+        self.latent_vector = np.array(features, dtype=np.float32) * self.base_scale
         return features
     
     # ==================== STATE CLUSTERING ====================
@@ -278,11 +283,11 @@ class BrainGrammarMegaNode(BaseNode):
         self.features_buffer.append(features)
         
         # Fit clusterer when we have enough samples
-        if not self.is_fitted and len(self.features_buffer) >= 200:
+        if not self.is_fitted and len(self.features_buffer) >= 100:
             self._fit_clusterer()
         
         if not self.is_fitted:
-            # Simple binning before clustering is ready
+            # Simple binning before clustering
             total = sum(features)
             return int(total * 1000) % self.n_states
         
@@ -302,17 +307,18 @@ class BrainGrammarMegaNode(BaseNode):
             return
         
         try:
-            X = np.array(self.features_buffer[-1000:])  # Use recent samples
+            X = np.array(self.features_buffer[-2000:])  # Use recent samples
             self.scaler = StandardScaler()
             X_scaled = self.scaler.fit_transform(X)
             
             self.clusterer = KMeans(n_clusters=self.n_states, random_state=42, n_init=10)
             self.clusterer.fit(X_scaled)
             self.is_fitted = True
+            print(f"Fitted clusterer with {self.n_states} states on {len(X)} samples")
             
         except Exception as e:
             print(f"Clustering error: {e}")
-            self.is_fitted = True  # Proceed anyway
+            self.is_fitted = True
     
     # ==================== GRAMMAR ANALYSIS ====================
     
@@ -341,31 +347,18 @@ class BrainGrammarMegaNode(BaseNode):
         if self.n_states_observed < 2:
             return
         
-        # Find attractors
         self._find_attractors()
-        
-        # Find escape routes
         self._find_escape_routes()
-        
-        # Find vocabulary (common sequences)
         self._find_words()
-        
-        # Find syntax rules
         self._find_syntax()
-        
-        # Find forbidden transitions
         self._find_forbidden()
-        
-        # Compute transfer entropy
         self._compute_transfer_entropy()
-        
-        # Compute topology
         self._compute_topology()
         
         self.analysis_count += 1
     
     def _find_attractors(self):
-        """Find attractor states (high self-loop)."""
+        """Find attractor states (high self-loop ratio)."""
         
         self.attractors = {}
         
@@ -373,9 +366,10 @@ class BrainGrammarMegaNode(BaseNode):
             self_loops = self.transition_counts[s][s]
             total_out = sum(self.transition_counts[s].values())
             
-            if total_out > 0:
+            if total_out > 10:  # Need enough observations
                 self_ratio = self_loops / total_out
-                if self_ratio > 0.3 or self_loops > 500:
+                # Match original threshold: 30% self-loop OR high count
+                if self_ratio > 0.30 or self_loops > 1000:
                     self.attractors[s] = {
                         'self_loops': self_loops,
                         'self_ratio': self_ratio,
@@ -383,7 +377,6 @@ class BrainGrammarMegaNode(BaseNode):
                         'strength': self_loops * self_ratio
                     }
         
-        # Sort by strength
         self.attractors = dict(sorted(
             self.attractors.items(),
             key=lambda x: -x[1]['strength']
@@ -415,7 +408,7 @@ class BrainGrammarMegaNode(BaseNode):
         
         seq = self.state_sequence
         
-        # Bigrams (excluding self-loops)
+        # Bigrams (excluding self-loops for variety)
         bigrams = Counter()
         for i in range(len(seq) - 1):
             if seq[i] != seq[i+1]:
@@ -443,20 +436,24 @@ class BrainGrammarMegaNode(BaseNode):
         
         for fg, count in fourgrams.most_common(5):
             self.words.append({'seq': fg, 'count': count, 'len': 4})
+        
+        # Sort by count
+        self.words.sort(key=lambda x: -x['count'])
     
     def _find_syntax(self):
-        """Find deterministic syntax rules."""
+        """Find deterministic syntax rules (the WIRING)."""
         
         self.syntax_rules = []
         
         for s1 in self.states_observed:
             total = sum(self.transition_counts[s1].values())
-            if total < 10:
+            if total < 20:  # Need enough observations
                 continue
             
             for s2, count in self.transition_counts[s1].items():
                 prob = count / total
-                if prob > 0.7:  # Deterministic threshold
+                # Deterministic: >70% probability (the 83-84% you see)
+                if prob > 0.70:
                     self.syntax_rules.append({
                         'from': s1,
                         'to': s2,
@@ -467,13 +464,13 @@ class BrainGrammarMegaNode(BaseNode):
         self.syntax_rules.sort(key=lambda x: -x['prob'])
     
     def _find_forbidden(self):
-        """Find forbidden transitions."""
+        """Find forbidden transitions (missing wires)."""
         
         self.forbidden = set()
         
         for s1 in self.states_observed:
             total = sum(self.transition_counts[s1].values())
-            if total < 20:  # Need enough observations
+            if total < 20:
                 continue
             
             for s2 in self.states_observed:
@@ -481,14 +478,14 @@ class BrainGrammarMegaNode(BaseNode):
                     self.forbidden.add((s1, s2))
     
     def _compute_transfer_entropy(self):
-        """Compute transfer entropy."""
+        """Compute transfer entropy (memory depth)."""
         
         seq = self.state_sequence
         if len(seq) < 100:
             self.transfer_entropy_val = 0.0
             return
         
-        # Simple transfer entropy at lag 1
+        # Transfer entropy at lag 1
         present_future = defaultdict(lambda: defaultdict(int))
         past_present_future = defaultdict(lambda: defaultdict(int))
         
@@ -510,7 +507,7 @@ class BrainGrammarMegaNode(BaseNode):
                 for c in fc.values():
                     if c > 0:
                         p = c / t
-                        H -= (t / total) * p * np.log2(p + 1e-10)
+                        H -= (t / total) * p * np.log2(p)
             return H
         
         H1 = cond_entropy(present_future)
@@ -556,13 +553,12 @@ class BrainGrammarMegaNode(BaseNode):
                         if j not in visited:
                             queue.append(int(j))
         
-        # Betti-1 estimate
         self.n_cycles = max(0, n_edges - n + n_comp)
     
     # ==================== PREDICTION ====================
     
     def _predict_next(self):
-        """Predict next state and compute surprise."""
+        """Predict next state based on transition probabilities."""
         
         if self.current_state not in self.transition_counts:
             self.predicted_next = self.current_state
@@ -578,7 +574,6 @@ class BrainGrammarMegaNode(BaseNode):
         for s, c in self.transition_counts[self.current_state].items():
             probs[s] = c / total
         
-        # Most likely next
         self.predicted_next = max(probs.keys(), key=lambda x: probs[x])
     
     def _compute_surprise(self, actual_state):
@@ -594,13 +589,12 @@ class BrainGrammarMegaNode(BaseNode):
         prob = self.transition_counts[self.last_state].get(actual_state, 0) / total
         
         if prob > 0:
-            self.last_surprise = -np.log2(prob + 1e-10)
+            self.last_surprise = -np.log2(prob)
         else:
             self.last_surprise = 10.0  # Forbidden transition!
         
         self.last_conformity = prob
         
-        # Track prediction accuracy
         if self.predicted_next == actual_state:
             self.prediction_correct += 1
         self.prediction_total += 1
@@ -651,11 +645,11 @@ class BrainGrammarMegaNode(BaseNode):
         
         # Periodic analysis
         self.samples_processed += 1
-        if self.samples_processed % 200 == 0:
+        if self.samples_processed % 100 == 0:  # More frequent updates
             self._analyze_grammar()
         
-        # Advance time
-        self.current_time += self.window_size
+        # Advance time - FIXED: small steps for overlapping windows
+        self.current_time += self.step_size
     
     # ==================== OUTPUTS ====================
     
@@ -716,7 +710,6 @@ class BrainGrammarMegaNode(BaseNode):
         cv2.putText(img, f"Region: {self.selected_region} | Samples: {self.samples_processed}", 
                    (10, 68), font, 0.35, (150, 150, 150), 1)
         
-        # Divider
         cv2.line(img, (0, 78), (width, 78), (80, 80, 80), 1)
         
         y = 100
@@ -735,7 +728,7 @@ class BrainGrammarMegaNode(BaseNode):
         y += 15
         
         # ===== ESCAPE ROUTES =====
-        cv2.putText(img, "ESCAPE ROUTES (how to leave attractors):", (10, y), font, 0.5, (0, 255, 200), 1)
+        cv2.putText(img, "ESCAPE ROUTES (how to leave):", (10, y), font, 0.5, (0, 255, 200), 1)
         y += 20
         
         for attractor, routes in list(self.escape_routes.items())[:3]:
@@ -761,7 +754,7 @@ class BrainGrammarMegaNode(BaseNode):
         y += 10
         
         # ===== SYNTAX =====
-        cv2.putText(img, "SYNTAX (deterministic rules):", (10, y), font, 0.5, (100, 255, 100), 1)
+        cv2.putText(img, "SYNTAX (deterministic rules = WIRING):", (10, y), font, 0.5, (100, 255, 100), 1)
         y += 20
         
         for rule in self.syntax_rules[:4]:
@@ -772,7 +765,7 @@ class BrainGrammarMegaNode(BaseNode):
         y += 10
         
         # ===== FORBIDDEN =====
-        cv2.putText(img, "FORBIDDEN (never happens):", (10, y), font, 0.5, (100, 100, 255), 1)
+        cv2.putText(img, "FORBIDDEN (never happens = missing wires):", (10, y), font, 0.5, (100, 100, 255), 1)
         y += 18
         
         forbidden_list = list(self.forbidden)[:8]
@@ -781,7 +774,6 @@ class BrainGrammarMegaNode(BaseNode):
         
         y += 25
         
-        # Divider
         cv2.line(img, (0, y), (width, y), (80, 80, 80), 1)
         y += 15
         
@@ -798,7 +790,7 @@ class BrainGrammarMegaNode(BaseNode):
         col2_y += 18
         cv2.putText(img, f"Transfer Entropy: {self.transfer_entropy_val:.3f} bits", (col2_x, col2_y), font, 0.4, (200, 200, 200), 1)
         col2_y += 18
-        cv2.putText(img, f"Cycles (β₁): {self.n_cycles}", (col2_x, col2_y), font, 0.4, (200, 200, 200), 1)
+        cv2.putText(img, f"Cycles (Betti-1): {self.n_cycles}", (col2_x, col2_y), font, 0.4, (200, 200, 200), 1)
         col2_y += 18
         cv2.putText(img, f"Attractors: {len(self.attractors)}", (col2_x, col2_y), font, 0.4, (200, 200, 200), 1)
         col2_y += 18
@@ -837,31 +829,30 @@ class BrainGrammarMegaNode(BaseNode):
         y += 30
         
         # ===== MINI TRANSITION MATRIX =====
-        if self.n_states_observed > 0:
+        if self.n_states_observed > 0 and len(self.transition_counts) > 0:
             cv2.putText(img, "TRANSITION MATRIX:", (10, y), font, 0.4, (200, 200, 200), 1)
             y += 5
             
-            # Create mini heatmap
             n = min(self.n_states_observed, 15)
             states = self.states_observed[:n]
             
             matrix = np.zeros((n, n), dtype=np.float32)
             for i, s1 in enumerate(states):
-                total = sum(self.transition_counts[s1].values())
-                if total > 0:
-                    for j, s2 in enumerate(states):
-                        matrix[i, j] = self.transition_counts[s1][s2] / total
+                if s1 in self.transition_counts:
+                    total = sum(self.transition_counts[s1].values())
+                    if total > 0:
+                        for j, s2 in enumerate(states):
+                            matrix[i, j] = self.transition_counts[s1].get(s2, 0) / total
             
-            # Scale to image
             mat_size = 150
             mat_img = (matrix * 255).astype(np.uint8)
             mat_img = cv2.applyColorMap(mat_img, cv2.COLORMAP_HOT)
             mat_img = cv2.resize(mat_img, (mat_size, mat_size), interpolation=cv2.INTER_NEAREST)
             
-            # Place in display
             mat_y = y + 5
             mat_x = 10
-            img[mat_y:mat_y+mat_size, mat_x:mat_x+mat_size] = mat_img
+            if mat_y + mat_size < height and mat_x + mat_size < width:
+                img[mat_y:mat_y+mat_size, mat_x:mat_x+mat_size] = mat_img
         
         # ===== BAND POWERS BAR =====
         band_y = height - 60
@@ -869,7 +860,7 @@ class BrainGrammarMegaNode(BaseNode):
         
         band_x = 70
         band_w = 50
-        band_names = ['d', 't', 'a', 'b', 'g']  # delta, theta, alpha, beta, gamma
+        band_names = ['d', 't', 'a', 'b', 'g']
         band_colors = [(255, 100, 100), (100, 255, 100), (100, 100, 255), (255, 255, 100), (255, 100, 255)]
         
         max_power = max(self.band_powers.values()) if self.band_powers else 1
@@ -884,7 +875,6 @@ class BrainGrammarMegaNode(BaseNode):
             cv2.rectangle(img, (x, band_y - bar_h), (x + band_w, band_y), band_colors[i], -1)
             cv2.putText(img, name, (x + 18, band_y + 15), font, 0.4, band_colors[i], 1)
         
-        # Analysis count
         cv2.putText(img, f"Analysis #{self.analysis_count}", (width - 120, height - 10), 
                    font, 0.3, (100, 100, 100), 1)
         
