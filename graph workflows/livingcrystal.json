@@ -7,10 +7,10 @@
     {
       "id": 0,
       "class_name": "LivingCrystalNode",
-      "pos_x": -505.0,
-      "pos_y": -407.0,
-      "width": 642.0,
-      "height": 504.0,
+      "pos_x": -634.0,
+      "pos_y": -614.0,
+      "width": 713.0,
+      "height": 714.0,
       "config": {
         "inputs": {
           "visual": "image",
@@ -337,32 +337,32 @@
         "pain_learning_boost": 2.0,
         "weight_max": 2.0,
         "weight_min": 0.01,
-        "audio_idx": 562,
-        "valence": 0.008407160092368249,
+        "audio_idx": 2545,
+        "valence": 4.0533904157589846e-07,
         "valence_decay": 0.995,
-        "arousal_level": 0.0017617706399547925,
+        "arousal_level": 3.8952941182100395e-12,
         "arousal_decay": 0.99,
-        "position_x": -0.9209244103987118,
-        "position_y": 2.2187845380176965,
-        "velocity_x": 0.0007976322215354003,
-        "velocity_y": -0.0003575848770423286,
+        "position_x": -2.9448941065453,
+        "position_y": -1.4914227874002706,
+        "velocity_x": 0.0034809935690166506,
+        "velocity_y": 0.0040274706602852805,
         "movement_gain": 0.1,
         "friction": 0.95,
-        "approach_tendency": 9.71209508918412e-06,
-        "dominant_freq": 20.0,
+        "approach_tendency": 3.0434736944121617e-09,
+        "dominant_freq": 32.0,
         "learning_steps": 800,
-        "step_count": 1709,
+        "step_count": 3692,
         "lifetime_reward": 0.676125243839749,
         "lifetime_pain": 0.0,
         "crystal_energy": 2048.0,
         "crystal_entropy": 8.317763328552246,
         "_output_values": {
-          "valence": 0.008407160092368249,
-          "arousal_out": 0.0017617706399547925,
-          "approach": 9.71209508918412e-06,
-          "vocalization": 20.0,
-          "move_x": 0.007976322215354003,
-          "move_y": -0.0035758487704232863
+          "valence": 4.0533904157589846e-07,
+          "arousal_out": 3.8952941182100395e-12,
+          "approach": 3.0434736944121617e-09,
+          "vocalization": 32.0,
+          "move_x": 0.03480993569016651,
+          "move_y": 0.0402747066028528
         }
       },
       "custom_state_file": "living_crystal_0.npz"
@@ -370,10 +370,10 @@
     {
       "id": 1,
       "class_name": "CrystalWorldNode",
-      "pos_x": 191.0,
-      "pos_y": -415.0,
-      "width": 577.0,
-      "height": 514.0,
+      "pos_x": 104.0,
+      "pos_y": -615.0,
+      "width": 708.0,
+      "height": 726.0,
       "config": {
         "inputs": {
           "move_x": "signal",
@@ -391,18 +391,18 @@
         },
         "input_data": {
           "move_x": [
-            0.0061733682084671865
+            0.017172650994666774
           ],
           "move_y": [
-            -0.0022604428869919045
+            0.03152263921918226
           ],
           "reset": []
         },
         "node_title": "Base Node",
         "world_size": 256,
         "view_radius": 32,
-        "pos_x": 115.09589140331636,
-        "pos_y": 159.06798972052647,
+        "pos_x": 86.72274859839948,
+        "pos_y": 107.06369638715138,
         "speed_scale": 2.0,
         "reward_zones": [
           [
@@ -488,16 +488,16 @@
             35.0
           ]
         ],
-        "step_count": 466,
+        "step_count": 2449,
         "total_reward": 0.9658932054853555,
         "total_pain": 0.0,
-        "distance_traveled": 58.81861096789373,
+        "distance_traveled": 324.91625208278725,
         "_output_values": {
           "reward": 0.0,
           "pain": 0.0,
-          "audio": -2.9271026848215405,
-          "position_x": 115.09589140331636,
-          "position_y": 159.06798972052647
+          "audio": 1.1905535261102562,
+          "position_x": 86.72274859839948,
+          "position_y": 107.06369638715138
         }
       },
       "custom_state_file": null
@@ -505,8 +505,8 @@
     {
       "id": 2,
       "class_name": "AudioBufferNode",
-      "pos_x": 7.0,
-      "pos_y": -606.0,
+      "pos_x": 798.0,
+      "pos_y": -585.0,
       "width": 200.0,
       "height": 180.0,
       "config": {
@@ -518,7 +518,7 @@
         },
         "input_data": {
           "signal": [
-            -1.2294658551507138
+            3.6878700648707355e-13
           ]
         },
         "node_title": "Audio Buffer",
@@ -528,9 +528,28 @@
     },
     {
       "id": 3,
+      "class_name": "LatentAdapterNode",
+      "pos_x": 830.0,
+      "pos_y": -378.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_in": "spectrum"
+        },
+        "outputs": {
+          "latent_out": "spectrum"
+        },
+        "node_title": "Latent Adapter",
+        "output_dim": 16
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
       "class_name": "SpectralSynthesizerNode",
-      "pos_x": 277.0,
-      "pos_y": -609.0,
+      "pos_x": 856.0,
+      "pos_y": -141.0,
       "width": 200.0,
       "height": 180.0,
       "config": {
@@ -551,7 +570,7 @@
         "active": true,
         "sample_rate": 44100,
         "chunk_size": 1024,
-        "time_counter": 2.883333333333328,
+        "time_counter": 1.5499999999999994,
         "fft_buffer_size": 2048
       },
       "custom_state_file": null
@@ -611,6 +630,13 @@
       "from_node_id": 2,
       "from_port": "buffer",
       "to_node_id": 3,
+      "to_port": "latent_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "latent_out",
+      "to_node_id": 4,
       "to_port": "dna_55",
       "learned_weight": 1.0
     }
