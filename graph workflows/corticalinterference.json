@@ -20,7 +20,7 @@
         },
         "input_data": {
           "coupling": [
-            0.06999999999999999
+            -0.6961653267578014
           ],
           "excitability": [],
           "speed": [],
@@ -37,7 +37,7 @@
         "b": 0.2,
         "c": -65.0,
         "d": 8.0,
-        "current_idx": 1280,
+        "current_idx": 4005,
         "electrode_coords": [
           [
             64,
@@ -228,8 +228,8 @@
           62
         ],
         "last_stats": {
-          "input_max_uV": 0.00013600000238511711,
-          "mean_v_mV": -64.227783203125,
+          "input_max_uV": 5.8000001445179805e-05,
+          "mean_v_mV": -63.66379165649414,
           "mapped": 37
         },
         "standard_map": {
@@ -320,19 +320,31 @@
     },
     {
       "id": 1,
-      "class_name": "ConstantSignalNode",
-      "pos_x": -427.0,
-      "pos_y": -46.0,
+      "class_name": "SignalOscillatorNode",
+      "pos_x": -418.0,
+      "pos_y": -86.0,
       "width": 200.0,
       "height": 180.0,
       "config": {
-        "inputs": {},
+        "inputs": {
+          "freq_mod": "signal",
+          "amp_mod": "signal"
+        },
         "outputs": {
           "signal": "signal"
         },
-        "input_data": {},
-        "node_title": "Constant Signal",
-        "value": 0.1
+        "input_data": {
+          "freq_mod": [],
+          "amp_mod": []
+        },
+        "node_title": "Signal Oscillator",
+        "base_frequency": 0.1,
+        "base_amplitude": 1,
+        "wave_type": "sine",
+        "current_frequency": 0.1,
+        "current_amplitude": 1,
+        "phase": 4.838052686528144,
+        "output_value": -0.9921147013144951
       },
       "custom_state_file": null
     }
