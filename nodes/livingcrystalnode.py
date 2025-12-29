@@ -100,7 +100,8 @@ class LivingCrystalNode(BaseNode):
         }
         
         # === CRYSTAL PARAMETERS ===
-        self.grid_size = 32  # Smaller for faster dynamics
+        self.grid_size = 64  # Default - can be changed in config
+        self._last_grid_size = 64  # Track for resize detection
         
         # === EEG CONFIGURATION ===
         self.edf_path = ""
@@ -139,18 +140,19 @@ class LivingCrystalNode(BaseNode):
         self.d = 8.0
         self.dt = 0.5
         
-        # State variables
-        self.v = np.ones((self.grid_size, self.grid_size), dtype=np.float32) * self.c
+        # State variables - initialize to grid_size
+        n = self.grid_size
+        self.v = np.ones((n, n), dtype=np.float32) * self.c
         self.u = self.v * self.b
         
         # === THE CRYSTAL: Learned coupling weights ===
-        self.weights_up = np.ones((self.grid_size, self.grid_size), dtype=np.float32) * 0.5
-        self.weights_down = np.ones((self.grid_size, self.grid_size), dtype=np.float32) * 0.5
-        self.weights_left = np.ones((self.grid_size, self.grid_size), dtype=np.float32) * 0.5
-        self.weights_right = np.ones((self.grid_size, self.grid_size), dtype=np.float32) * 0.5
+        self.weights_up = np.ones((n, n), dtype=np.float32) * 0.5
+        self.weights_down = np.ones((n, n), dtype=np.float32) * 0.5
+        self.weights_left = np.ones((n, n), dtype=np.float32) * 0.5
+        self.weights_right = np.ones((n, n), dtype=np.float32) * 0.5
         
         # Spike traces for STDP
-        self.spike_trace = np.zeros((self.grid_size, self.grid_size), dtype=np.float32)
+        self.spike_trace = np.zeros((n, n), dtype=np.float32)
         self.trace_decay = 0.95
         
         # Learning parameters
@@ -162,15 +164,15 @@ class LivingCrystalNode(BaseNode):
         
         # === SENSORY PROCESSING ===
         # Visual input gets projected onto sensory region
-        self.visual_region = slice(0, self.grid_size // 2)  # Top half
-        self.motor_region = slice(self.grid_size // 2, self.grid_size)  # Bottom half
+        self.visual_region = slice(0, n // 2)  # Top half
+        self.motor_region = slice(n // 2, n)  # Bottom half
         
         # Audio input creates oscillatory patterns
         self.audio_buffer = np.zeros(64)
         self.audio_idx = 0
         
         # Current sensory state
-        self.current_visual = np.zeros((self.grid_size // 2, self.grid_size), dtype=np.float32)
+        self.current_visual = np.zeros((n // 2, n), dtype=np.float32)
         
         # === EMOTIONAL STATE ===
         # Valence emerges from reward/pain history
@@ -223,9 +225,53 @@ class LivingCrystalNode(BaseNode):
     
     def set_config_options(self, options):
         if isinstance(options, dict):
+            old_grid_size = self.grid_size
             for key, value in options.items():
                 if hasattr(self, key):
                     setattr(self, key, value)
+            
+            # Check if grid size changed - need to reinitialize arrays
+            if self.grid_size != old_grid_size:
+                print(f"[LivingCrystal] Grid size changed {old_grid_size} -> {self.grid_size}, reinitializing...")
+                self._reinit_arrays()
+                # Remap electrodes to new grid size
+                if self.is_loaded:
+                    self._map_electrodes()
+    
+    def _reinit_arrays(self):
+        """Reinitialize all arrays to current grid_size."""
+        n = self.grid_size
+        
+        # Neural state
+        self.v = np.ones((n, n), dtype=np.float32) * self.c
+        self.u = self.v * self.b
+        
+        # Crystal weights
+        self.weights_up = np.ones((n, n), dtype=np.float32) * 0.5
+        self.weights_down = np.ones((n, n), dtype=np.float32) * 0.5
+        self.weights_left = np.ones((n, n), dtype=np.float32) * 0.5
+        self.weights_right = np.ones((n, n), dtype=np.float32) * 0.5
+        
+        # Spike trace
+        self.spike_trace = np.zeros((n, n), dtype=np.float32)
+        
+        # Sensory regions
+        self.visual_region = slice(0, n // 2)
+        self.motor_region = slice(n // 2, n)
+        self.current_visual = np.zeros((n // 2, n), dtype=np.float32)
+        
+        # Reset lifecycle since structure is gone
+        self.is_born = False
+        self.birth_step = 0
+        self.learning_steps = 0
+        self.total_spikes = 0
+        if self.is_loaded:
+            self.lifecycle_phase = "GESTATING"
+        else:
+            self.lifecycle_phase = "WAITING"
+        
+        self._last_grid_size = n
+        print(f"[LivingCrystal] Arrays reinitialized to {n}x{n}")
     
     def _maybe_reload_eeg(self):
         """Check if EDF path changed and reload if needed."""
@@ -408,6 +454,13 @@ class LivingCrystalNode(BaseNode):
     
     def step(self):
         self.step_count += 1
+        
+        # Check for grid size mismatch (from loading old configs)
+        if self.v.shape[0] != self.grid_size:
+            print(f"[LivingCrystal] Size mismatch detected, reinitializing arrays...")
+            self._reinit_arrays()
+            if self.is_loaded:
+                self._map_electrodes()
         
         # Check for EEG file changes
         self._maybe_reload_eeg()
@@ -666,13 +719,20 @@ class LivingCrystalNode(BaseNode):
     
     def _reset(self):
         """Reset the crystal to initial state - begin gestation anew."""
-        self.v = np.ones((self.grid_size, self.grid_size), dtype=np.float32) * self.c
+        n = self.grid_size
+        self.v = np.ones((n, n), dtype=np.float32) * self.c
         self.u = self.v * self.b
-        self.weights_up = np.ones((self.grid_size, self.grid_size), dtype=np.float32) * 0.5
-        self.weights_down = np.ones((self.grid_size, self.grid_size), dtype=np.float32) * 0.5
-        self.weights_left = np.ones((self.grid_size, self.grid_size), dtype=np.float32) * 0.5
-        self.weights_right = np.ones((self.grid_size, self.grid_size), dtype=np.float32) * 0.5
-        self.spike_trace = np.zeros((self.grid_size, self.grid_size), dtype=np.float32)
+        self.weights_up = np.ones((n, n), dtype=np.float32) * 0.5
+        self.weights_down = np.ones((n, n), dtype=np.float32) * 0.5
+        self.weights_left = np.ones((n, n), dtype=np.float32) * 0.5
+        self.weights_right = np.ones((n, n), dtype=np.float32) * 0.5
+        self.spike_trace = np.zeros((n, n), dtype=np.float32)
+        
+        # Reset sensory regions
+        self.visual_region = slice(0, n // 2)
+        self.motor_region = slice(n // 2, n)
+        self.current_visual = np.zeros((n // 2, n), dtype=np.float32)
+        
         self.valence = 0.0
         self.arousal_level = 0.5
         self.position_x = 0.0
@@ -691,10 +751,11 @@ class LivingCrystalNode(BaseNode):
         self.birth_step = 0
         if self.is_loaded:
             self.lifecycle_phase = "GESTATING"
+            self._map_electrodes()  # Remap electrodes to current grid size
         else:
             self.lifecycle_phase = "WAITING"
         
-        print("[LivingCrystal] Reset - beginning new gestation")
+        print(f"[LivingCrystal] Reset - beginning new gestation at {n}x{n}")
     
     def get_output(self, port_name):
         if port_name == "crystal_view":
