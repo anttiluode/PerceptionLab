@@ -1,0 +1,266 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "CrystalChipNode",
+      "pos_x": -852.0,
+      "pos_y": -88.0,
+      "width": 407.0,
+      "height": 235.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "latent_in": "spectrum",
+          "signal_in": "signal",
+          "gain": "signal",
+          "coupling": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "latent_out": "spectrum",
+          "signal_out": "signal",
+          "chip_view": "image",
+          "activity_view": "image",
+          "resonance": "signal",
+          "energy": "signal",
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "lfp": "signal"
+        },
+        "input_data": {
+          "image_in": [],
+          "latent_in": [],
+          "signal_in": [
+            0.0866032679738562
+          ],
+          "gain": [],
+          "coupling": [],
+          "reset": []
+        },
+        "node_title": "Base Node",
+        "crystal_path": "E:/crystal64.npz",
+        "_last_path": "E:/crystal64.npz",
+        "is_loaded": true,
+        "status_msg": "Loaded crystal64.npz | 64x64 | 39 pins",
+        "grid_size": 64,
+        "pin_names": [
+          "Fc3.",
+          "Fcz.",
+          "Fc4.",
+          "C3..",
+          "Cz..",
+          "C4..",
+          "Cp3.",
+          "Cpz.",
+          "Cp4.",
+          "Fp1.",
+          "Fpz.",
+          "Fp2.",
+          "Af7.",
+          "Af3.",
+          "Afz.",
+          "Af4.",
+          "Af8.",
+          "F7..",
+          "F3..",
+          "Fz..",
+          "F4..",
+          "F8..",
+          "Ft7.",
+          "Ft8.",
+          "T7..",
+          "T8..",
+          "Tp7.",
+          "Tp8.",
+          "P7..",
+          "P3..",
+          "P1..",
+          "Pz..",
+          "P2..",
+          "P4..",
+          "P8..",
+          "Poz.",
+          "O1..",
+          "Oz..",
+          "O2.."
+        ],
+        "input_pin_indices": [
+          9,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "output_pin_indices": [
+          6,
+          7,
+          8,
+          10,
+          26,
+          27,
+          28,
+          29,
+          31,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ],
+        "internal_pin_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          22,
+          23,
+          24,
+          25,
+          30,
+          32
+        ],
+        "learning_steps": 200,
+        "total_spikes": 17346,
+        "edf_source": "3.edf",
+        "created": "2025-12-30T07:53:54.791175",
+        "a": 0.02,
+        "b": 0.2,
+        "c": -65.0,
+        "d": 8.0,
+        "dt": 0.5,
+        "base_coupling": 5,
+        "input_gain": 50,
+        "spread_radius": 3,
+        "step_count": 2574,
+        "current_resonance": 280.76409912109375,
+        "current_energy": 18253112.0,
+        "lfp_history_size": 256,
+        "lfp_idx": 14,
+        "band_powers": {
+          "delta": 39.965223759211625,
+          "theta": 25.953632294245477,
+          "alpha": 22.119064514251665,
+          "beta": 19.341319672799614,
+          "gamma": 16.274485207102558
+        },
+        "current_lfp": -64.61858367919922,
+        "sample_rate": 100.0,
+        "_output_values": {
+          "signal_out": -71.50041198730469,
+          "resonance": 280.76409912109375,
+          "energy": 18253112.0,
+          "delta": 39.965223759211625,
+          "theta": 25.953632294245477,
+          "alpha": 22.119064514251665,
+          "beta": 19.341319672799614,
+          "gamma": 16.274485207102558,
+          "lfp": -64.61858367919922
+        }
+      },
+      "custom_state_file": "crystal_chip_0.npz"
+    },
+    {
+      "id": 1,
+      "class_name": "NonlinearFilterNode",
+      "pos_x": -420.0,
+      "pos_y": -334.0,
+      "width": 858.0,
+      "height": 746.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "signal_out": "signal"
+        },
+        "outputs": {
+          "analysis_view": "image",
+          "transfer_function": "image",
+          "generated_freqs": "signal",
+          "nonlinearity": "signal",
+          "dominant_harmonic": "signal"
+        },
+        "input_data": {
+          "signal_in": [
+            0.0866032679738562
+          ],
+          "signal_out": [
+            -41.066141510009764
+          ]
+        },
+        "node_title": "Base Node",
+        "buffer_size": 512,
+        "nonlinearity_score": 0.8675440486911863,
+        "generated_power": 1485584.2106595307,
+        "dominant_harmonic": 173.0,
+        "phase_lag": -1020.0,
+        "sample_rate": 100.0,
+        "step_count": 2574
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "MediaSourceNode",
+      "pos_x": -678.0,
+      "pos_y": -267.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.12410498366013073
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "signal_out",
+      "to_node_id": 1,
+      "to_port": "signal_out",
+      "learned_weight": 1.0
+    }
+  ]
+}
