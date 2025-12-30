@@ -1,0 +1,280 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "CrystalChipNode",
+      "pos_x": -663.0,
+      "pos_y": -211.0,
+      "width": 369.0,
+      "height": 259.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "latent_in": "spectrum",
+          "signal_in": "signal",
+          "gain": "signal",
+          "coupling": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "latent_out": "spectrum",
+          "signal_out": "signal",
+          "chip_view": "image",
+          "activity_view": "image",
+          "resonance": "signal",
+          "energy": "signal",
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "lfp": "signal"
+        },
+        "node_title": "Base Node",
+        "crystal_path": "e:/crystal64.npz",
+        "_last_path": "e:/crystal64.npz",
+        "is_loaded": true,
+        "status_msg": "Loaded crystal64.npz | 64x64 | 39 pins",
+        "grid_size": 64,
+        "pin_names": [
+          "Fc3.",
+          "Fcz.",
+          "Fc4.",
+          "C3..",
+          "Cz..",
+          "C4..",
+          "Cp3.",
+          "Cpz.",
+          "Cp4.",
+          "Fp1.",
+          "Fpz.",
+          "Fp2.",
+          "Af7.",
+          "Af3.",
+          "Afz.",
+          "Af4.",
+          "Af8.",
+          "F7..",
+          "F3..",
+          "Fz..",
+          "F4..",
+          "F8..",
+          "Ft7.",
+          "Ft8.",
+          "T7..",
+          "T8..",
+          "Tp7.",
+          "Tp8.",
+          "P7..",
+          "P3..",
+          "P1..",
+          "Pz..",
+          "P2..",
+          "P4..",
+          "P8..",
+          "Poz.",
+          "O1..",
+          "Oz..",
+          "O2.."
+        ],
+        "input_pin_indices": [
+          9,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "output_pin_indices": [
+          6,
+          7,
+          8,
+          10,
+          26,
+          27,
+          28,
+          29,
+          31,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ],
+        "internal_pin_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          22,
+          23,
+          24,
+          25,
+          30,
+          32
+        ],
+        "learning_steps": 200,
+        "total_spikes": 17346,
+        "edf_source": "3.edf",
+        "created": "2025-12-30T07:53:54.791175",
+        "a": 0.02,
+        "b": 0.2,
+        "c": -65.0,
+        "d": 8.0,
+        "dt": 0.5,
+        "base_coupling": 5,
+        "input_gain": 50,
+        "spread_radius": 3,
+        "step_count": 11071,
+        "current_resonance": 310.7032775878906,
+        "current_energy": 16476400.0,
+        "lfp_history_size": 256,
+        "lfp_idx": 63,
+        "band_powers": {
+          "delta": 38.8419402355496,
+          "theta": 21.136020693236055,
+          "alpha": 15.706960038881734,
+          "beta": 15.768483766848675,
+          "gamma": 16.360141949788392
+        },
+        "current_lfp": -60.92499923706055,
+        "sample_rate": 100.0,
+        "_output_values": {
+          "signal_out": -57.24137878417969,
+          "resonance": 310.7032775878906,
+          "energy": 16476400.0,
+          "delta": 38.8419402355496,
+          "theta": 21.136020693236055,
+          "alpha": 15.706960038881734,
+          "beta": 15.768483766848675,
+          "gamma": 16.360141949788392,
+          "lfp": -60.92499923706055
+        }
+      },
+      "custom_state_file": "crystal_chip_0.npz"
+    },
+    {
+      "id": 1,
+      "class_name": "MediaSourceNode",
+      "pos_x": -737.0,
+      "pos_y": -458.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.2140549428104575
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "MoireFrequencyNode",
+      "pos_x": -288.0,
+      "pos_y": -452.0,
+      "width": 1006.0,
+      "height": 643.0,
+      "config": {
+        "inputs": {
+          "theta_signal": "signal",
+          "alpha_signal": "signal",
+          "beta_signal": "signal",
+          "gamma_signal": "signal",
+          "field_input": "complex_spectrum",
+          "token_stream": "spectrum"
+        },
+        "input_data": {
+          "theta_signal": [
+            14.737501811242218
+          ],
+          "alpha_signal": [
+            10.992540097198997
+          ],
+          "beta_signal": [
+            11.022831530203282
+          ],
+          "gamma_signal": [
+            11.463045228106449
+          ],
+          "field_input": [],
+          "token_stream": []
+        },
+        "node_title": "Moir\u00e9 Frequency (Cross-Band Interference)",
+        "field_size": 64,
+        "epoch": 2752,
+        "history_len": 100,
+        "theta": 14.737501811242218,
+        "alpha": 10.992540097198997,
+        "beta": 11.022831530203282,
+        "gamma": 11.463045228106449,
+        "theta_phase": 0.5957205187346127,
+        "alpha_phase": -2.0789956198560997,
+        "beta_phase": 0.9888010732288622,
+        "gamma_phase": 1.373185033088836,
+        "binding_signal": 0.2465740120908503
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta",
+      "to_node_id": 2,
+      "to_port": "theta_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha",
+      "to_node_id": 2,
+      "to_port": "alpha_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta",
+      "to_node_id": 2,
+      "to_port": "beta_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma",
+      "to_node_id": 2,
+      "to_port": "gamma_signal",
+      "learned_weight": 1.0
+    }
+  ]
+}
