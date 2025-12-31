@@ -1,0 +1,281 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": -300.0,
+      "pos_y": 100.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.014456495098039215
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ThalamicGateNode",
+      "pos_x": -68.0,
+      "pos_y": 57.0,
+      "width": 219.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "image_in": "image",
+          "cortical_feedback": "signal",
+          "arousal_level": "signal",
+          "attention_target": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal",
+          "image_out": "image",
+          "gate_view": "image",
+          "gate_state": "signal",
+          "burst_phase": "signal",
+          "relay_gain": "signal"
+        },
+        "node_title": "Thalamic Gate",
+        "mode": "relay",
+        "base_gain": 1.0,
+        "gate_threshold": 0.3,
+        "burst_frequency": 10.0,
+        "burst_duty_cycle": 0.5,
+        "attention_sharpness": 2.0,
+        "arousal_sensitivity": 1.0,
+        "gate_state": 1.0,
+        "phase": 0.0,
+        "relay_gain": 1.0,
+        "trn_state": 0.0,
+        "trn_threshold": 0.5,
+        "refractory": 0,
+        "refractory_period": 10,
+        "step_count": 4953,
+        "total_passed": 4953.0,
+        "total_blocked": 0.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "GrowingNeuralArchitectureNode",
+      "pos_x": 226.0,
+      "pos_y": 62.0,
+      "width": 938.0,
+      "height": 594.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "signal_in": "signal",
+          "growth_drive": "signal",
+          "pruning_signal": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "structure_view": "image",
+          "activity_view": "image",
+          "axon_view": "image",
+          "output_signal": "signal",
+          "total_synapses": "signal",
+          "total_length": "signal",
+          "mean_delay": "signal",
+          "layer_count": "signal"
+        },
+        "node_title": "Growing Cortical Tissue",
+        "space_size": 64,
+        "n_neurons": 120,
+        "growth_rate": 0.5,
+        "prune_threshold": 0.1,
+        "myelination_threshold": 0.8,
+        "step_count": 4953,
+        "current_time": 4953.0,
+        "total_synapses": 121
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "WaveletCouplingObserverNode",
+      "pos_x": -141.0,
+      "pos_y": 335.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "coupling": "signal",
+          "window_sec": "signal"
+        },
+        "input_data": {
+          "delta": [],
+          "theta": [
+            6.279224872589111
+          ],
+          "alpha": [
+            121.0
+          ],
+          "beta": [],
+          "gamma": [
+            0.0
+          ],
+          "coupling": [],
+          "window_sec": []
+        },
+        "node_title": "Growth Monitor"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "DisplayNode",
+      "pos_x": 1231.0,
+      "pos_y": 57.0,
+      "width": 529.0,
+      "height": 581.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "DisplayNode",
+      "pos_x": 1776.0,
+      "pos_y": 46.0,
+      "width": 508.0,
+      "height": 598.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 2306.0,
+      "pos_y": 43.0,
+      "width": 448.0,
+      "height": 587.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "growth_drive",
+      "learned_weight": 2.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image_out",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "output_signal",
+      "to_node_id": 2,
+      "to_port": "pruning_signal",
+      "learned_weight": 0.5
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "output_signal",
+      "to_node_id": 3,
+      "to_port": "gamma",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "mean_delay",
+      "to_node_id": 3,
+      "to_port": "theta",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "total_synapses",
+      "to_node_id": 3,
+      "to_port": "alpha",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "axon_view",
+      "to_node_id": 4,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "activity_view",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "activity_view",
+      "to_node_id": 6,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "output_signal",
+      "to_node_id": 1,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
