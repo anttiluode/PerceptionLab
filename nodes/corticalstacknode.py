@@ -91,12 +91,12 @@ class CorticalStackNode(BaseNode):
         self._last_crystal_path = ""
         self.stdp_lr = 0.001
         self.input_gain = 30.0
-        self.inter_layer_gain = 1.0  # Now includes internal scaling
+        self.inter_layer_gain = 1.0
         self.coupling_strength = 5.0
         self.enable_learning = True
         
         # Grid size - will be set when crystal loads
-        self.grid_size = 32  # Default, will be overwritten by crystal
+        self.grid_size = 32
         self.layer_names = ['L_input', 'L_process', 'L_output', 'L_feedback']
         
         # Crystal metadata
@@ -106,7 +106,7 @@ class CorticalStackNode(BaseNode):
         self.pin_coords = []
         self.pin_names = []
         
-        # Layers dict - initialized empty, populated when crystal loads
+        # Layers dict
         self.layers = {}
         self.inter_weights = {}
         self.spike_traces = {}
@@ -125,12 +125,12 @@ class CorticalStackNode(BaseNode):
         self.layer_spike_counts = {name: 0 for name in self.layer_names}
         self.coherence_value = 0.0
         
-        # Initialize with default grid (will be replaced when crystal loads)
+        # Initialize with default grid
         self._init_layers(self.grid_size)
         self._init_inter_weights()
         
-        # Display
-        self.display_image = None
+        # Display - store as numpy array, not QImage
+        self.display_array = None
         self._update_display()
     
     def get_config_options(self):
@@ -145,7 +145,6 @@ class CorticalStackNode(BaseNode):
     
     def set_config_options(self, options):
         if isinstance(options, dict):
-            # Check if grid_size is changing
             new_grid = options.get('grid_size', self.grid_size)
             if new_grid != self.grid_size:
                 self._init_layers(new_grid)
@@ -153,13 +152,12 @@ class CorticalStackNode(BaseNode):
             
             for key, value in options.items():
                 if key == 'grid_size':
-                    continue  # Already handled above
+                    continue
                 if hasattr(self, key):
                     setattr(self, key, value)
             
-            # If crystal path is set, force reload to ensure proper sizing
             if 'crystal_path' in options and options['crystal_path']:
-                self._last_crystal_path = ""  # Force reload
+                self._last_crystal_path = ""
     
     def _init_layers(self, grid_size):
         """Initialize all cortical layers for given grid size."""
@@ -169,32 +167,22 @@ class CorticalStackNode(BaseNode):
         for name in self.layer_names:
             params = self.LAYER_PARAMS[name]
             self.layers[name] = {
-                # Neural state
                 'v': np.ones((n, n), dtype=np.float32) * -65.0,
                 'u': np.ones((n, n), dtype=np.float32) * -13.0,
-                
-                # Izhikevich parameters
                 'a': params['a'],
                 'b': params['b'],
                 'c': params['c'],
                 'd': params['d'],
-                
-                # Directional weights (same format as crystal)
                 'weights_up': np.ones((n, n), dtype=np.float32) * 0.5,
                 'weights_down': np.ones((n, n), dtype=np.float32) * 0.5,
                 'weights_left': np.ones((n, n), dtype=np.float32) * 0.5,
                 'weights_right': np.ones((n, n), dtype=np.float32) * 0.5,
-                
-                # Spike state
                 'spikes': np.zeros((n, n), dtype=bool),
                 'spike_trace': np.zeros((n, n), dtype=np.float32),
                 'activity': np.zeros((n, n), dtype=np.float32),
-                
-                # Input current
                 'I': np.zeros((n, n), dtype=np.float32)
             }
         
-        # Spike traces for inter-layer STDP
         self.spike_traces = {name: np.zeros((n, n), dtype=np.float32) for name in self.layer_names}
     
     def _init_inter_weights(self):
@@ -204,7 +192,6 @@ class CorticalStackNode(BaseNode):
         for source_layer, target_layers in self.CONNECTIVITY.items():
             for target_layer in target_layers:
                 key = f"{source_layer}_to_{target_layer}"
-                # Simple spatial weights - nearby neurons connected
                 self.inter_weights[key] = np.ones((n, n), dtype=np.float32) * 0.1
     
     def _check_crystal_path(self):
@@ -221,7 +208,6 @@ class CorticalStackNode(BaseNode):
         """Self-healing: ensure all arrays match current grid_size."""
         n = self.grid_size
         
-        # Check layers
         needs_layer_reinit = False
         if 'L_input' in self.layers:
             layer_size = self.layers['L_input']['v'].shape[0]
@@ -234,7 +220,6 @@ class CorticalStackNode(BaseNode):
             print(f"[CorticalStack] Reinitializing layers to {n}x{n}")
             self._init_layers(n)
         
-        # Check inter_weights
         needs_inter_reinit = False
         if self.inter_weights:
             first_key = list(self.inter_weights.keys())[0]
@@ -247,7 +232,6 @@ class CorticalStackNode(BaseNode):
             print(f"[CorticalStack] Reinitializing inter-weights to {n}x{n}")
             self._init_inter_weights()
         
-        # Check spike_traces
         if self.spike_traces:
             first_name = list(self.spike_traces.keys())[0]
             if self.spike_traces[first_name].shape[0] != n:
@@ -262,7 +246,6 @@ class CorticalStackNode(BaseNode):
         try:
             data = np.load(path, allow_pickle=True)
             
-            # Get grid size FROM the crystal file
             if 'grid_size' in data:
                 crystal_grid_size = int(data['grid_size'])
             elif 'weights_up' in data:
@@ -271,20 +254,17 @@ class CorticalStackNode(BaseNode):
                 print(f"[CorticalStack] Cannot determine grid size from crystal")
                 return False
             
-            # ALWAYS reinitialize to match crystal size
             print(f"[CorticalStack] Setting grid to {crystal_grid_size}x{crystal_grid_size}")
             self.grid_size = crystal_grid_size
             self._init_layers(crystal_grid_size)
             self._init_inter_weights()
             
-            # Load directional weights into L_input layer
             if 'weights_up' in data:
                 self.layers['L_input']['weights_up'] = data['weights_up'].astype(np.float32)
                 self.layers['L_input']['weights_down'] = data['weights_down'].astype(np.float32)
                 self.layers['L_input']['weights_left'] = data['weights_left'].astype(np.float32)
                 self.layers['L_input']['weights_right'] = data['weights_right'].astype(np.float32)
             
-            # Load pin coordinates
             if 'pin_coords' in data and len(data['pin_coords']) > 0:
                 self.pin_coords = [tuple(c) for c in data['pin_coords']]
             else:
@@ -295,7 +275,6 @@ class CorticalStackNode(BaseNode):
             else:
                 self.pin_names = []
             
-            # Load metadata
             self.crystal_source = str(data.get('edf_source', os.path.basename(path)))
             self.crystal_grid_size = crystal_grid_size
             self.crystal_loaded = True
@@ -373,18 +352,13 @@ class CorticalStackNode(BaseNode):
     def step(self):
         self.step_count += 1
         
-        # Check crystal path
         self._check_crystal_path()
-        
-        # SELF-HEALING: Check if sizes are mismatched and fix
         self._ensure_consistent_sizes()
         
-        # Get thalamic gate
         gate = self._read_input('thalamic_gate', 1.0)
         if gate is not None:
             self.thalamic_gate_value = float(np.clip(gate, 0.0, 1.0))
         
-        # Get external input
         ext_signal = self._read_input('signal_in', 0.0)
         if ext_signal is not None:
             ext_signal = float(ext_signal)
@@ -393,22 +367,16 @@ class CorticalStackNode(BaseNode):
         
         ext_image = self._read_image_input('image_in')
         
-        # Apply input to L_input
         self._apply_external_input(ext_signal * self.thalamic_gate_value, ext_image)
-        
-        # Update layers
         self._update_layers()
         
-        # STDP learning
         if self.enable_learning:
             lr = self._read_input('learning_rate', self.stdp_lr)
             if lr is not None:
                 self._apply_inter_layer_stdp(float(lr))
         
-        # Coherence
         self._calculate_coherence()
         
-        # Display
         if self.step_count % 4 == 0:
             self._update_display()
     
@@ -417,10 +385,8 @@ class CorticalStackNode(BaseNode):
         layer = self.layers['L_input']
         n = self.grid_size
         
-        # Base signal input
         layer['I'] = np.ones((n, n), dtype=np.float32) * signal * self.input_gain
         
-        # Image input
         if image is not None:
             try:
                 if len(image.shape) == 3:
@@ -437,7 +403,6 @@ class CorticalStackNode(BaseNode):
         """Update all layers with Izhikevich dynamics."""
         n = self.grid_size
         
-        # Calculate inter-layer currents - SPATIAL propagation
         inter_currents = {name: np.zeros((n, n), dtype=np.float32) for name in self.layer_names}
         
         for source_layer, target_layers in self.CONNECTIVITY.items():
@@ -448,32 +413,22 @@ class CorticalStackNode(BaseNode):
                 key = f"{source_layer}_to_{target_layer}"
                 weights = self.inter_weights[key]
                 
-                # Spatial propagation: spikes at position (i,j) drive target at same position
-                # Plus local spread via convolution-like blur
-                spike_current = source_spikes * 30.0  # Strong spike signal
-                
-                # Add voltage-based coupling (graded potential)
-                v_normalized = (source_v + 65.0) / 95.0  # Normalize to ~0-1 range
+                spike_current = source_spikes * 30.0
+                v_normalized = (source_v + 65.0) / 95.0
                 v_normalized = np.clip(v_normalized, 0, 1)
                 graded_current = v_normalized * 10.0
-                
-                # Local spread - nearby neurons also affected
                 spread = cv2.GaussianBlur(spike_current, (5, 5), 1.0)
                 
-                # Total inter-layer current
                 inter_currents[target_layer] += weights * (spike_current + spread + graded_current) * self.inter_layer_gain
         
-        # Update each layer
         for name in self.layer_names:
             layer = self.layers[name]
             a, b, c, d = layer['a'], layer['b'], layer['c'], layer['d']
             v = layer['v']
             u = layer['u']
             
-            # External input
             I = layer['I'] + inter_currents[name]
             
-            # Neighbor coupling using directional weights
             v_up = np.roll(v, -1, axis=0)
             v_down = np.roll(v, 1, axis=0)
             v_left = np.roll(v, -1, axis=1)
@@ -492,7 +447,6 @@ class CorticalStackNode(BaseNode):
             I_coupling = self.coupling_strength * (neighbor_avg - v)
             I_coupling = np.clip(I_coupling, -50, 50)
             
-            # Izhikevich dynamics
             dv = (0.04 * v * v + 5.0 * v + 140.0 - u + I + I_coupling) * self.dt
             du = a * (b * v - u) * self.dt
             
@@ -502,7 +456,6 @@ class CorticalStackNode(BaseNode):
             v = np.clip(v, -100, 50)
             u = np.clip(u, -50, 50)
             
-            # Spikes
             spikes = v >= 30.0
             v[spikes] = c
             u[spikes] += d
@@ -512,7 +465,6 @@ class CorticalStackNode(BaseNode):
             layer['spikes'] = spikes
             layer['activity'] = 0.9 * layer['activity'] + 0.1 * spikes.astype(np.float32) * 100
             
-            # Update spike trace
             layer['spike_trace'] = layer['spike_trace'] * self.trace_decay
             layer['spike_trace'][spikes] = 1.0
             
@@ -535,10 +487,7 @@ class CorticalStackNode(BaseNode):
                 key = f"{source_layer}_to_{target_layer}"
                 weights = self.inter_weights[key]
                 
-                # LTP: target spiked, source had recent activity
                 dw_ltp = lr * target_spikes.astype(np.float32) * np.mean(source_trace)
-                
-                # LTD: source spiked, target had recent activity
                 dw_ltd = 0.5 * lr * source_spikes.astype(np.float32) * np.mean(target_trace)
                 
                 weights = weights + dw_ltp - dw_ltd
@@ -554,7 +503,7 @@ class CorticalStackNode(BaseNode):
             self.coherence_value = 0.0
     
     def _update_display(self):
-        """Create visualization."""
+        """Create visualization - store as numpy array."""
         n = self.grid_size
         cell_size = 128
         info_width = 200
@@ -589,7 +538,6 @@ class CorticalStackNode(BaseNode):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)
             cv2.rectangle(img, (x, y), (x + cell_size - 2, y + cell_size - 2), color, 1)
         
-        # Info panel
         info_x = cell_size * 2 + 10
         info_y = 50
         
@@ -622,17 +570,15 @@ class CorticalStackNode(BaseNode):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.3, (150, 150, 150), 1)
             y_offset += 15
         
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        
-        if QtGui:
-            qimg = QtGui.QImage(img_rgb.data, w, h, w * 3, QtGui.QImage.Format.Format_RGB888).copy()
-            self.display_image = qimg
+        # Store as RGB numpy array (convert from BGR)
+        self.display_array = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
     def get_output(self, port_name):
         if port_name == 'stack_view':
-            return self.display_image
+            # Return numpy array, not QImage
+            return self.display_array
         elif port_name == 'layer_views':
-            return self.display_image
+            return self.display_array
         elif port_name == 'output_signal':
             return float(np.mean(self.layers['L_output']['v']))
         elif port_name == 'feedback_signal':
@@ -648,4 +594,9 @@ class CorticalStackNode(BaseNode):
         return None
     
     def get_display_image(self):
-        return self.display_image
+        """Return QImage for the node's own display panel."""
+        if self.display_array is not None and QtGui:
+            h, w = self.display_array.shape[:2]
+            return QtGui.QImage(self.display_array.data, w, h, w * 3, 
+                              QtGui.QImage.Format.Format_RGB888).copy()
+        return None

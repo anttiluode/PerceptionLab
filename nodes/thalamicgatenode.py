@@ -90,7 +90,7 @@ class ThalamicGateNode(BaseNode):
         self.refractory = 0
         self.refractory_period = 10
         
-        # Cache for image output
+        # Cache for image output - store as numpy array
         self._last_image_in = None
         
         # Statistics
@@ -98,8 +98,8 @@ class ThalamicGateNode(BaseNode):
         self.total_passed = 0.0
         self.total_blocked = 0.0
         
-        # Display
-        self.display_image = None
+        # Display - store as numpy array, not QImage
+        self.display_array = None
         self._update_display()
     
     def get_config_options(self):
@@ -305,7 +305,8 @@ class ThalamicGateNode(BaseNode):
             return None
         
         elif port_name == 'gate_view':
-            return self.display_image
+            # Return numpy array, not QImage
+            return self.display_array
         
         elif port_name == 'gate_state':
             return float(self.gate_state)
@@ -319,7 +320,7 @@ class ThalamicGateNode(BaseNode):
         return None
     
     def _update_display(self):
-        """Create visualization of gate state."""
+        """Create visualization of gate state - store as numpy array."""
         w, h = 300, 200
         img = np.zeros((h, w, 3), dtype=np.uint8)
         
@@ -378,11 +379,13 @@ class ThalamicGateNode(BaseNode):
             cv2.putText(img, f"Pass: {pass_rate:.1%}", (200, 120),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.35, (100, 100, 100), 1)
         
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        
-        if QtGui:
-            qimg = QtGui.QImage(img_rgb.data, w, h, w * 3, QtGui.QImage.Format.Format_RGB888).copy()
-            self.display_image = qimg
+        # Store as RGB numpy array (convert from BGR)
+        self.display_array = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
     def get_display_image(self):
-        return self.display_image
+        """Return QImage for the node's own display panel."""
+        if self.display_array is not None and QtGui:
+            h, w = self.display_array.shape[:2]
+            return QtGui.QImage(self.display_array.data, w, h, w * 3, 
+                              QtGui.QImage.Format.Format_RGB888).copy()
+        return None
