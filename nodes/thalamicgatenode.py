@@ -299,9 +299,11 @@ class ThalamicGateNode(BaseNode):
         
         elif port_name == 'image_out':
             if self._last_image_in is not None:
-                # Apply gate as multiplicative factor - return numpy array
-                gated = (self._last_image_in * self.gate_state).astype(np.uint8)
-                return gated
+                img = self._last_image_in * self.gate_state
+                # Ensure proper range
+                if img.max() <= 1.0:
+                    img = img * 255
+                return img.astype(np.uint8)
             return None
         
         elif port_name == 'gate_view':
