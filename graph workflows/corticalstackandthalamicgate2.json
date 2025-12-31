@@ -1,0 +1,221 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "CorticalStackNode",
+      "pos_x": 81.0,
+      "pos_y": -409.0,
+      "width": 478.0,
+      "height": 585.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "signal_in": "signal",
+          "learning_rate": "signal",
+          "thalamic_gate": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "stack_view": "image",
+          "layer_views": "image",
+          "output_signal": "signal",
+          "feedback_signal": "signal",
+          "input_signal": "signal",
+          "process_signal": "signal",
+          "coherence": "signal",
+          "total_spikes": "signal"
+        },
+        "node_title": "Base Node",
+        "crystal_path": "e:/crystal64.npz",
+        "_last_crystal_path": "e:/crystal64.npz",
+        "stdp_lr": 0.001,
+        "input_gain": 30,
+        "inter_layer_gain": 5,
+        "coupling_strength": 5,
+        "enable_learning": "True",
+        "grid_size": 64,
+        "layer_names": [
+          "L_input",
+          "L_process",
+          "L_output",
+          "L_feedback"
+        ],
+        "crystal_loaded": true,
+        "crystal_source": "3.edf",
+        "crystal_grid_size": 64,
+        "pin_names": [
+          "Fc3.",
+          "Fcz.",
+          "Fc4.",
+          "C3..",
+          "Cz..",
+          "C4..",
+          "Cp3.",
+          "Cpz.",
+          "Cp4.",
+          "Fp1.",
+          "Fpz.",
+          "Fp2.",
+          "Af7.",
+          "Af3.",
+          "Afz.",
+          "Af4.",
+          "Af8.",
+          "F7..",
+          "F3..",
+          "Fz..",
+          "F4..",
+          "F8..",
+          "Ft7.",
+          "Ft8.",
+          "T7..",
+          "T8..",
+          "Tp7.",
+          "Tp8.",
+          "P7..",
+          "P3..",
+          "P1..",
+          "Pz..",
+          "P2..",
+          "P4..",
+          "P8..",
+          "Poz.",
+          "O1..",
+          "Oz..",
+          "O2.."
+        ],
+        "trace_decay": 0.95,
+        "weight_max": 2.0,
+        "weight_min": 0.01,
+        "dt": 0.5,
+        "step_count": 2810,
+        "thalamic_gate_value": 1.0,
+        "layer_spike_counts": {
+          "L_input": 705,
+          "L_process": 47,
+          "L_output": 52,
+          "L_feedback": 424
+        },
+        "coherence_value": 0.8872063302224407
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ThalamicGateNode",
+      "pos_x": -684.0,
+      "pos_y": -435.0,
+      "width": 732.0,
+      "height": 644.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "image_in": "image",
+          "cortical_feedback": "signal",
+          "arousal_level": "signal",
+          "attention_target": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal",
+          "image_out": "image",
+          "gate_view": "image",
+          "gate_state": "signal",
+          "burst_phase": "signal",
+          "relay_gain": "signal"
+        },
+        "node_title": "Base Node",
+        "mode": "relay",
+        "base_gain": 1.0,
+        "gate_threshold": 0.3,
+        "burst_frequency": 10.0,
+        "burst_duty_cycle": 0.5,
+        "attention_sharpness": 2.0,
+        "arousal_sensitivity": 1.0,
+        "gate_state": 1.0,
+        "phase": 0.0,
+        "relay_gain": 1.0,
+        "trn_state": 0.0,
+        "trn_threshold": 0.5,
+        "refractory": 0,
+        "refractory_period": 10,
+        "step_count": 2810,
+        "total_passed": 2810.0,
+        "total_blocked": 0.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "MediaSourceNode",
+      "pos_x": -857.0,
+      "pos_y": -295.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.1973171977124183
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image_out",
+      "to_node_id": 0,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal_out",
+      "to_node_id": 0,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "feedback_signal",
+      "to_node_id": 1,
+      "to_port": "cortical_feedback",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
