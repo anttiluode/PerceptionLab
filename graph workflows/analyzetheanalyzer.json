@@ -1,0 +1,328 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 14
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -928.0,
+      "pos_y": 41.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "DisplayNode",
+      "pos_x": 325.0,
+      "pos_y": 183.0,
+      "width": 350.0,
+      "height": 301.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -30.0,
+      "pos_y": 275.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 3
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 332.0,
+      "pos_y": -199.0,
+      "width": 248.0,
+      "height": 298.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 685.0,
+      "pos_y": 311.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 7
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "DisplayNode",
+      "pos_x": 683.0,
+      "pos_y": 48.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "input_data": {
+          "image_in": []
+        },
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 927.0,
+      "pos_y": -191.0,
+      "width": 398.0,
+      "height": 429.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "AdvancedCrystalProbeNode",
+      "pos_x": 93.0,
+      "pos_y": -207.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "crystal_response": "signal",
+          "crystal_image": "image",
+          "enable": "signal",
+          "probe_mode": "signal",
+          "target_freq": "signal",
+          "modulation": "signal",
+          "spatial_pattern": "image"
+        },
+        "outputs": {
+          "probe_signal": "signal",
+          "probe_image": "image",
+          "spectrum_view": "image",
+          "bode_view": "image",
+          "resonance_map": "image",
+          "peak_freq": "signal",
+          "q_factor": "signal",
+          "phase_shift": "signal",
+          "ring_time": "signal",
+          "coherence": "signal"
+        },
+        "node_title": "Base Node",
+        "probe_mode": 3,
+        "step_count": 850,
+        "gamma_start": 30.0,
+        "gamma_end": 100.0,
+        "gamma_resolution": 0.1,
+        "gamma_sweep_steps": 700,
+        "impulse_target": 49.8,
+        "impulse_interval": 20,
+        "last_impulse": 0,
+        "ring_time": 0.0,
+        "theta_freq": 5.0,
+        "gamma_burst_freq": 50.0,
+        "burst_duration": 10,
+        "burst_count": 0,
+        "in_burst": false,
+        "hfo_start": 80.0,
+        "hfo_end": 500.0,
+        "hfo_sweep_duration": 1000,
+        "noise_amplitude": 5.0,
+        "replay_step": 0,
+        "replay_speed": 5,
+        "carrier_freq": 50.0,
+        "envelope_freq": 5.0,
+        "locked_freq": 49.8,
+        "current_freq": 379.8288964661869,
+        "phase": 3.7757505231094513,
+        "envelope_phase": 0.0,
+        "dt": 0.01,
+        "bode_freqs": [],
+        "bode_amplitudes": [],
+        "bode_phases": [],
+        "resonances": [],
+        "peak_frequency": 49.8,
+        "q_factor": 0.0,
+        "phase_shift": 0.0,
+        "coherence": 0.0,
+        "grid_size": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 8,
+      "class_name": "AdvancedCrystalProbeNode",
+      "pos_x": 636.0,
+      "pos_y": -194.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "crystal_response": "signal",
+          "crystal_image": "image",
+          "enable": "signal",
+          "probe_mode": "signal",
+          "target_freq": "signal",
+          "modulation": "signal",
+          "spatial_pattern": "image"
+        },
+        "outputs": {
+          "probe_signal": "signal",
+          "probe_image": "image",
+          "spectrum_view": "image",
+          "bode_view": "image",
+          "resonance_map": "image",
+          "peak_freq": "signal",
+          "q_factor": "signal",
+          "phase_shift": "signal",
+          "ring_time": "signal",
+          "coherence": "signal"
+        },
+        "node_title": "Base Node",
+        "probe_mode": 7,
+        "step_count": 850,
+        "gamma_start": 30.0,
+        "gamma_end": 100.0,
+        "gamma_resolution": 0.1,
+        "gamma_sweep_steps": 700,
+        "impulse_target": 49.8,
+        "impulse_interval": 20,
+        "last_impulse": 0,
+        "ring_time": 0.0,
+        "theta_freq": 5.0,
+        "gamma_burst_freq": 50.0,
+        "burst_duration": 10,
+        "burst_count": 0,
+        "in_burst": false,
+        "hfo_start": 80.0,
+        "hfo_end": 500.0,
+        "hfo_sweep_duration": 1000,
+        "noise_amplitude": 5.0,
+        "replay_step": 0,
+        "replay_speed": 5,
+        "carrier_freq": 50.0,
+        "envelope_freq": 5.0,
+        "locked_freq": 49.8,
+        "current_freq": 49.8,
+        "phase": 2.641482013987165,
+        "envelope_phase": 5.026548245743669,
+        "dt": 0.01,
+        "bode_freqs": [],
+        "bode_amplitudes": [],
+        "bode_phases": [],
+        "resonances": [],
+        "peak_frequency": 49.8,
+        "q_factor": 0.0,
+        "phase_shift": 0.0,
+        "coherence": 0.0,
+        "grid_size": 64
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 4,
+      "from_port": "signal",
+      "to_node_id": 8,
+      "to_port": "probe_mode",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 7,
+      "to_port": "probe_mode",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "probe_image",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "probe_image",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "magnitude_view",
+      "to_node_id": 8,
+      "to_port": "crystal_image",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 8,
+      "from_port": "probe_image",
+      "to_node_id": 6,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "magnitude_view",
+      "to_node_id": 7,
+      "to_port": "crystal_image",
+      "learned_weight": 1.0
+    }
+  ]
+}
