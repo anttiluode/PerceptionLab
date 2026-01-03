@@ -1,0 +1,484 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "CrystalChipNode",
+      "pos_x": 440.0,
+      "pos_y": -43.0,
+      "width": 464.0,
+      "height": 279.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "latent_in": "spectrum",
+          "signal_in": "signal",
+          "gain": "signal",
+          "coupling": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "latent_out": "spectrum",
+          "signal_out": "signal",
+          "chip_view": "image",
+          "activity_view": "image",
+          "resonance": "signal",
+          "energy": "signal",
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "lfp": "signal"
+        },
+        "node_title": "Base Node",
+        "crystal_path": "e:/crystal64.npz",
+        "is_loaded": true,
+        "status_msg": "Loaded crystal64.npz | 64x64 | 39 pins",
+        "grid_size": 64,
+        "pin_names": [
+          "Fc3.",
+          "Fcz.",
+          "Fc4.",
+          "C3..",
+          "Cz..",
+          "C4..",
+          "Cp3.",
+          "Cpz.",
+          "Cp4.",
+          "Fp1.",
+          "Fpz.",
+          "Fp2.",
+          "Af7.",
+          "Af3.",
+          "Afz.",
+          "Af4.",
+          "Af8.",
+          "F7..",
+          "F3..",
+          "Fz..",
+          "F4..",
+          "F8..",
+          "Ft7.",
+          "Ft8.",
+          "T7..",
+          "T8..",
+          "Tp7.",
+          "Tp8.",
+          "P7..",
+          "P3..",
+          "P1..",
+          "Pz..",
+          "P2..",
+          "P4..",
+          "P8..",
+          "Poz.",
+          "O1..",
+          "Oz..",
+          "O2.."
+        ],
+        "input_pin_indices": [
+          9,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "output_pin_indices": [
+          6,
+          7,
+          8,
+          10,
+          26,
+          27,
+          28,
+          29,
+          31,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ],
+        "internal_pin_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          22,
+          23,
+          24,
+          25,
+          30,
+          32
+        ],
+        "learning_steps": 200,
+        "total_spikes": 17346,
+        "edf_source": "3.edf",
+        "created": "2025-12-30T07:53:54.791175",
+        "a": 0.02,
+        "b": 0.2,
+        "c": -65.0,
+        "d": 8.0,
+        "dt": 0.5,
+        "base_coupling": 5,
+        "input_gain": 50,
+        "spread_radius": 3,
+        "step_count": 61342,
+        "current_resonance": 413.0284423828125,
+        "current_energy": 17537694.0,
+        "lfp_history_size": 256,
+        "lfp_idx": 158,
+        "band_powers": {
+          "delta": 38.14150258799012,
+          "theta": 21.173435340064508,
+          "alpha": 16.902178862758593,
+          "beta": 17.004045763290836,
+          "gamma": 26.16378126269392
+        },
+        "current_lfp": -62.19835662841797,
+        "sample_rate": 100.0,
+        "_output_values": {
+          "signal_out": -71.79444885253906,
+          "resonance": 413.0284423828125,
+          "energy": 17537694.0,
+          "delta": 38.14150258799012,
+          "theta": 21.173435340064508,
+          "alpha": 16.902178862758593,
+          "beta": 17.004045763290836,
+          "gamma": 26.16378126269392,
+          "lfp": -62.19835662841797
+        }
+      },
+      "custom_state_file": "crystal_chip_0.npz"
+    },
+    {
+      "id": 1,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 98.0,
+      "pos_y": 80.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 81.0,
+      "pos_y": -278.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "DeepProbeNode",
+      "pos_x": 435.0,
+      "pos_y": -364.0,
+      "width": 354.0,
+      "height": 250.0,
+      "config": {
+        "inputs": {
+          "crystal_activity": "image",
+          "crystal_signal": "signal",
+          "crystal_bands": "spectrum",
+          "mode": "signal",
+          "query_pattern": "image",
+          "enable": "signal",
+          "export_trigger": "signal"
+        },
+        "outputs": {
+          "probe_signal": "signal",
+          "probe_image": "image",
+          "vocabulary_view": "image",
+          "rsm_view": "image",
+          "synthetic_eeg": "spectrum",
+          "decode_view": "image",
+          "eigenmode_power": "signal",
+          "vocabulary_size": "signal",
+          "rsm_coherence": "signal"
+        },
+        "node_title": "Base Node",
+        "mode": 0,
+        "step_count": 52855,
+        "n_components": 16,
+        "speak_pattern_idx": 0,
+        "speak_phase": 0.0,
+        "speak_amplitude": 10,
+        "rsm_labels": [],
+        "rsm_coherence": 0.0,
+        "eeg_sample_rate": 256.0,
+        "eeg_buffer_seconds": 10,
+        "pin_to_channel": {},
+        "export_path": "shit.edf",
+        "export_ready": true
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "SpectralSynthesizerNode",
+      "pos_x": 1663.0,
+      "pos_y": -329.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "dna_55": "spectrum",
+          "master_gain": "signal"
+        },
+        "outputs": {
+          "visualizer": "image",
+          "audio_signal": "signal",
+          "spectrum": "spectrum",
+          "fft_image": "image"
+        },
+        "node_title": "Spectral Synthesizer",
+        "base_freq": 110.0,
+        "master_gain": 1.0,
+        "num_modes": 55,
+        "active": true,
+        "sample_rate": 44100,
+        "chunk_size": 1024,
+        "time_counter": 843.1833333328951,
+        "fft_buffer_size": 2048
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "GoldenRatioVerifierNode",
+      "pos_x": 1855.0,
+      "pos_y": -312.0,
+      "width": 498.0,
+      "height": 302.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "spectrum_in": "spectrum",
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "phi_score": "signal",
+          "phi_deviation": "signal",
+          "peak_count": "signal",
+          "ratio_histogram": "image",
+          "phi_map": "image",
+          "analysis_view": "image",
+          "peak_ratios": "spectrum",
+          "best_phi_power": "signal"
+        },
+        "node_title": "Base Node",
+        "phi_score": 0.85,
+        "phi_deviation": 0.056830911183519045,
+        "peak_count": 16,
+        "step_count": 4581
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "GoldenRatioVerifierNode",
+      "pos_x": 947.0,
+      "pos_y": -373.0,
+      "width": 414.0,
+      "height": 326.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "spectrum_in": "spectrum",
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "phi_score": "signal",
+          "phi_deviation": "signal",
+          "peak_count": "signal",
+          "ratio_histogram": "image",
+          "phi_map": "image",
+          "analysis_view": "image",
+          "peak_ratios": "spectrum",
+          "best_phi_power": "signal"
+        },
+        "node_title": "Base Node",
+        "phi_score": 1.0,
+        "phi_deviation": 0.021665920578204313,
+        "peak_count": 3,
+        "step_count": 4222
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "GoldenRatioVerifierNode",
+      "pos_x": 946.0,
+      "pos_y": -42.0,
+      "width": 419.0,
+      "height": 349.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "spectrum_in": "spectrum",
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "phi_score": "signal",
+          "phi_deviation": "signal",
+          "peak_count": "signal",
+          "ratio_histogram": "image",
+          "phi_map": "image",
+          "analysis_view": "image",
+          "peak_ratios": "spectrum",
+          "best_phi_power": "signal"
+        },
+        "node_title": "Base Node",
+        "phi_score": 1.0,
+        "phi_deviation": 0.04730452635264848,
+        "peak_count": 4,
+        "step_count": 3258
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image_out",
+      "to_node_id": 3,
+      "to_port": "crystal_activity",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "signal_out",
+      "to_node_id": 3,
+      "to_port": "crystal_signal",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "latent_out",
+      "to_node_id": 3,
+      "to_port": "crystal_bands",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "mode",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "enable",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "probe_signal",
+      "to_node_id": 0,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "probe_image",
+      "to_node_id": 0,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "synthetic_eeg",
+      "to_node_id": 0,
+      "to_port": "latent_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "synthetic_eeg",
+      "to_node_id": 4,
+      "to_port": "dna_55",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "spectrum",
+      "to_node_id": 5,
+      "to_port": "spectrum_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "audio_signal",
+      "to_node_id": 5,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "synthetic_eeg",
+      "to_node_id": 6,
+      "to_port": "spectrum_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "probe_signal",
+      "to_node_id": 6,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "signal_out",
+      "to_node_id": 7,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "latent_out",
+      "to_node_id": 7,
+      "to_port": "spectrum_in",
+      "learned_weight": 1.0
+    }
+  ]
+}

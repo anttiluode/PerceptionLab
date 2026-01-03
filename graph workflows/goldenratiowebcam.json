@@ -1,0 +1,172 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PhiVisionNode",
+      "pos_x": -819.0,
+      "pos_y": -372.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "density_mod": "signal"
+        },
+        "outputs": {
+          "vision_out": "image",
+          "skeleton": "image",
+          "residuals": "image",
+          "raw_feed": "image"
+        },
+        "input_data": {
+          "density_mod": []
+        },
+        "node_title": "Base Node",
+        "alpha_freq": 10.0,
+        "start_time": 1767430657.380169,
+        "base_density": 0.15,
+        "saccade_amp": 0.5
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "DisplayNode",
+      "pos_x": -355.0,
+      "pos_y": -543.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "input_data": {
+          "image_in": []
+        },
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "DisplayNode",
+      "pos_x": -291.0,
+      "pos_y": -359.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "input_data": {
+          "image_in": []
+        },
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "DisplayNode",
+      "pos_x": -299.0,
+      "pos_y": -148.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "input_data": {
+          "image_in": []
+        },
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "DisplayNode",
+      "pos_x": 99.0,
+      "pos_y": -448.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "input_data": {
+          "image_in": []
+        },
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "HolographicFFTNode",
+      "pos_x": -105.0,
+      "pos_y": -602.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "input_data": {
+          "image_in": []
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "vision_out",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "skeleton",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "raw_feed",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "residuals",
+      "to_node_id": 4,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "raw_feed",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}

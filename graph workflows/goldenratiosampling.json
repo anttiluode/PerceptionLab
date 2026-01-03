@@ -1,0 +1,214 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PhiSighBridgeNode",
+      "pos_x": -360.0,
+      "pos_y": -277.0,
+      "width": 703.0,
+      "height": 578.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "low_cut_mod": "signal",
+          "high_cut_mod": "signal",
+          "density_mod": "signal"
+        },
+        "outputs": {
+          "original": "image",
+          "sigh_filtered": "image",
+          "phi_sampled": "image",
+          "phi_reconstructed": "image",
+          "residual": "image",
+          "bridge_view": "image",
+          "sigh_energy": "signal",
+          "phi_coverage": "signal",
+          "sync_score": "signal",
+          "residual_energy": "signal"
+        },
+        "node_title": "\u03c6-Sigh Bridge",
+        "size": 256,
+        "n_samples": 500,
+        "low_cut": 0.02,
+        "high_cut": 0.4,
+        "_sigh_energy": 0.2952639059316435,
+        "_phi_coverage": 0.09912109375,
+        "_sync_score": 0.6780049176665995,
+        "_residual_energy": 0.004006833983892476
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "MediaSourceNode",
+      "pos_x": -380.0,
+      "pos_y": -251.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.02745016339869281
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 432.0,
+      "pos_y": -426.0,
+      "width": 200.0,
+      "height": 193.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 1134.0,
+      "pos_y": -363.0,
+      "width": 572.0,
+      "height": 583.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 401.0,
+      "pos_y": -21.0,
+      "width": 315.0,
+      "height": 284.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 697.0,
+      "pos_y": -396.0,
+      "width": 282.0,
+      "height": 275.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 721.0,
+      "pos_y": -118.0,
+      "width": 302.0,
+      "height": 390.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "image",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "sigh_filtered",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "phi_sampled",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "phi_reconstructed",
+      "to_node_id": 4,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "residual",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "bridge_view",
+      "to_node_id": 6,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
