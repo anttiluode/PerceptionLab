@@ -1,5 +1,11 @@
 # Antti's Perception Laboratory (modular with node folder sepearate)
 
+EDIT: NEW PORTABLE 3 clicks to perception lab zip file at huggingface:
+
+https://huggingface.co/spaces/Aluode/PerceptionLabPortable
+
+Contains python 
+
 ![GUI](./anttis.png)
 
 Welcome to the Perception Laboratory, a professional, node-based interface for designing and running 
