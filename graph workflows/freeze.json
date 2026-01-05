@@ -1,0 +1,264 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "ArtificialVisualCortexV2",
+      "pos_x": 257.0,
+      "pos_y": -190.0,
+      "width": 1120.0,
+      "height": 762.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "delta_in": "signal",
+          "theta_in": "signal",
+          "alpha_in": "signal",
+          "beta_in": "signal",
+          "gamma_in": "signal",
+          "latent_in": "spectrum",
+          "learning": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "v1_mandala": "image",
+          "it_layer": "image",
+          "depth_signal": "image",
+          "eigenstate": "image",
+          "activity_view": "image",
+          "temporal_spectrum": "image",
+          "propagation_map": "image",
+          "spike_raster": "image",
+          "cross_correlogram": "spectrum",
+          "phase_coherence": "signal",
+          "resonance": "signal",
+          "energy": "signal",
+          "entropy": "signal",
+          "depth_profile": "spectrum",
+          "lfp_out": "signal",
+          "mean_propagation_delay": "signal",
+          "temporal_stability": "signal"
+        },
+        "node_title": "Base Node",
+        "grid_size": 64,
+        "n_v1_layers": 12,
+        "base_symmetry": 2,
+        "symmetry_multiplier": 1.618033988749895,
+        "a": 0.02,
+        "b": 0.2,
+        "c": -65.0,
+        "d": 8.0,
+        "dt": 0.5,
+        "coupling_strength": 16,
+        "inter_layer_coupling": 18,
+        "learning_rate": 0.1,
+        "trace_decay": 0.95,
+        "weight_max": 2.0,
+        "weight_min": 0.01,
+        "symmetry_levels": [
+          2,
+          3,
+          5,
+          8,
+          13,
+          22,
+          35,
+          58
+        ],
+        "history_length": 256,
+        "ccg_lag_bins": 51,
+        "temporal_stability_score": 0.0225567798059062,
+        "step_count": 53288,
+        "current_resonance": 20.59071922302246,
+        "current_energy": 694883.75,
+        "current_entropy": 11.898978233337402,
+        "lfp_idx": 22408
+      },
+      "custom_state_file": "visual_cortex_v2_0.npz"
+    },
+    {
+      "id": 1,
+      "class_name": "MediaSourceNode",
+      "pos_x": 40.0,
+      "pos_y": -139.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.227953431372549
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "SelfConsistentResonanceNode",
+      "pos_x": 1403.0,
+      "pos_y": 173.0,
+      "width": 289.0,
+      "height": 220.0,
+      "config": {
+        "inputs": {
+          "frequency_input": "spectrum",
+          "feedback_modulation": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "structure": "image",
+          "tension_map": "image",
+          "scars_insulation": "image",
+          "eigen_image": "image",
+          "eigenfrequencies": "spectrum",
+          "criticality_metric": "signal"
+        },
+        "node_title": "Base Node",
+        "size": 128,
+        "center": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "RingZoomNode",
+      "pos_x": 1669.0,
+      "pos_y": -78.0,
+      "width": 803.0,
+      "height": 533.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "fft_input": "complex_spectrum",
+          "center_mod": "signal",
+          "bandwidth_mod": "signal",
+          "sweep_speed": "signal"
+        },
+        "outputs": {
+          "ring_spatial": "image",
+          "ring_fft": "image",
+          "full_fft": "image",
+          "phi_rings_view": "image",
+          "ring_stack": "image",
+          "ring_energy": "signal",
+          "center_freq": "signal",
+          "peak_freq": "signal"
+        },
+        "node_title": "Ring Zoom",
+        "size": 512,
+        "center_freq": 0.3,
+        "bandwidth": 0.1,
+        "auto_sweep": false,
+        "sweep_phase": 0.0,
+        "force_resolution": 512,
+        "_ring_energy": 0.00034327397926421535,
+        "_peak_freq": 0.015
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "EEGFileSourceNode",
+      "pos_x": 21.0,
+      "pos_y": 160.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "raw_signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "EEG (All)",
+        "edf_file_path": "e:\\docshouse\\450\\2.edf",
+        "selected_region": "All",
+        "fs": 100.0,
+        "current_time": 30.13333333333399,
+        "window_size": 1.0,
+        "output_powers": {
+          "delta": 1.1252662545823868e-11,
+          "theta": 1.6531374440360693e-11,
+          "alpha": 2.1184179250262486e-11,
+          "beta": 3.2579686285703245e-11,
+          "gamma": 1.2332268397338283e-11,
+          "raw_signal": 6.058438115975102e-05
+        }
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "cross_correlogram",
+      "to_node_id": 2,
+      "to_port": "frequency_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "eigen_image",
+      "to_node_id": 3,
+      "to_port": "image",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "delta",
+      "to_node_id": 0,
+      "to_port": "delta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "theta",
+      "to_node_id": 0,
+      "to_port": "theta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "alpha",
+      "to_node_id": 0,
+      "to_port": "alpha_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "beta",
+      "to_node_id": 0,
+      "to_port": "beta_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "gamma",
+      "to_node_id": 0,
+      "to_port": "gamma_in",
+      "learned_weight": 1.0
+    }
+  ]
+}

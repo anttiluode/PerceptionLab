@@ -1,0 +1,116 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "ArtificialVisualCortexV2",
+      "pos_x": 32.0,
+      "pos_y": -257.0,
+      "width": 1265.0,
+      "height": 884.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "delta_in": "signal",
+          "theta_in": "signal",
+          "alpha_in": "signal",
+          "beta_in": "signal",
+          "gamma_in": "signal",
+          "latent_in": "spectrum",
+          "learning": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "v1_mandala": "image",
+          "it_layer": "image",
+          "depth_signal": "image",
+          "eigenstate": "image",
+          "activity_view": "image",
+          "temporal_spectrum": "image",
+          "propagation_map": "image",
+          "spike_raster": "image",
+          "cross_correlogram": "spectrum",
+          "phase_coherence": "signal",
+          "resonance": "signal",
+          "energy": "signal",
+          "entropy": "signal",
+          "depth_profile": "spectrum",
+          "lfp_out": "signal",
+          "mean_propagation_delay": "signal",
+          "temporal_stability": "signal"
+        },
+        "node_title": "Base Node",
+        "grid_size": 64,
+        "n_v1_layers": 8,
+        "base_symmetry": 2,
+        "symmetry_multiplier": 1.618033988749895,
+        "a": 0.02,
+        "b": 0.2,
+        "c": -65.0,
+        "d": 8.0,
+        "dt": 0.5,
+        "coupling_strength": 3.0,
+        "inter_layer_coupling": 1.0,
+        "learning_rate": 0.001,
+        "trace_decay": 0.95,
+        "weight_max": 2.0,
+        "weight_min": 0.01,
+        "symmetry_levels": [
+          2,
+          3,
+          5,
+          8,
+          13,
+          22,
+          35,
+          58
+        ],
+        "history_length": 256,
+        "ccg_lag_bins": 51,
+        "temporal_stability_score": -0.4410418402934999,
+        "step_count": 1004,
+        "current_resonance": 24.96112823486328,
+        "current_energy": 746651.5625,
+        "current_entropy": 11.901121139526367,
+        "lfp_idx": 1004
+      },
+      "custom_state_file": "visual_cortex_v2_0.npz"
+    },
+    {
+      "id": 1,
+      "class_name": "MediaSourceNode",
+      "pos_x": -152.0,
+      "pos_y": -160.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.15273243464052286
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
