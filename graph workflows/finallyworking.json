@@ -12,1261 +12,155 @@
       "width": 160.0,
       "height": 120.0,
       "config": {
-        "inputs": {},
-        "outputs": {
-          "signal": "signal",
-          "image": "image"
-        },
-        "input_data": {},
-        "node_title": "Source (Webcam)",
-        "device_id": 0,
+        "node_title": "Retina (Webcam)",
         "source_type": "Webcam",
-        "w": 160,
-        "h": 120,
-        "sample_rate": 44100,
-        "signal_output": 0.13518831699346406
-      },
-      "custom_state_file": null
+        "device_id": 0
+      }
     },
     {
       "id": 1,
       "class_name": "SignalAmplifierNode",
       "pos_x": -750.0,
-      "pos_y": -50.0,
+      "pos_y": 100.0,
       "width": 180.0,
       "height": 160.0,
       "config": {
-        "inputs": {
-          "signal_in": "signal"
-        },
-        "outputs": {
-          "signal_out": "signal"
-        },
-        "input_data": {
-          "signal_in": [
-            0.08624727328431372
-          ]
-        },
-        "node_title": "Optic Nerve Amp",
-        "gain": 3.5,
-        "output_value": 0.30186545649509805
-      },
-      "custom_state_file": null
+        "node_title": "Intensity Meter",
+        "gain": 5.0
+      }
     },
     {
       "id": 2,
       "class_name": "NeuroCrystalNode2",
-      "pos_x": -450.0,
+      "pos_x": -350.0,
       "pos_y": -200.0,
       "width": 240.0,
       "height": 220.0,
       "config": {
-        "inputs": {
-          "drive_signal": "spectrum",
-          "injection_pattern": "image"
-        },
-        "outputs": {
-          "activity_view": "image",
-          "network_view": "image",
-          "combined_view": "image",
-          "topology_spectrum": "spectrum"
-        },
         "node_title": "Cortex (Surface Opt)",
-        "config": {
-          "resolution": 64,
-          "plasticity": 0.08,
-          "decay": 0.015,
-          "diffusion": 0.25,
-          "surface_tension": 0.12,
-          "anisotropy": 0.02
-        }
-      },
-      "custom_state_file": null
+        "resolution": 64,
+        "surface_tension": 0.18,
+        "plasticity": 0.15,
+        "diffusion": 0.2
+      }
     },
     {
       "id": 3,
       "class_name": "HomeostaticRegulatorNode2",
-      "pos_x": -452.0,
-      "pos_y": 25.0,
+      "pos_x": -500.0,
+      "pos_y": 100.0,
       "width": 240.0,
       "height": 200.0,
       "config": {
-        "inputs": {
-          "novelty": "signal",
-          "metabolic_cost": "spectrum",
-          "override": "signal"
-        },
-        "outputs": {
-          "focus_command": "signal",
-          "energy_level": "signal",
-          "state_view": "image",
-          "state_name": "spectrum"
-        },
-        "input_data": {
-          "novelty": [
-            0.024001454651046195
-          ],
-          "metabolic_cost": [],
-          "override": []
-        },
         "node_title": "Thalamus (Regulator)",
-        "config": {
-          "max_energy": 100.0,
-          "wake_threshold": 30.0,
-          "sleep_threshold": 80.0,
-          "base_drain": 0.5,
-          "focus_drain_mult": 2.0,
-          "recharge_rate": 1.5,
-          "novelty_sensitivity": 0.4
-        },
-        "energy": 92.5405089230515,
-        "focus": 0.05,
-        "state": "DROWSY",
-        "sleep_pressure": 0.07209491076948496,
-        "wake_drive": 0.009600581860418478,
-        "history": [
-          {
-            "energy": 0.685,
-            "focus": 0.49,
-            "novelty": 0.0,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.6701999999999999,
-            "focus": 0.481,
-            "novelty": 0.0,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.6555799999999999,
-            "focus": 0.48744379840029944,
-            "novelty": 0.2908759680059886,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.6408311240319939,
-            "focus": 0.4931384278312461,
-            "novelty": 0.2887801854195322,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.625968355475369,
-            "focus": 0.49815442786175274,
-            "novelty": 0.28659685627262416,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.611005266918134,
-            "focus": 0.5025550204765127,
-            "novelty": 0.28432070801870424,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.5959541665086037,
-            "focus": 0.5063984322645152,
-            "novelty": 0.2819782767130763,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.5808261978633134,
-            "focus": 0.5097372187819837,
-            "novelty": 0.27957259487839964,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.5656314534876737,
-            "focus": 0.5126192428087865,
-            "novelty": 0.27711491810002126,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.550379068631498,
-            "focus": 0.5150879891808409,
-            "novelty": 0.2746134130586609,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.5350773088478812,
-            "focus": 0.5171828758324502,
-            "novelty": 0.2720737113938668,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.5197336513312322,
-            "focus": 0.5189397735808629,
-            "novelty": 0.2695037066331529,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.5043548558596149,
-            "focus": 0.5203912451316869,
-            "novelty": 0.2669089781782066,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.4889470309569812,
-            "focus": 0.5215670835139538,
-            "novelty": 0.2642992579087109,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.4735156892867021,
-            "focus": 0.522494160131001,
-            "novelty": 0.2616756993688522,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.4580658060840821,
-            "focus": 0.5231968384050087,
-            "novelty": 0.2590418857421566,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.4426018693159819,
-            "focus": 0.5236974165145055,
-            "novelty": 0.2564052389999516,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.4271279209856918,
-            "focus": 0.5240159780015903,
-            "novelty": 0.2537660627707065,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.41164760142566004,
-            "focus": 0.5241709420303086,
-            "novelty": 0.2511312365775464,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.3961641825850538,
-            "focus": 0.5241790564110963,
-            "novelty": 0.24850417167637173,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.3806806014568319,
-            "focus": 0.5240555325317964,
-            "novelty": 0.24588763523619317,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.36519949080619596,
-            "focus": 0.5238142334714732,
-            "novelty": 0.24328508385712871,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.3497232061367665,
-            "focus": 0.5234676887083157,
-            "novelty": 0.24069757167979702,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.3342538523626002,
-            "focus": 0.5230274111863435,
-            "novelty": 0.23812982697718818,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.3187933041388733,
-            "focus": 0.5225039415062204,
-            "novelty": 0.2355854287702233,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.3033432253087489,
-            "focus": 0.521906803911688,
-            "novelty": 0.23306513112179272,
-            "state": "AWAKE"
-          },
-          {
-            "energy": 0.2879050892305151,
-            "focus": 0.5212449179278514,
-            "novelty": 0.23057588814664448,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2854050892305151,
-            "focus": 0.4951826720314588,
-            "novelty": 0.22811240987035886,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2829050892305151,
-            "focus": 0.4704235384298859,
-            "novelty": 0.22567855182064325,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2804050892305151,
-            "focus": 0.4469023615083916,
-            "novelty": 0.2232765611183145,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2779050892305151,
-            "focus": 0.42455724343297196,
-            "novelty": 0.2209093074119131,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2754050892305151,
-            "focus": 0.40332938126132334,
-            "novelty": 0.2185820432288807,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2729050892305151,
-            "focus": 0.38316291219825716,
-            "novelty": 0.21630253171693323,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2704050892305151,
-            "focus": 0.3640047665883443,
-            "novelty": 0.21406453734155798,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2679050892305151,
-            "focus": 0.34580452825892705,
-            "novelty": 0.21186904504278642,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2654050892305151,
-            "focus": 0.3285143018459807,
-            "novelty": 0.2097181736672486,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.26290508923051514,
-            "focus": 0.3120885867536816,
-            "novelty": 0.20761825487906574,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.26040508923051514,
-            "focus": 0.29648415741599754,
-            "novelty": 0.20556891453052764,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.25790508923051514,
-            "focus": 0.28165994954519763,
-            "novelty": 0.2035637715431022,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.25540508923051514,
-            "focus": 0.26757695206793775,
-            "novelty": 0.20160270173561473,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.25290508923051513,
-            "focus": 0.25419810446454083,
-            "novelty": 0.19968773423568023,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.25040508923051513,
-            "focus": 0.2414881992413138,
-            "novelty": 0.1978162332273846,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.24790508923051513,
-            "focus": 0.22941378927924808,
-            "novelty": 0.19599315936811681,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.24540508923051513,
-            "focus": 0.21794309981528567,
-            "novelty": 0.1942134078376475,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.24290508923051513,
-            "focus": 0.20704594482452138,
-            "novelty": 0.1924701023434381,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.24040508923051512,
-            "focus": 0.1966936475832953,
-            "novelty": 0.19076500474263194,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.23790508923051512,
-            "focus": 0.18685896520413053,
-            "novelty": 0.1890970936864812,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.23540508923051512,
-            "focus": 0.177516016943924,
-            "novelty": 0.18746405366821153,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.23290508923051512,
-            "focus": 0.16864021609672777,
-            "novelty": 0.18586687127336998,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.23040508923051511,
-            "focus": 0.16020820529189136,
-            "novelty": 0.184309964629149,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2279050892305151,
-            "focus": 0.1521977950272968,
-            "novelty": 0.1827864722383933,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2254050892305151,
-            "focus": 0.14458790527593196,
-            "novelty": 0.18129430581754027,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2229050892305151,
-            "focus": 0.13735851001213537,
-            "novelty": 0.17982879633717405,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2204050892305151,
-            "focus": 0.1304905845115286,
-            "novelty": 0.178390695338217,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.2179050892305151,
-            "focus": 0.12396605528595216,
-            "novelty": 0.17697568129011113,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.21540508923051513,
-            "focus": 0.11776775252165454,
-            "novelty": 0.1755817334216208,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.21290508923051513,
-            "focus": 0.1118793648955718,
-            "novelty": 0.1742060165594154,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.21040508923051512,
-            "focus": 0.10628539665079322,
-            "novelty": 0.17284742980098924,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.20790508923051512,
-            "focus": 0.10097112681825356,
-            "novelty": 0.17150586144179866,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.20540508923051512,
-            "focus": 0.09592257047734087,
-            "novelty": 0.17017866135027912,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.20290508923051512,
-            "focus": 0.09112644195347383,
-            "novelty": 0.16886399075963576,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.20040508923051512,
-            "focus": 0.08657011985580014,
-            "novelty": 0.16755967360897442,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.1979050892305151,
-            "focus": 0.08224161386301013,
-            "novelty": 0.16626501787490952,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.1954050892305151,
-            "focus": 0.07812953316985961,
-            "novelty": 0.1649775726955966,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.1929050892305151,
-            "focus": 0.07422305651136663,
-            "novelty": 0.16369336813093682,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.1904050892305151,
-            "focus": 0.0705119036857983,
-            "novelty": 0.16241053858619334,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.1879050892305151,
-            "focus": 0.06698630850150837,
-            "novelty": 0.16112711233980295,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.18540508923051513,
-            "focus": 0.06363699307643295,
-            "novelty": 0.15983816273818574,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.18290508923051513,
-            "focus": 0.060455143422611296,
-            "novelty": 0.1585426831263444,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.18040508923051513,
-            "focus": 0.05743238625148073,
-            "novelty": 0.1572374283966891,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.17790508923051512,
-            "focus": 0.054560766938906685,
-            "novelty": 0.15591851331000853,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.17540508923051512,
-            "focus": 0.05183272859196135,
-            "novelty": 0.15458473029118805,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.17290508923051512,
-            "focus": 0.05,
-            "novelty": 0.1532336728576641,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.17040508923051512,
-            "focus": 0.05,
-            "novelty": 0.1518642677942457,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.16790508923051511,
-            "focus": 0.05,
-            "novelty": 0.15047547929786007,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.1654050892305151,
-            "focus": 0.05,
-            "novelty": 0.14906777399144272,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.1629050892305151,
-            "focus": 0.05,
-            "novelty": 0.14764139415961294,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.1604050892305151,
-            "focus": 0.05,
-            "novelty": 0.14619735507737427,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.1579050892305151,
-            "focus": 0.05,
-            "novelty": 0.14473670090411211,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.1554050892305151,
-            "focus": 0.05,
-            "novelty": 0.14326022901198468,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.15290508923051513,
-            "focus": 0.05,
-            "novelty": 0.141768772732253,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.15040508923051513,
-            "focus": 0.05,
-            "novelty": 0.14026312566761934,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.14790508923051512,
-            "focus": 0.05,
-            "novelty": 0.13874403073803065,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.1629050892305151,
-            "focus": 0.05,
-            "novelty": 0.1372120827704326,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.17790508923051512,
-            "focus": 0.05,
-            "novelty": 0.13566751094464377,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.1929050892305151,
-            "focus": 0.05,
-            "novelty": 0.13411064542381052,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.20790508923051512,
-            "focus": 0.05,
-            "novelty": 0.1325417847667044,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.2229050892305151,
-            "focus": 0.05,
-            "novelty": 0.1309610059508809,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.23790508923051512,
-            "focus": 0.05,
-            "novelty": 0.12936858310265006,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.25290508923051513,
-            "focus": 0.05,
-            "novelty": 0.12776440673338477,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.2679050892305151,
-            "focus": 0.05,
-            "novelty": 0.12614865878746814,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.2829050892305151,
-            "focus": 0.05,
-            "novelty": 0.12452137643337703,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.2979050892305151,
-            "focus": 0.05,
-            "novelty": 0.12288280845601963,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.31290508923051513,
-            "focus": 0.05,
-            "novelty": 0.12123290881619384,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.3279050892305151,
-            "focus": 0.05,
-            "novelty": 0.11957184067595125,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.3429050892305151,
-            "focus": 0.05,
-            "novelty": 0.11789987063907638,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.3579050892305151,
-            "focus": 0.05,
-            "novelty": 0.1162171357733726,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.37290508923051513,
-            "focus": 0.05,
-            "novelty": 0.11452365647560148,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.38790508923051514,
-            "focus": 0.05,
-            "novelty": 0.11281979383851228,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.4029050892305151,
-            "focus": 0.05,
-            "novelty": 0.11110580207569447,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.4179050892305151,
-            "focus": 0.05,
-            "novelty": 0.10938194830609002,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.4329050892305151,
-            "focus": 0.05,
-            "novelty": 0.10764845318206318,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.44790508923051514,
-            "focus": 0.05,
-            "novelty": 0.10590579994340532,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.4629050892305151,
-            "focus": 0.05,
-            "novelty": 0.10415434777500485,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.4779050892305151,
-            "focus": 0.05,
-            "novelty": 0.10239451946571342,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.4929050892305151,
-            "focus": 0.05,
-            "novelty": 0.10062662276688351,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.5079050892305151,
-            "focus": 0.05,
-            "novelty": 0.09885125618413919,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.5229050892305152,
-            "focus": 0.05,
-            "novelty": 0.09706889730674058,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.5379050892305152,
-            "focus": 0.05,
-            "novelty": 0.09528001275278367,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.5529050892305151,
-            "focus": 0.05,
-            "novelty": 0.09348521217539832,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.5679050892305151,
-            "focus": 0.05,
-            "novelty": 0.09168492354383838,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.5829050892305151,
-            "focus": 0.05,
-            "novelty": 0.08987969426794891,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.5979050892305151,
-            "focus": 0.05,
-            "novelty": 0.0880701688601038,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.6129050892305151,
-            "focus": 0.05,
-            "novelty": 0.0862568845460606,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.6279050892305151,
-            "focus": 0.05,
-            "novelty": 0.08444060073160709,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.642905089230515,
-            "focus": 0.05,
-            "novelty": 0.08262194726885638,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.657905089230515,
-            "focus": 0.05,
-            "novelty": 0.0808014830802669,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.6729050892305151,
-            "focus": 0.05,
-            "novelty": 0.07897991948308686,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.6879050892305151,
-            "focus": 0.05,
-            "novelty": 0.07715782185987256,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.7029050892305151,
-            "focus": 0.05,
-            "novelty": 0.07533590921588684,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.717905089230515,
-            "focus": 0.05,
-            "novelty": 0.07351481791604975,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.732905089230515,
-            "focus": 0.05,
-            "novelty": 0.07169526801696473,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.747905089230515,
-            "focus": 0.05,
-            "novelty": 0.06987787710229058,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.762905089230515,
-            "focus": 0.05,
-            "novelty": 0.06806336537186876,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.777905089230515,
-            "focus": 0.05,
-            "novelty": 0.06625238808473947,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.7929050892305151,
-            "focus": 0.05,
-            "novelty": 0.06444560327589759,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.8079050892305151,
-            "focus": 0.05,
-            "novelty": 0.06264376053108701,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.8229050892305151,
-            "focus": 0.05,
-            "novelty": 0.060847529869161955,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.8379050892305151,
-            "focus": 0.05,
-            "novelty": 0.059057487106486284,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.852905089230515,
-            "focus": 0.05,
-            "novelty": 0.057274357227406196,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.867905089230515,
-            "focus": 0.05,
-            "novelty": 0.055498832726197427,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.882905089230515,
-            "focus": 0.05,
-            "novelty": 0.053731402034911765,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.897905089230515,
-            "focus": 0.05,
-            "novelty": 0.051972773847001656,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.912905089230515,
-            "focus": 0.05,
-            "novelty": 0.05022360270311576,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.9279050892305151,
-            "focus": 0.05,
-            "novelty": 0.048484512768291195,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.9429050892305151,
-            "focus": 0.05,
-            "novelty": 0.04675608321980517,
-            "state": "SLEEPING"
-          },
-          {
-            "energy": 0.9579050892305151,
-            "focus": 0.05,
-            "novelty": 0.045038762282271695,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.955405089230515,
-            "focus": 0.05,
-            "novelty": 0.043333232386597156,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.9529050892305151,
-            "focus": 0.05,
-            "novelty": 0.04164005399653522,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.950405089230515,
-            "focus": 0.05,
-            "novelty": 0.03995984973399417,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.9479050892305151,
-            "focus": 0.05,
-            "novelty": 0.03829345097308282,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.945405089230515,
-            "focus": 0.05,
-            "novelty": 0.03664125568888774,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.9429050892305151,
-            "focus": 0.05,
-            "novelty": 0.03500375248089562,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.940405089230515,
-            "focus": 0.05,
-            "novelty": 0.033381593548546445,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.9379050892305151,
-            "focus": 0.05,
-            "novelty": 0.03177525045718596,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.935405089230515,
-            "focus": 0.05,
-            "novelty": 0.03018534884492668,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.9329050892305151,
-            "focus": 0.05,
-            "novelty": 0.028612416842216156,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.930405089230515,
-            "focus": 0.05,
-            "novelty": 0.027057026581386437,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.9279050892305151,
-            "focus": 0.05,
-            "novelty": 0.02551979618853018,
-            "state": "DROWSY"
-          },
-          {
-            "energy": 0.925405089230515,
-            "focus": 0.05,
-            "novelty": 0.024001454651046195,
-            "state": "DROWSY"
-          }
-        ]
-      },
-      "custom_state_file": null
+        "max_energy": 100.0,
+        "recharge_rate": 1.5,
+        "intensity_scale": 0.1
+      }
     },
     {
       "id": 4,
       "class_name": "MERARenormNode2",
-      "pos_x": -101.0,
-      "pos_y": -403.0,
+      "pos_x": 0.0,
+      "pos_y": -450.0,
       "width": 220.0,
       "height": 200.0,
       "config": {
-        "inputs": {
-          "signal_in": "spectrum",
-          "image_in": "image"
-        },
-        "outputs": {
-          "bulk_view": "image",
-          "deep_tensor": "spectrum",
-          "entropy_flow": "spectrum",
-          "scale_metric": "signal"
-        },
         "node_title": "MERA (Scale View)",
-        "config": {
-          "levels": 5,
-          "disentangle": 0.3
-        }
-      },
-      "custom_state_file": null
+        "levels": 4
+      }
     },
     {
       "id": 5,
       "class_name": "HaPPYHolographNode2",
-      "pos_x": -100.0,
+      "pos_x": 0.0,
       "pos_y": -200.0,
       "width": 220.0,
       "height": 200.0,
       "config": {
-        "inputs": {
-          "boundary_signal": "spectrum",
-          "boundary_image": "image"
-        },
-        "outputs": {
-          "hyperbolic_view": "image",
-          "central_charge": "signal",
-          "bulk_spectrum": "spectrum",
-          "boundary_entropy": "signal"
-        },
-        "node_title": "HaPPY (Bulk View)",
-        "config": {
-          "disk_size": 256,
-          "layers": 6,
-          "error_correction": 0.3
-        }
-      },
-      "custom_state_file": null
+        "node_title": "HaPPY (Bulk View)"
+      }
     },
     {
       "id": 6,
       "class_name": "CognitiveManifoldNode2",
-      "pos_x": -102.0,
-      "pos_y": 3.0,
+      "pos_x": 0.0,
+      "pos_y": 50.0,
       "width": 220.0,
       "height": 200.0,
       "config": {
-        "inputs": {
-          "thought_vector": "spectrum",
-          "reset": "signal"
-        },
-        "outputs": {
-          "manifold_view": "image",
-          "set_id": "signal",
-          "novelty": "signal",
-          "trajectory": "spectrum"
-        },
         "node_title": "Manifold (Concept)",
-        "config": {
-          "n_clusters": 5,
-          "trajectory_length": 200,
-          "canvas_size": 400,
-          "learning_rate": 0.02
-        },
-        "max_history": 500,
-        "n_clusters": 4,
-        "cluster_colors": [
-          [
-            255,
-            100,
-            100
-          ],
-          [
-            100,
-            255,
-            100
-          ],
-          [
-            100,
-            100,
-            255
-          ],
-          [
-            255,
-            255,
-            100
-          ],
-          [
-            255,
-            100,
-            255
-          ],
-          [
-            100,
-            255,
-            255
-          ],
-          [
-            255,
-            180,
-            100
-          ],
-          [
-            180,
-            100,
-            255
-          ]
-        ]
-      },
-      "custom_state_file": null
+        "trajectory_length": 300,
+        "n_clusters": 4
+      }
     },
     {
       "id": 7,
       "class_name": "EmergentGraphNode2",
-      "pos_x": -101.0,
-      "pos_y": 206.0,
+      "pos_x": 0.0,
+      "pos_y": 300.0,
       "width": 220.0,
       "height": 200.0,
       "config": {
-        "inputs": {
-          "activation": "spectrum",
-          "reset": "signal"
-        },
-        "outputs": {
-          "universe_view": "image",
-          "density": "signal",
-          "cluster_count": "signal",
-          "positions": "spectrum"
-        },
         "node_title": "Gravity Graph",
-        "config": {
-          "n_particles": 128,
-          "gravity": 0.015,
-          "dark_energy": 0.002,
-          "interaction_radius": 0.3,
-          "damping": 0.95,
-          "canvas_size": 400
-        }
-      },
-      "custom_state_file": null
+        "n_particles": 64,
+        "gravity": 0.05
+      }
     },
     {
       "id": 8,
       "class_name": "DisplayNode",
-      "pos_x": 197.0,
-      "pos_y": -403.0,
+      "pos_x": 300.0,
+      "pos_y": -450.0,
       "width": 200.0,
       "height": 200.0,
       "config": {
-        "inputs": {
-          "image_in": "image"
-        },
-        "outputs": {},
         "node_title": "Scale Display"
-      },
-      "custom_state_file": null
+      }
     },
     {
       "id": 9,
       "class_name": "DisplayNode",
-      "pos_x": 200.0,
+      "pos_x": 300.0,
       "pos_y": -200.0,
       "width": 200.0,
       "height": 200.0,
       "config": {
-        "inputs": {
-          "image_in": "image"
-        },
-        "outputs": {},
         "node_title": "Bulk Geometry"
-      },
-      "custom_state_file": null
+      }
     },
     {
       "id": 10,
       "class_name": "DisplayNode",
-      "pos_x": 200.0,
-      "pos_y": 1.0,
+      "pos_x": 300.0,
+      "pos_y": 50.0,
       "width": 200.0,
       "height": 200.0,
       "config": {
-        "inputs": {
-          "image_in": "image"
-        },
-        "outputs": {},
         "node_title": "Thought Trajectory"
-      },
-      "custom_state_file": null
+      }
     },
     {
       "id": 11,
       "class_name": "DisplayNode",
-      "pos_x": 200.0,
-      "pos_y": 202.0,
+      "pos_x": 300.0,
+      "pos_y": 300.0,
       "width": 200.0,
       "height": 200.0,
       "config": {
-        "inputs": {
-          "image_in": "image"
-        },
-        "outputs": {},
         "node_title": "Emergent Relations"
-      },
-      "custom_state_file": null
+      }
     },
     {
       "id": 12,
       "class_name": "DynamicEphapticNode",
       "pos_x": -650.0,
       "pos_y": -200.0,
-      "width": 160.0,
+      "width": 180.0,
       "height": 140.0,
       "config": {
-        "inputs": {
-          "image_in": "image",
-          "focus": "signal"
-        },
-        "outputs": {
-          "field_vector": "spectrum"
-        },
-        "node_title": "Attention Gate",
-        "max_dim": 256
-      },
-      "custom_state_file": null
+        "node_title": "Attention Gate"
+      }
     }
   ],
   "edges": [
@@ -1275,6 +169,20 @@
       "from_port": "image",
       "to_node_id": 12,
       "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal_out",
+      "to_node_id": 3,
+      "to_port": "intensity_in",
       "learned_weight": 1.0
     },
     {
@@ -1289,13 +197,6 @@
       "from_port": "field_vector",
       "to_node_id": 2,
       "to_port": "drive_signal",
-      "learned_weight": 1.0
-    },
-    {
-      "from_node_id": 0,
-      "from_port": "signal",
-      "to_node_id": 1,
-      "to_port": "signal_in",
       "learned_weight": 1.0
     },
     {
