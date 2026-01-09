@@ -11,7 +11,7 @@ except AttributeError:
             self.inputs = {}
             self.outputs = {}
             self.input_data = {}
-        def get_blended_input(self, name): return None
+        def get_blended_input(self, name, mode=None): return None
 
 class HomeostaticRegulatorNode2(BaseNode):
     """
@@ -19,12 +19,16 @@ class HomeostaticRegulatorNode2(BaseNode):
     -----------------------------
     A virtual battery that manages the energy budget of attention.
     
-    - High focus (gamma-like) drains energy
-    - Low focus (delta-like) recharges energy
-    - When depleted, forces "sleep" (low focus)
-    - When recharged and novel input arrives, "wakes up"
+    Inputs:
+    - novelty: surprise signal from manifold (wakes up system)
+    - intensity_in: signal from amplifier (higher = more metabolic cost)
+    - metabolic_cost: spectrum input (alternative cost signal)
+    - override: manual wake/sleep control
     
-    Accepts spectrum/array inputs and extracts scalar metrics.
+    Outputs:
+    - focus_command: 0 (sleep) to 1 (alert) - controls ephaptic lens
+    - energy_level: battery state 0-1
+    - state_view: visualization
     """
     NODE_CATEGORY = "Biology"
     NODE_COLOR = QtGui.QColor(255, 200, 100)
@@ -35,7 +39,8 @@ class HomeostaticRegulatorNode2(BaseNode):
         
         self.inputs = {
             'novelty': 'signal',
-            'metabolic_cost': 'spectrum',  # Can be array - we'll extract energy
+            'intensity_in': 'signal',      # From SignalAmplifier
+            'metabolic_cost': 'spectrum',   # Alternative: from spectrum
             'override': 'signal',
         }
         
@@ -54,6 +59,7 @@ class HomeostaticRegulatorNode2(BaseNode):
             'focus_drain_mult': 2.0,
             'recharge_rate': 1.5,
             'novelty_sensitivity': 0.4,
+            'intensity_scale': 0.1,  # How much intensity affects drain
         }
         
         self._output_values = {}
@@ -66,10 +72,12 @@ class HomeostaticRegulatorNode2(BaseNode):
         self.sleep_pressure = 0.0
         self.wake_drive = 0.0
         self.history = []
+        self.current_intensity = 0.0
 
     def get_input(self, name):
         if hasattr(self, 'get_blended_input'):
-            return self.get_blended_input(name)
+            result = self.get_blended_input(name, 'sum')
+            return result
         if name in self.input_data and len(self.input_data[name]) > 0:
             val = self.input_data[name]
             return val[0] if isinstance(val, list) else val
@@ -90,7 +98,6 @@ class HomeostaticRegulatorNode2(BaseNode):
         if isinstance(val, np.ndarray):
             if val.size == 0:
                 return 0.0
-            # Extract meaningful scalar: mean of absolute values
             return float(np.mean(np.abs(val)))
         if isinstance(val, (list, tuple)):
             if len(val) == 0:
@@ -103,12 +110,15 @@ class HomeostaticRegulatorNode2(BaseNode):
 
     def step(self):
         # Get inputs - safely convert to scalars
-        novelty_raw = self.get_input('novelty')
-        ext_cost_raw = self.get_input('metabolic_cost')
+        novelty = np.clip(self._to_scalar(self.get_input('novelty')), 0, 1)
+        intensity = self._to_scalar(self.get_input('intensity_in'))
+        spectrum_cost = self._to_scalar(self.get_input('metabolic_cost'))
         override_raw = self.get_input('override')
         
-        novelty = np.clip(self._to_scalar(novelty_raw), 0, 1)
-        ext_cost = np.clip(self._to_scalar(ext_cost_raw), 0, 1)
+        # Combine intensity sources
+        self.current_intensity = intensity + spectrum_cost
+        ext_cost = np.clip(self.current_intensity * self.config['intensity_scale'], 0, 1)
+        
         override = self._to_scalar(override_raw) if override_raw is not None else None
         
         max_e = self.config['max_energy']
@@ -124,11 +134,11 @@ class HomeostaticRegulatorNode2(BaseNode):
         self.wake_drive = novelty * nov_sens
         
         # Manual override
-        if override is not None:
+        if override is not None and override != 0:
             if override > 0.7:
                 self.state = "AWAKE"
                 self.focus = 0.8
-            elif override < 0.3 and override > 0:
+            elif override < 0.3:
                 self.state = "SLEEPING"
                 self.focus = 0.1
         
@@ -144,7 +154,7 @@ class HomeostaticRegulatorNode2(BaseNode):
                 self.state = "DROWSY"
                 
         elif self.state == "DROWSY":
-            drain = base_drain * 0.5
+            drain = base_drain * 0.5 + ext_cost * 0.5
             self.energy -= drain
             self.focus = self.focus * 0.95
             
@@ -177,6 +187,7 @@ class HomeostaticRegulatorNode2(BaseNode):
             'energy': self.energy / max_e,
             'focus': self.focus,
             'novelty': novelty,
+            'intensity': ext_cost,
             'state': self.state
         })
         if len(self.history) > 200:
@@ -213,9 +224,10 @@ class HomeostaticRegulatorNode2(BaseNode):
         else:
             fill_color = (200, 100, 50)
         
-        cv2.rectangle(canvas, (battery_x + 2, fill_y),
-                     (battery_x + battery_w - 2, battery_y + battery_h - 2),
-                     fill_color, -1)
+        if fill_h > 0:
+            cv2.rectangle(canvas, (battery_x + 2, fill_y),
+                         (battery_x + battery_w - 2, battery_y + battery_h - 2),
+                         fill_color, -1)
         
         # Thresholds
         wake_y = battery_y + battery_h - int((wake_th / max_e) * battery_h)
@@ -238,7 +250,7 @@ class HomeostaticRegulatorNode2(BaseNode):
                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
         cv2.putText(canvas, f"Focus: {self.focus:.2f}", (100, 100),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
-        cv2.putText(canvas, f"Sleep Pressure: {self.sleep_pressure:.2f}", (100, 120),
+        cv2.putText(canvas, f"Intensity: {self.current_intensity:.2f}", (100, 120),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
         
         # History graph
