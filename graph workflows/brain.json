@@ -1,0 +1,317 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "CrystalChipNode",
+      "pos_x": -288.0,
+      "pos_y": -35.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "latent_in": "spectrum",
+          "signal_in": "signal",
+          "gain": "signal",
+          "coupling": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image",
+          "latent_out": "spectrum",
+          "signal_out": "signal",
+          "chip_view": "image",
+          "activity_view": "image",
+          "resonance": "signal",
+          "energy": "signal",
+          "delta": "signal",
+          "theta": "signal",
+          "alpha": "signal",
+          "beta": "signal",
+          "gamma": "signal",
+          "lfp": "signal"
+        },
+        "node_title": "Base Node",
+        "crystal_path": "e:/crystal64.npz",
+        "is_loaded": true,
+        "status_msg": "Loaded crystal64.npz | 64x64 | 39 pins",
+        "grid_size": 64,
+        "pin_names": [
+          "Fc3.",
+          "Fcz.",
+          "Fc4.",
+          "C3..",
+          "Cz..",
+          "C4..",
+          "Cp3.",
+          "Cpz.",
+          "Cp4.",
+          "Fp1.",
+          "Fpz.",
+          "Fp2.",
+          "Af7.",
+          "Af3.",
+          "Afz.",
+          "Af4.",
+          "Af8.",
+          "F7..",
+          "F3..",
+          "Fz..",
+          "F4..",
+          "F8..",
+          "Ft7.",
+          "Ft8.",
+          "T7..",
+          "T8..",
+          "Tp7.",
+          "Tp8.",
+          "P7..",
+          "P3..",
+          "P1..",
+          "Pz..",
+          "P2..",
+          "P4..",
+          "P8..",
+          "Poz.",
+          "O1..",
+          "Oz..",
+          "O2.."
+        ],
+        "input_pin_indices": [
+          9,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "output_pin_indices": [
+          6,
+          7,
+          8,
+          10,
+          26,
+          27,
+          28,
+          29,
+          31,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ],
+        "internal_pin_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          22,
+          23,
+          24,
+          25,
+          30,
+          32
+        ],
+        "learning_steps": 200,
+        "total_spikes": 17346,
+        "edf_source": "3.edf",
+        "created": "2025-12-30T07:53:54.791175",
+        "a": 0.02,
+        "b": 0.2,
+        "c": -65.0,
+        "d": 8.0,
+        "dt": 0.5,
+        "base_coupling": 5,
+        "input_gain": 50,
+        "spread_radius": 3,
+        "step_count": 735,
+        "current_resonance": 300.3292236328125,
+        "current_energy": 18946038.0,
+        "lfp_history_size": 256,
+        "lfp_idx": 223,
+        "band_powers": {
+          "delta": 46.22710365467425,
+          "theta": 36.481853965856,
+          "alpha": 33.40260600957041,
+          "beta": 31.614421857813603,
+          "gamma": 21.436249483802058
+        },
+        "current_lfp": -65.7660140991211,
+        "sample_rate": 100.0,
+        "_output_values": {
+          "signal_out": -71.68018341064453,
+          "resonance": 300.3292236328125,
+          "energy": 18946038.0,
+          "delta": 46.22710365467425,
+          "theta": 36.481853965856,
+          "alpha": 33.40260600957041,
+          "beta": 31.614421857813603,
+          "gamma": 21.436249483802058,
+          "lfp": -65.7660140991211
+        }
+      },
+      "custom_state_file": "crystal_chip_0.npz"
+    },
+    {
+      "id": 1,
+      "class_name": "NeuroplasticNode",
+      "pos_x": 59.0,
+      "pos_y": -52.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "latent_in": "spectrum",
+          "optic_nerve": "image",
+          "learning_rate": "signal"
+        },
+        "outputs": {
+          "decoded_vision": "image",
+          "wiring_viz": "image"
+        },
+        "node_title": "Neuroplastic Decoder",
+        "res": 32,
+        "frame_count": 735
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "MediaSourceNode",
+      "pos_x": -390.0,
+      "pos_y": -261.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.22587888071895423
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "DisplayNode",
+      "pos_x": 460.0,
+      "pos_y": -181.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "input_data": {
+          "image_in": []
+        },
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "DisplayNode",
+      "pos_x": 437.0,
+      "pos_y": 28.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "input_data": {
+          "image_in": []
+        },
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -163.0,
+      "pos_y": -306.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 0.01
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "latent_out",
+      "to_node_id": 1,
+      "to_port": "latent_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "optic_nerve",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "decoded_vision",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "wiring_viz",
+      "to_node_id": 4,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "signal",
+      "to_node_id": 1,
+      "to_port": "learning_rate",
+      "learned_weight": 1.0
+    }
+  ]
+}

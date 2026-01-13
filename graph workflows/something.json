@@ -1,0 +1,126 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MorphogenicCortexNode",
+      "pos_x": -73.0,
+      "pos_y": -475.0,
+      "width": 465.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "stimulus_input": "image",
+          "prediction_error": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "field_state": "image",
+          "wiring_map": "image",
+          "plasticity_state": "signal",
+          "connection_count": "signal"
+        },
+        "node_title": "Base Node",
+        "size": 64,
+        "n_connections": 1000,
+        "max_connections": 2000,
+        "panic_threshold": 0.05,
+        "is_panicking": false,
+        "plasticity": 0.001
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ReflexiveFieldNode",
+      "pos_x": 472.0,
+      "pos_y": -441.0,
+      "width": 370.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "field_state": "image",
+          "external_spectrum": "spectrum",
+          "awareness": "signal",
+          "freeze_model": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "reflexive_field": "image",
+          "prediction_field": "image",
+          "error_field": "image",
+          "self_model": "image",
+          "prediction_error": "signal",
+          "integration": "signal",
+          "parameter_drift": "signal",
+          "complexity": "signal",
+          "autonomy": "signal",
+          "model_spectrum": "spectrum"
+        },
+        "node_title": "Base Node",
+        "size": 64,
+        "model_dim": 16,
+        "field_gain": 1.0307859406058437,
+        "field_smooth": 0.4692140593941575,
+        "prediction_weight": 0.3,
+        "model_learning_rate": 0.001,
+        "modulation_rate": 0.0001,
+        "total_prediction_error": 0.00013581254247273928,
+        "integration_measure": 0.9999936856172624,
+        "autonomy_measure": 1.0,
+        "t": 636
+      },
+      "custom_state_file": "reflexive_model_1.npz"
+    },
+    {
+      "id": 2,
+      "class_name": "MediaSourceNode",
+      "pos_x": -323.0,
+      "pos_y": -443.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.23712152777777779
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "prediction_error",
+      "to_node_id": 0,
+      "to_port": "prediction_error",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "field_state",
+      "to_node_id": 1,
+      "to_port": "field_state",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 0,
+      "to_port": "stimulus_input",
+      "learned_weight": 1.0
+    }
+  ]
+}

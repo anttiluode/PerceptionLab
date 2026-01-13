@@ -1,0 +1,198 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SurfaceTensionNode",
+      "pos_x": -486.0,
+      "pos_y": -432.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "noisy_input": "image",
+          "tension": "signal"
+        },
+        "outputs": {
+          "relaxed_view": "image",
+          "stress_map": "image"
+        },
+        "node_title": "Surface Tension Crystal",
+        "res": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ScramblerNode",
+      "pos_x": -819.0,
+      "pos_y": -428.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "scrambled_out": "image"
+        },
+        "node_title": "Reality Scrambler",
+        "res": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "MediaSourceNode",
+      "pos_x": -1120.0,
+      "pos_y": -458.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.226577818627451
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "DisplayNode",
+      "pos_x": -203.0,
+      "pos_y": -479.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "PredictiveDreamNode",
+      "pos_x": -818.0,
+      "pos_y": -215.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "visual_reality": "image"
+        },
+        "outputs": {
+          "dream_view": "image",
+          "surprise_map": "image",
+          "panic_signal": "signal"
+        },
+        "node_title": "Predictive Dream (Retro-V2)",
+        "history_loss": [
+          0.006071134936064482,
+          0.01021643541753292,
+          0.009018096141517162,
+          0.011729180812835693,
+          0.010497760027647018,
+          0.011869381181895733,
+          0.010735506191849709,
+          0.010452484712004662,
+          0.00943298451602459,
+          0.008565559983253479,
+          0.008207754231989384,
+          0.007503765635192394,
+          0.007595596835017204,
+          0.007108106277883053,
+          0.007419117726385593,
+          0.006971890572458506,
+          0.006605871953070164,
+          0.006906367372721434,
+          0.006299667060375214,
+          0.006117250770330429,
+          0.005705166608095169,
+          0.005269180983304977,
+          0.005058666691184044,
+          0.0048643131740391254,
+          0.004543362185359001,
+          0.004280788823962212,
+          0.0043006171472370625,
+          0.004211749415844679,
+          0.004104039166122675,
+          0.0039024665020406246,
+          0.003874968271702528,
+          0.003917424939572811,
+          0.0037774916272610426,
+          0.004737791605293751,
+          0.0047709462232887745,
+          0.004407697357237339,
+          0.006115712225437164,
+          0.006020244210958481,
+          0.008352343924343586,
+          0.008341489359736443,
+          0.009557473473250866,
+          0.01786733791232109,
+          0.010131845250725746,
+          0.011379856616258621,
+          0.00917539931833744,
+          0.008171888999640942,
+          0.007556388154625893,
+          0.0075593376532197,
+          0.007257185876369476,
+          0.006815630942583084
+        ],
+        "initialized": true
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "scrambled_out",
+      "to_node_id": 0,
+      "to_port": "noisy_input",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "relaxed_view",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 4,
+      "to_port": "visual_reality",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "panic_signal",
+      "to_node_id": 0,
+      "to_port": "tension",
+      "learned_weight": 1.0
+    }
+  ]
+}
