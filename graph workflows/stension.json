@@ -1,0 +1,172 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SurfaceTensionNode",
+      "pos_x": -486.0,
+      "pos_y": -432.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "noisy_input": "image",
+          "tension": "signal"
+        },
+        "outputs": {
+          "relaxed_view": "image",
+          "stress_map": "image"
+        },
+        "node_title": "Surface Tension Crystal",
+        "res": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "MediaSourceNode",
+      "pos_x": -1120.0,
+      "pos_y": -458.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.2285575980392157
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "DisplayNode",
+      "pos_x": -203.0,
+      "pos_y": -479.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "PredictiveDreamNode",
+      "pos_x": -817.0,
+      "pos_y": -215.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "visual_reality": "image"
+        },
+        "outputs": {
+          "dream_view": "image",
+          "surprise_map": "image",
+          "panic_signal": "signal"
+        },
+        "node_title": "Predictive Dream (Retro-V2)",
+        "history_loss": [
+          0.001973371719941497,
+          0.0018623273354023695,
+          0.0017967249732464552,
+          0.001910386374220252,
+          0.0018487062770873308,
+          0.002272583544254303,
+          0.0022323871962726116,
+          0.0043829442001879215,
+          0.0043889256194233894,
+          0.0040590474382042885,
+          0.003901219228282571,
+          0.003979080356657505,
+          0.0038518565706908703,
+          0.0035636546090245247,
+          0.00330431223846972,
+          0.003031650558114052,
+          0.002953553106635809,
+          0.0028659524396061897,
+          0.0029249570798128843,
+          0.002674963790923357,
+          0.0026623127050697803,
+          0.0025138799101114273,
+          0.002356576267629862,
+          0.002407513093203306,
+          0.0023258253931999207,
+          0.002150977496057749,
+          0.0020398045890033245,
+          0.002029570285230875,
+          0.0019983581732958555,
+          0.0020408346317708492,
+          0.0019865762442350388,
+          0.001967871328815818,
+          0.0019190805032849312,
+          0.0019230293110013008,
+          0.001870113774202764,
+          0.0018206890672445297,
+          0.0017685488564893603,
+          0.0017077864613384008,
+          0.0016696155071258545,
+          0.0018872471991926432,
+          0.0018977811560034752,
+          0.001717163948342204,
+          0.0016862809425219893,
+          0.0018376399530097842,
+          0.001737308339215815,
+          0.001480853883549571,
+          0.0014411163283511996,
+          0.001491934759542346,
+          0.0014490379253402352,
+          0.0014012411702424288
+        ],
+        "initialized": true
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "relaxed_view",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "image",
+      "to_node_id": 3,
+      "to_port": "visual_reality",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "panic_signal",
+      "to_node_id": 0,
+      "to_port": "tension",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "dream_view",
+      "to_node_id": 0,
+      "to_port": "noisy_input",
+      "learned_weight": 1.0
+    }
+  ]
+}
