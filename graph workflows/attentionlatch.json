@@ -1,0 +1,515 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 260.0,
+      "pos_y": -139.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "FractalAnalyzerNode",
+      "pos_x": 513.0,
+      "pos_y": -577.0,
+      "width": 200.0,
+      "height": 197.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fractal_beta": "signal",
+          "complexity": "signal",
+          "spectral_energy": "signal",
+          "spectrum_image": "image",
+          "fractal_twin": "image"
+        },
+        "node_title": "Fractal Analyzer (Robust)",
+        "size": 96,
+        "fit_range_min": 5,
+        "levels": 5,
+        "fractal_beta": -2.477023229390179,
+        "complexity_value": 0.2614883853049106,
+        "measurement_method": "fractal_beta"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "FractalAnalyzerNode",
+      "pos_x": 849.0,
+      "pos_y": -571.0,
+      "width": 200.0,
+      "height": 214.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fractal_beta": "signal",
+          "complexity": "signal",
+          "spectral_energy": "signal",
+          "spectrum_image": "image",
+          "fractal_twin": "image"
+        },
+        "node_title": "Fractal Analyzer (Robust)",
+        "size": 96,
+        "fit_range_min": 5,
+        "levels": 5,
+        "fractal_beta": -2.4977338128024593,
+        "complexity_value": 0.25113309359877034,
+        "measurement_method": "fractal_beta"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "FractalAnalyzerNode",
+      "pos_x": 844.0,
+      "pos_y": -308.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "fractal_beta": "signal",
+          "complexity": "signal",
+          "spectral_energy": "signal",
+          "spectrum_image": "image",
+          "fractal_twin": "image"
+        },
+        "node_title": "Fractal Analyzer (Robust)",
+        "size": 96,
+        "fit_range_min": 5,
+        "levels": 5,
+        "fractal_beta": -2.4603234328454473,
+        "complexity_value": 0.26983828357727635,
+        "measurement_method": "fractal_beta"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "MediaSourceNode",
+      "pos_x": 267.0,
+      "pos_y": -508.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.4068835784313726
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "ComplexCorticalStackNode",
+      "pos_x": 593.0,
+      "pos_y": -309.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "sensory_in": "image",
+          "plasticity": "signal",
+          "deep_phase_shift": "signal"
+        },
+        "node_title": "Base Node",
+        "W": 64,
+        "H": 64,
+        "n_layers": 3
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "FeedbackNode",
+      "pos_x": 277.0,
+      "pos_y": -352.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "decay": "signal",
+          "gain": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Base Node",
+        "w": 200,
+        "h": 180
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "SignalPlotterNode",
+      "pos_x": 1134.0,
+      "pos_y": -563.0,
+      "width": 391.0,
+      "height": 282.0,
+      "config": {
+        "inputs": {
+          "signal_A (Red)": "signal",
+          "signal_B (Green)": "signal",
+          "signal_C (Blue)": "signal"
+        },
+        "outputs": {
+          "plot_image": "image"
+        },
+        "input_data": {
+          "signal_A (Red)": [
+            -2.466201523712103
+          ],
+          "signal_B (Green)": [],
+          "signal_C (Blue)": []
+        },
+        "node_title": "Signal Plotter",
+        "history_size": 500,
+        "colors": {
+          "A": [
+            255,
+            0,
+            0
+          ],
+          "B": [
+            0,
+            255,
+            0
+          ],
+          "C": [
+            0,
+            0,
+            255
+          ]
+        },
+        "min_val": -2.6718770672441843,
+        "max_val": -2.3230661744131287
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 8,
+      "class_name": "SignalPlotterNode",
+      "pos_x": 1130.0,
+      "pos_y": -359.0,
+      "width": 433.0,
+      "height": 326.0,
+      "config": {
+        "inputs": {
+          "signal_A (Red)": "signal",
+          "signal_B (Green)": "signal",
+          "signal_C (Blue)": "signal"
+        },
+        "outputs": {
+          "plot_image": "image"
+        },
+        "input_data": {
+          "signal_A (Red)": [
+            -2.498390336079781
+          ],
+          "signal_B (Green)": [],
+          "signal_C (Blue)": []
+        },
+        "node_title": "Signal Plotter",
+        "history_size": 500,
+        "colors": {
+          "A": [
+            255,
+            0,
+            0
+          ],
+          "B": [
+            0,
+            255,
+            0
+          ],
+          "C": [
+            0,
+            0,
+            255
+          ]
+        },
+        "min_val": -2.672850736590075,
+        "max_val": -9.66369906311359e-09
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 9,
+      "class_name": "SignalPlotterNode",
+      "pos_x": 831.0,
+      "pos_y": -133.0,
+      "width": 454.0,
+      "height": 265.0,
+      "config": {
+        "inputs": {
+          "signal_A (Red)": "signal",
+          "signal_B (Green)": "signal",
+          "signal_C (Blue)": "signal"
+        },
+        "outputs": {
+          "plot_image": "image"
+        },
+        "input_data": {
+          "signal_A (Red)": [
+            -2.4562542835483083
+          ],
+          "signal_B (Green)": [],
+          "signal_C (Blue)": []
+        },
+        "node_title": "Signal Plotter",
+        "history_size": 500,
+        "colors": {
+          "A": [
+            255,
+            0,
+            0
+          ],
+          "B": [
+            0,
+            255,
+            0
+          ],
+          "C": [
+            0,
+            0,
+            255
+          ]
+        },
+        "min_val": -2.6415517059667515,
+        "max_val": -2.245988022517738
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 10,
+      "class_name": "AttentionLatchNode",
+      "pos_x": 565.0,
+      "pos_y": -89.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "fractal_beta": "signal",
+          "theta_wave": "signal",
+          "threshold": "signal"
+        },
+        "outputs": {
+          "final_phase": 0.0,
+          "attention_state": 1.0
+        },
+        "input_data": {
+          "fractal_beta": [
+            -2.466201523712103
+          ],
+          "theta_wave": [
+            -0.10175540301920821
+          ],
+          "threshold": []
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 11,
+      "class_name": "NeuroOscillatorNode",
+      "pos_x": 258.0,
+      "pos_y": -33.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "frequency": "signal",
+          "offset": "signal"
+        },
+        "outputs": {
+          "wave_out": -0.31952758187724944,
+          "phase_out": 0.5517621040344238,
+          "gate_pulse": 0.7649601474057349
+        },
+        "input_data": {
+          "frequency": [],
+          "offset": []
+        },
+        "node_title": "Base Node",
+        "phase_accumulator": 0.5517621040344238,
+        "last_time": 1768549613.7476468
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 12,
+      "class_name": "DisplayNode",
+      "pos_x": 1692.0,
+      "pos_y": -186.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 13,
+      "class_name": "SpectralAmplifierNode",
+      "pos_x": 1637.0,
+      "pos_y": -410.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "low_gain": "signal",
+          "high_gain": "signal",
+          "crossover": "signal"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 5,
+      "from_port": "layer_1_holo",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "layer_2_holo",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "layer_3_holo",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "image",
+      "to_node_id": 5,
+      "to_port": "sensory_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "layer_3_holo",
+      "to_node_id": 6,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "image_out",
+      "to_node_id": 5,
+      "to_port": "holographic_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 5,
+      "to_port": "plasticity",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "fractal_beta",
+      "to_node_id": 7,
+      "to_port": "signal_A (Red)",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "fractal_beta",
+      "to_node_id": 8,
+      "to_port": "signal_A (Red)",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "fractal_beta",
+      "to_node_id": 9,
+      "to_port": "signal_A (Red)",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "final_phase",
+      "to_node_id": 5,
+      "to_port": "deep_phase_shift",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "fractal_beta",
+      "to_node_id": 10,
+      "to_port": "fractal_beta",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 11,
+      "from_port": "wave_out",
+      "to_node_id": 10,
+      "to_port": "theta_wave",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "layer_1_holo",
+      "to_node_id": 13,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 13,
+      "from_port": "amplified_out",
+      "to_node_id": 12,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
