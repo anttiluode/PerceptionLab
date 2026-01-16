@@ -1,0 +1,311 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "AudioBufferNode",
+      "pos_x": 259.0,
+      "pos_y": -242.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal": "signal"
+        },
+        "outputs": {
+          "buffer": "spectrum"
+        },
+        "input_data": {
+          "signal": []
+        },
+        "node_title": "Audio Buffer",
+        "buffer_size": 2048,
+        "outputs_data": {}
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "CorticalEigenmodeNode",
+      "pos_x": 492.0,
+      "pos_y": -215.0,
+      "width": 899.0,
+      "height": 376.0,
+      "config": {
+        "inputs": {
+          "complex_modes": "complex_spectrum",
+          "phase_coherence": "signal",
+          "modulation": "signal"
+        },
+        "outputs": {
+          "cortex_image": "image",
+          "eigenmode_gallery": "image",
+          "lh_image": "image",
+          "rh_image": "image",
+          "mode_energy": "signal",
+          "spatial_complexity": "signal"
+        },
+        "node_title": "Base Node",
+        "surface_type": "inflated",
+        "target_tris": 10000,
+        "n_eigenmodes": 20,
+        "n_input_modes": 10,
+        "W": 640,
+        "H": 320,
+        "gamma": 0.7,
+        "_mode_energy": 11158399.0,
+        "_spatial_complexity": 44.52699279785156,
+        "_initialized": true,
+        "_init_error": ""
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "MediaSourceNode",
+      "pos_x": 28.0,
+      "pos_y": -615.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.08936744281045751
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 932.0,
+      "pos_y": -548.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 1152.0,
+      "pos_y": -595.0,
+      "width": 264.0,
+      "height": 229.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "GeometricBridgeNode",
+      "pos_x": 551.0,
+      "pos_y": -617.0,
+      "width": 317.0,
+      "height": 333.0,
+      "config": {
+        "inputs": {
+          "signal_in": "spectrum",
+          "smoothing": "signal"
+        },
+        "outputs": {
+          "resonance_map": "image",
+          "energy_plot": "image",
+          "geometric_stress": "signal"
+        },
+        "node_title": "Base Node",
+        "resolution": 32,
+        "energy_history": [
+          0.16764369690606284,
+          0.1721996055821084,
+          0.1721996055821084,
+          0.1721996055821084,
+          0.17714203007398333,
+          0.17714203007398333,
+          0.17414599766694705,
+          0.17414599766694705,
+          0.17186579114814066,
+          0.17186579114814066,
+          0.17186579114814066,
+          0.17508996004698946,
+          0.17508996004698946,
+          0.17789509675047943,
+          0.17789509675047943,
+          0.18180985993934323,
+          0.18180985993934323,
+          0.18180985993934323,
+          0.18302946241170523,
+          0.18302946241170523,
+          0.18104287089036403,
+          0.18104287089036403,
+          0.17926129006880961,
+          0.17926129006880961,
+          0.17926129006880961,
+          0.18049840969735825,
+          0.18049840969735825,
+          0.1793305737138185,
+          0.1793305737138185,
+          0.18293436935985063,
+          0.18293436935985063,
+          0.18293436935985063,
+          0.17822103215912977,
+          0.17822103215912977,
+          0.1794700451472796,
+          0.17984445836228474,
+          0.17743413055753643,
+          0.17743413055753643,
+          0.1794750474620575,
+          0.1794750474620575,
+          0.17798339635525728,
+          0.17798339635525728,
+          0.17831324826989864,
+          0.17831324826989864,
+          0.18006731405948062,
+          0.1814019990842209,
+          0.1814019990842209,
+          0.18249347660816384,
+          0.18249347660816384,
+          0.18046307577025056,
+          0.18046307577025056,
+          0.1834810441985441,
+          0.18107778766750127,
+          0.18108685208131187,
+          0.18108685208131187,
+          0.18072845123627346,
+          0.18072845123627346,
+          0.18324841114600066,
+          0.18324841114600066,
+          0.18049785615118008,
+          0.1822498249840837,
+          0.1822498249840837,
+          0.18522198843597126,
+          0.18522198843597126,
+          0.18141287142123674,
+          0.18141287142123674,
+          0.18139612950011436,
+          0.18139612950011436,
+          0.18139612950011436,
+          0.1794793418418798,
+          0.1794793418418798,
+          0.1794793418418798,
+          0.18285037807552063,
+          0.18285037807552063,
+          0.18247802338284735,
+          0.18247802338284735,
+          0.18451487251457027,
+          0.18451487251457027,
+          0.18484264466663164,
+          0.18484264466663164,
+          0.18484264466663164,
+          0.18431319433109444,
+          0.18431319433109444,
+          0.1883895793527961,
+          0.1883895793527961,
+          0.1878107207744108,
+          0.1878107207744108,
+          0.1878107207744108,
+          0.18779113311242235,
+          0.18779113311242235,
+          0.18976659013354796,
+          0.18976659013354796,
+          0.18976659013354796,
+          0.18581547840923102,
+          0.18581547840923102,
+          0.18380877286179564,
+          0.18380877286179564,
+          0.18802187069203458,
+          0.18802187069203458,
+          0.185228944873703
+        ]
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "ImageToVectorNode",
+      "pos_x": 215.0,
+      "pos_y": -608.0,
+      "width": 325.0,
+      "height": 289.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "vector_out": "spectrum"
+        },
+        "node_title": "Image -> Vector",
+        "output_dim": 512
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 3,
+      "from_port": "complex_spectrum",
+      "to_node_id": 1,
+      "to_port": "complex_modes",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "cortex_image",
+      "to_node_id": 4,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 6,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "vector_out",
+      "to_node_id": 5,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
