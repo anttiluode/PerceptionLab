@@ -257,6 +257,16 @@ class FractalAnalyzerNode(BaseNode):
         # Get input image (use 'first' to avoid blending issues)
         img_in = self.get_blended_input('image_in', 'first')
         
+        # --- FIX: Guard against Bad Data (Strings/Non-Arrays) ---
+        if img_in is not None:
+            if isinstance(img_in, (str, np.str_)):
+                img_in = None
+            elif not isinstance(img_in, np.ndarray):
+                img_in = None
+            elif not hasattr(img_in, 'ndim'):
+                img_in = None
+        # --------------------------------------------------------
+        
         if img_in is None:
             # Decay outputs when no input
             self.fractal_beta *= 0.95
