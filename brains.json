@@ -1,0 +1,269 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PhiHologramNode",
+      "pos_x": 95.0,
+      "pos_y": -500.0,
+      "width": 863.0,
+      "height": 649.0,
+      "config": {
+        "inputs": {
+          "phase_rot": "signal",
+          "spatial_k": "signal",
+          "speed": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "delta_hologram": "image",
+          "theta_hologram": "image",
+          "alpha_hologram": "image",
+          "beta_hologram": "image",
+          "gamma_hologram": "image",
+          "combined_hologram": "image",
+          "delta_field": "complex_spectrum",
+          "theta_field": "complex_spectrum",
+          "alpha_field": "complex_spectrum",
+          "beta_field": "complex_spectrum",
+          "gamma_field": "complex_spectrum",
+          "delta_power": "signal",
+          "theta_power": "signal",
+          "alpha_power": "signal",
+          "beta_power": "signal",
+          "gamma_power": "signal",
+          "time_seconds": "signal"
+        },
+        "input_data": {
+          "phase_rot": [],
+          "spatial_k": [],
+          "speed": [],
+          "reset": []
+        },
+        "node_title": "Base Node",
+        "edf_file_path": "E:\\docshouse\\450\\1.edf",
+        "resolution": 256,
+        "default_k": 3000,
+        "default_rot": 0,
+        "display_band": "alpha",
+        "active_elecs": {
+          "Fp1": [
+            -0.3,
+            0.9
+          ],
+          "Fp2": [
+            0.3,
+            0.9
+          ],
+          "F7": [
+            -0.7,
+            0.6
+          ],
+          "F3": [
+            -0.35,
+            0.6
+          ],
+          "Fz": [
+            0,
+            0.6
+          ],
+          "F4": [
+            0.35,
+            0.6
+          ],
+          "F8": [
+            0.7,
+            0.6
+          ],
+          "T7": [
+            -0.9,
+            0.0
+          ],
+          "C3": [
+            -0.4,
+            0.0
+          ],
+          "Cz": [
+            0,
+            0.0
+          ],
+          "C4": [
+            0.4,
+            0.0
+          ],
+          "T8": [
+            0.9,
+            0.0
+          ],
+          "P7": [
+            -0.7,
+            -0.5
+          ],
+          "P3": [
+            -0.35,
+            -0.5
+          ],
+          "Pz": [
+            0,
+            -0.5
+          ],
+          "P4": [
+            0.35,
+            -0.5
+          ],
+          "P8": [
+            0.7,
+            -0.5
+          ],
+          "O1": [
+            -0.3,
+            -0.85
+          ],
+          "Oz": [
+            0,
+            -0.85
+          ],
+          "O2": [
+            0.3,
+            -0.85
+          ]
+        },
+        "sfreq": 160.0,
+        "current_idx": 5410,
+        "loaded_path": "E:\\docshouse\\450\\1.edf",
+        "status_msg": "Loaded: 20 channels",
+        "power_cache": {
+          "delta": 0.09869839251041412,
+          "theta": 0.08810579031705856,
+          "alpha": 0.10834851861000061,
+          "beta": 0.12274883687496185,
+          "gamma": 0.11455812305212021
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "CochlearResonanceScannerNode",
+      "pos_x": 984.0,
+      "pos_y": -485.0,
+      "width": 1321.0,
+      "height": 628.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "complex_field": "complex_spectrum",
+          "threshold": "signal"
+        },
+        "outputs": {
+          "cochlea_view": "image",
+          "resonance_map": "image",
+          "symmetry_view": "image",
+          "harmonic_view": "image",
+          "frequency_profile": "spectrum",
+          "harmonic_ratios": "spectrum",
+          "resonance_score": "signal",
+          "symmetry_score": "signal",
+          "harmonic_score": "signal",
+          "dominant_freq": "signal",
+          "num_harmonics": "signal",
+          "resonance_found": "signal"
+        },
+        "node_title": "Base Node",
+        "resonance_threshold": 0.4,
+        "min_peaks": 3,
+        "harmonic_tolerance": 0.15,
+        "resonance_score": 0.1240879152967315,
+        "symmetry_score": 0.3636263843224383,
+        "harmonic_score": 0.0,
+        "dominant_freq": 6.0,
+        "num_harmonics": 0,
+        "peak_ratios": []
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "V1EdgeHunterNode",
+      "pos_x": 2386.0,
+      "pos_y": -510.0,
+      "width": 976.0,
+      "height": 657.0,
+      "config": {
+        "inputs": {
+          "complex_field": "complex_spectrum",
+          "image_in": "image",
+          "manual_phase": "signal",
+          "manual_k": "signal",
+          "start_hunt": "signal",
+          "reset": "signal",
+          "threshold": "signal"
+        },
+        "outputs": {
+          "phase_rot_out": "signal",
+          "spatial_k_out": "signal",
+          "edge_found": "signal",
+          "edge_strength": "signal",
+          "dominant_angle": "signal",
+          "hunt_view": "image",
+          "fft_orientation": "image",
+          "edge_map": "image",
+          "orientation_hist": "image",
+          "orientation_spectrum": "spectrum"
+        },
+        "node_title": "Base Node",
+        "hunt_active": false,
+        "hunt_found": false,
+        "phase_min": -90.0,
+        "phase_max": 90.0,
+        "phase_step": 5.0,
+        "k_min": 5.0,
+        "k_max": 100.0,
+        "k_step": 5.0,
+        "current_phase": 0.0,
+        "current_k": 15.0,
+        "best_phase": 0.0,
+        "best_k": 15.0,
+        "best_score": 0.26583594709845954,
+        "edge_threshold": 0.3,
+        "num_orientations": 36,
+        "dominant_orientation": 0.0,
+        "edge_coherence": 0.11527037859106931
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "theta_hologram",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_field",
+      "to_node_id": 1,
+      "to_port": "complex_field",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_field",
+      "to_node_id": 2,
+      "to_port": "complex_field",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_hologram",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
