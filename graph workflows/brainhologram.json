@@ -1,0 +1,228 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PhiHologramNode",
+      "pos_x": -773.0,
+      "pos_y": -173.0,
+      "width": 446.0,
+      "height": 256.0,
+      "config": {
+        "inputs": {
+          "phase_rot": "signal",
+          "spatial_k": "signal",
+          "speed": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "delta_hologram": "image",
+          "theta_hologram": "image",
+          "alpha_hologram": "image",
+          "beta_hologram": "image",
+          "gamma_hologram": "image",
+          "combined_hologram": "image",
+          "delta_field": "complex_spectrum",
+          "theta_field": "complex_spectrum",
+          "alpha_field": "complex_spectrum",
+          "beta_field": "complex_spectrum",
+          "gamma_field": "complex_spectrum",
+          "delta_power": "signal",
+          "theta_power": "signal",
+          "alpha_power": "signal",
+          "beta_power": "signal",
+          "gamma_power": "signal",
+          "time_seconds": "signal"
+        },
+        "input_data": {
+          "phase_rot": [],
+          "spatial_k": [
+            14.0
+          ],
+          "speed": [],
+          "reset": []
+        },
+        "node_title": "Base Node",
+        "edf_file_path": "e:\\docshouse\\450\\2.edf",
+        "resolution": 256,
+        "default_k": 15,
+        "default_rot": 0,
+        "display_band": "alpha",
+        "active_elecs": {
+          "Fp1": [
+            -0.3,
+            0.9
+          ],
+          "Fp2": [
+            0.3,
+            0.9
+          ],
+          "F7": [
+            -0.7,
+            0.6
+          ],
+          "F3": [
+            -0.35,
+            0.6
+          ],
+          "Fz": [
+            0,
+            0.6
+          ],
+          "F4": [
+            0.35,
+            0.6
+          ],
+          "F8": [
+            0.7,
+            0.6
+          ],
+          "T7": [
+            -0.9,
+            0.0
+          ],
+          "C3": [
+            -0.4,
+            0.0
+          ],
+          "Cz": [
+            0,
+            0.0
+          ],
+          "C4": [
+            0.4,
+            0.0
+          ],
+          "T8": [
+            0.9,
+            0.0
+          ],
+          "P7": [
+            -0.7,
+            -0.5
+          ],
+          "P3": [
+            -0.35,
+            -0.5
+          ],
+          "Pz": [
+            0,
+            -0.5
+          ],
+          "P4": [
+            0.35,
+            -0.5
+          ],
+          "P8": [
+            0.7,
+            -0.5
+          ],
+          "O1": [
+            -0.3,
+            -0.85
+          ],
+          "Oz": [
+            0,
+            -0.85
+          ],
+          "O2": [
+            0.3,
+            -0.85
+          ]
+        },
+        "sfreq": 160.0,
+        "current_idx": 9190,
+        "loaded_path": "e:\\docshouse\\450\\2.edf",
+        "status_msg": "Loaded: 20 channels",
+        "power_cache": {
+          "delta": 0.15610289573669434,
+          "theta": 0.14490394294261932,
+          "alpha": 0.18447589874267578,
+          "beta": 0.16838863492012024,
+          "gamma": 0.11987365037202835
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 15.0,
+      "pos_y": -334.0,
+      "width": 416.0,
+      "height": 629.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "DisplayNode",
+      "pos_x": -266.0,
+      "pos_y": -56.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -617.0,
+      "pos_y": -402.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 20
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "combined_hologram",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha_hologram",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "spatial_k",
+      "learned_weight": 1.0
+    }
+  ]
+}
