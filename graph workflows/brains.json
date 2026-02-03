@@ -49,7 +49,6 @@
         "default_k": 150,
         "default_rot": 0,
         "display_band": "alpha",
-        "channel_data": {},
         "active_elecs": {
           "Fp1": [
             -0.3,
@@ -133,37 +132,15 @@
           ]
         },
         "sfreq": 160.0,
-        "current_idx": 1195,
+        "current_idx": 2470,
         "loaded_path": "E:\\docshouse\\450\\1.edf",
         "status_msg": "Loaded: 20 channels",
-        "dist_maps": {},
-        "band_phases": {
-          "delta": {},
-          "theta": {},
-          "alpha": {},
-          "beta": {},
-          "gamma": {}
-        },
-        "field_cache": {
-          "delta": null,
-          "theta": null,
-          "alpha": null,
-          "beta": null,
-          "gamma": null
-        },
-        "image_cache": {
-          "delta": null,
-          "theta": null,
-          "alpha": null,
-          "beta": null,
-          "gamma": null
-        },
         "power_cache": {
-          "delta": 0.08399877697229385,
-          "theta": 0.11082261800765991,
-          "alpha": 0.12570179998874664,
-          "beta": 0.15242379903793335,
-          "gamma": 0.14126944541931152
+          "delta": 0.09382385015487671,
+          "theta": 0.10362312942743301,
+          "alpha": 0.10730603337287903,
+          "beta": 0.1107177585363388,
+          "gamma": 0.12199171632528305
         }
       },
       "custom_state_file": null
@@ -171,10 +148,10 @@
     {
       "id": 1,
       "class_name": "CochlearResonanceScannerNode",
-      "pos_x": 1041.0,
-      "pos_y": -520.0,
-      "width": 605.0,
-      "height": 300.0,
+      "pos_x": 984.0,
+      "pos_y": -485.0,
+      "width": 1321.0,
+      "height": 628.0,
       "config": {
         "inputs": {
           "image_in": "image",
@@ -195,18 +172,15 @@
           "num_harmonics": "signal",
           "resonance_found": "signal"
         },
-        "input_data": {},
         "node_title": "Base Node",
         "resonance_threshold": 0.4,
         "min_peaks": 3,
         "harmonic_tolerance": 0.15,
-        "resonance_score": 0.0,
-        "symmetry_score": 0.0,
+        "resonance_score": 0.12248054709915686,
+        "symmetry_score": 0.3582684903305229,
         "harmonic_score": 0.0,
-        "dominant_freq": 0.0,
+        "dominant_freq": 6.0,
         "num_harmonics": 0,
-        "resonance_found": false,
-        "detected_peaks": [],
         "peak_ratios": []
       },
       "custom_state_file": null
@@ -214,10 +188,10 @@
     {
       "id": 2,
       "class_name": "V1EdgeHunterNode",
-      "pos_x": 1042.0,
-      "pos_y": -191.0,
-      "width": 600.0,
-      "height": 360.0,
+      "pos_x": -941.0,
+      "pos_y": -494.0,
+      "width": 1270.0,
+      "height": 675.0,
       "config": {
         "inputs": {
           "complex_field": "complex_spectrum",
@@ -240,7 +214,6 @@
           "orientation_hist": "image",
           "orientation_spectrum": "spectrum"
         },
-        "input_data": {},
         "node_title": "Base Node",
         "hunt_active": false,
         "hunt_found": false,
@@ -254,11 +227,11 @@
         "current_k": 15.0,
         "best_phase": 0.0,
         "best_k": 15.0,
-        "best_score": 0.0,
+        "best_score": 0.25894312218374255,
         "edge_threshold": 0.3,
         "num_orientations": 36,
         "dominant_orientation": 0.0,
-        "edge_coherence": 0.0
+        "edge_coherence": 0.19834629842686824
       },
       "custom_state_file": null
     }
@@ -290,6 +263,20 @@
       "from_port": "theta_hologram",
       "to_node_id": 2,
       "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "phase_rot_out",
+      "to_node_id": 0,
+      "to_port": "phase_rot",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "spatial_k_out",
+      "to_node_id": 0,
+      "to_port": "spatial_k",
       "learned_weight": 1.0
     }
   ]
