@@ -1,0 +1,250 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "DisplayNode",
+      "pos_x": 503.0,
+      "pos_y": -385.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "input_data": {
+          "image_in": []
+        },
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "DisplayNode",
+      "pos_x": 502.0,
+      "pos_y": -189.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "input_data": {
+          "image_in": []
+        },
+        "node_title": "Display"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "PhiHologramNode",
+      "pos_x": -556.0,
+      "pos_y": -316.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "phase_rot": "signal",
+          "spatial_k": "signal",
+          "speed": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "delta_hologram": "image",
+          "theta_hologram": "image",
+          "alpha_hologram": "image",
+          "beta_hologram": "image",
+          "gamma_hologram": "image",
+          "combined_hologram": "image",
+          "delta_field": "complex_spectrum",
+          "theta_field": "complex_spectrum",
+          "alpha_field": "complex_spectrum",
+          "beta_field": "complex_spectrum",
+          "gamma_field": "complex_spectrum",
+          "delta_power": "signal",
+          "theta_power": "signal",
+          "alpha_power": "signal",
+          "beta_power": "signal",
+          "gamma_power": "signal",
+          "time_seconds": "signal"
+        },
+        "input_data": {
+          "phase_rot": [],
+          "spatial_k": [],
+          "speed": [],
+          "reset": []
+        },
+        "node_title": "Base Node",
+        "edf_file_path": "E:\\docshouse\\450\\2.edf",
+        "resolution": 128,
+        "default_k": 150,
+        "default_rot": 0,
+        "display_band": "alpha",
+        "active_elecs": {
+          "Fp1": [
+            -0.3,
+            0.9
+          ],
+          "Fp2": [
+            0.3,
+            0.9
+          ],
+          "F7": [
+            -0.7,
+            0.6
+          ],
+          "F3": [
+            -0.35,
+            0.6
+          ],
+          "Fz": [
+            0,
+            0.6
+          ],
+          "F4": [
+            0.35,
+            0.6
+          ],
+          "F8": [
+            0.7,
+            0.6
+          ],
+          "T7": [
+            -0.9,
+            0.0
+          ],
+          "C3": [
+            -0.4,
+            0.0
+          ],
+          "Cz": [
+            0,
+            0.0
+          ],
+          "C4": [
+            0.4,
+            0.0
+          ],
+          "T8": [
+            0.9,
+            0.0
+          ],
+          "P7": [
+            -0.7,
+            -0.5
+          ],
+          "P3": [
+            -0.35,
+            -0.5
+          ],
+          "Pz": [
+            0,
+            -0.5
+          ],
+          "P4": [
+            0.35,
+            -0.5
+          ],
+          "P8": [
+            0.7,
+            -0.5
+          ],
+          "O1": [
+            -0.3,
+            -0.85
+          ],
+          "Oz": [
+            0,
+            -0.85
+          ],
+          "O2": [
+            0.3,
+            -0.85
+          ]
+        },
+        "sfreq": 160.0,
+        "current_idx": 3415,
+        "loaded_path": "E:\\docshouse\\450\\2.edf",
+        "status_msg": "Loaded: 20 channels",
+        "power_cache": {
+          "delta": 0.12844230234622955,
+          "theta": 0.12634897232055664,
+          "alpha": 0.1024874746799469,
+          "beta": 0.11509336531162262,
+          "gamma": 0.13686560094356537
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicDecoderNode",
+      "pos_x": -263.0,
+      "pos_y": -420.0,
+      "width": 653.0,
+      "height": 528.0,
+      "config": {
+        "inputs": {
+          "complex_field": "complex_spectrum",
+          "reference_image": "image",
+          "phase_search": "signal",
+          "hex_scale": "signal",
+          "corner_weight": "signal",
+          "lobe_separation": "signal"
+        },
+        "outputs": {
+          "decoded_phase_0": "image",
+          "decoded_phase_90": "image",
+          "decoded_current": "image",
+          "fft_magnitude": "image",
+          "sample_points": "image",
+          "phase_coherence": "image",
+          "eigenmode_view": "image",
+          "hex_samples": "spectrum",
+          "corner_samples": "spectrum",
+          "lobe_samples": "spectrum",
+          "coherence_score": "signal",
+          "optimal_phase": "signal",
+          "lobe_asymmetry": "signal"
+        },
+        "node_title": "Base Node",
+        "hex_rings": 3,
+        "search_resolution": 36,
+        "corner_radius": 0.15,
+        "auto_search": true,
+        "phase_cache": {},
+        "optimal_phase_found": 5.93411945678072,
+        "coherence_history": [],
+        "metrics": {
+          "coherence": 0.551197218582715,
+          "optimal_phase": 339.99999999999994,
+          "asymmetry": -0.0011842944659292698
+        }
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 2,
+      "from_port": "combined_hologram",
+      "to_node_id": 3,
+      "to_port": "reference_image",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "alpha_field",
+      "to_node_id": 3,
+      "to_port": "complex_field",
+      "learned_weight": 1.0
+    }
+  ]
+}
