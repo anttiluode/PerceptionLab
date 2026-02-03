@@ -1,0 +1,183 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PhiHologramNode",
+      "pos_x": 512.0,
+      "pos_y": -364.0,
+      "width": 418.0,
+      "height": 406.0,
+      "config": {
+        "inputs": {
+          "phase_rot": "signal",
+          "spatial_k": "signal",
+          "speed": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "delta_hologram": "image",
+          "theta_hologram": "image",
+          "alpha_hologram": "image",
+          "beta_hologram": "image",
+          "gamma_hologram": "image",
+          "combined_hologram": "image",
+          "delta_field": "complex_spectrum",
+          "theta_field": "complex_spectrum",
+          "alpha_field": "complex_spectrum",
+          "beta_field": "complex_spectrum",
+          "gamma_field": "complex_spectrum",
+          "delta_power": "signal",
+          "theta_power": "signal",
+          "alpha_power": "signal",
+          "beta_power": "signal",
+          "gamma_power": "signal",
+          "time_seconds": "signal"
+        },
+        "input_data": {
+          "phase_rot": [],
+          "spatial_k": [],
+          "speed": [],
+          "reset": []
+        },
+        "node_title": "Base Node",
+        "edf_file_path": "E:\\docshouse\\450\\1.edf",
+        "resolution": 128,
+        "default_k": 150,
+        "default_rot": 0,
+        "display_band": "alpha",
+        "active_elecs": {
+          "Fp1": [
+            -0.3,
+            0.9
+          ],
+          "Fp2": [
+            0.3,
+            0.9
+          ],
+          "F7": [
+            -0.7,
+            0.6
+          ],
+          "F3": [
+            -0.35,
+            0.6
+          ],
+          "Fz": [
+            0,
+            0.6
+          ],
+          "F4": [
+            0.35,
+            0.6
+          ],
+          "F8": [
+            0.7,
+            0.6
+          ],
+          "T7": [
+            -0.9,
+            0.0
+          ],
+          "C3": [
+            -0.4,
+            0.0
+          ],
+          "Cz": [
+            0,
+            0.0
+          ],
+          "C4": [
+            0.4,
+            0.0
+          ],
+          "T8": [
+            0.9,
+            0.0
+          ],
+          "P7": [
+            -0.7,
+            -0.5
+          ],
+          "P3": [
+            -0.35,
+            -0.5
+          ],
+          "Pz": [
+            0,
+            -0.5
+          ],
+          "P4": [
+            0.35,
+            -0.5
+          ],
+          "P8": [
+            0.7,
+            -0.5
+          ],
+          "O1": [
+            -0.3,
+            -0.85
+          ],
+          "Oz": [
+            0,
+            -0.85
+          ],
+          "O2": [
+            0.3,
+            -0.85
+          ]
+        },
+        "sfreq": 160.0,
+        "current_idx": 1195,
+        "loaded_path": "E:\\docshouse\\450\\1.edf",
+        "status_msg": "Loaded: 20 channels",
+        "power_cache": {
+          "delta": 0.08399877697229385,
+          "theta": 0.11082261800765991,
+          "alpha": 0.12570179998874664,
+          "beta": 0.15242379903793335,
+          "gamma": 0.14126944541931152
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "FFTCochleaNode",
+      "pos_x": 972.0,
+      "pos_y": -357.0,
+      "width": 438.0,
+      "height": 376.0,
+      "config": {
+        "inputs": {
+          "image": "image",
+          "signal": "signal"
+        },
+        "outputs": {
+          "spectrum": "spectrum",
+          "signal": "signal",
+          "image": "image",
+          "complex_spectrum": "complex_spectrum"
+        },
+        "node_title": "FFT Cochlea",
+        "freq_bins": 64,
+        "x": 0.0,
+        "internal_freq": 5.929659496298779
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "beta_hologram",
+      "to_node_id": 1,
+      "to_port": "image",
+      "learned_weight": 1.0
+    }
+  ]
+}
