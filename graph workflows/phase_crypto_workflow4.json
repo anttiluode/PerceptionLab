@@ -1,0 +1,511 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 50
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PhiHologramNode",
+      "pos_x": -450.0,
+      "pos_y": -150.0,
+      "width": 500.0,
+      "height": 400.0,
+      "config": {
+        "inputs": {
+          "phase_rot": "signal",
+          "spatial_k": "signal",
+          "speed": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "delta_hologram": "image",
+          "theta_hologram": "image",
+          "alpha_hologram": "image",
+          "beta_hologram": "image",
+          "gamma_hologram": "image",
+          "combined_hologram": "image",
+          "delta_field": "complex_spectrum",
+          "theta_field": "complex_spectrum",
+          "alpha_field": "complex_spectrum",
+          "beta_field": "complex_spectrum",
+          "gamma_field": "complex_spectrum",
+          "delta_power": "signal",
+          "theta_power": "signal",
+          "alpha_power": "signal",
+          "beta_power": "signal",
+          "gamma_power": "signal",
+          "time_seconds": "signal"
+        },
+        "input_data": {
+          "phase_rot": [],
+          "spatial_k": [],
+          "speed": [],
+          "reset": []
+        },
+        "node_title": "EEG Source",
+        "edf_file_path": "e:\\docshouse\\450\\2.edf",
+        "resolution": 128,
+        "default_k": 15,
+        "default_rot": 0,
+        "display_band": "alpha",
+        "active_elecs": {
+          "Fp1": [
+            -0.3,
+            0.9
+          ],
+          "Fp2": [
+            0.3,
+            0.9
+          ],
+          "F7": [
+            -0.7,
+            0.6
+          ],
+          "F3": [
+            -0.35,
+            0.6
+          ],
+          "Fz": [
+            0,
+            0.6
+          ],
+          "F4": [
+            0.35,
+            0.6
+          ],
+          "F8": [
+            0.7,
+            0.6
+          ],
+          "T7": [
+            -0.9,
+            0.0
+          ],
+          "C3": [
+            -0.4,
+            0.0
+          ],
+          "Cz": [
+            0,
+            0.0
+          ],
+          "C4": [
+            0.4,
+            0.0
+          ],
+          "T8": [
+            0.9,
+            0.0
+          ],
+          "P7": [
+            -0.7,
+            -0.5
+          ],
+          "P3": [
+            -0.35,
+            -0.5
+          ],
+          "Pz": [
+            0,
+            -0.5
+          ],
+          "P4": [
+            0.35,
+            -0.5
+          ],
+          "P8": [
+            0.7,
+            -0.5
+          ],
+          "O1": [
+            -0.3,
+            -0.85
+          ],
+          "Oz": [
+            0,
+            -0.85
+          ],
+          "O2": [
+            0.3,
+            -0.85
+          ]
+        },
+        "sfreq": 160.0,
+        "current_idx": 2690,
+        "loaded_path": "e:\\docshouse\\450\\2.edf",
+        "status_msg": "Loaded: 20 channels",
+        "power_cache": {
+          "delta": 0.1205952987074852,
+          "theta": 0.16020157933235168,
+          "alpha": 0.13042953610420227,
+          "beta": 0.1522703468799591,
+          "gamma": 0.12738123536109924
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "PhaseCryptographyNode",
+      "pos_x": 42.0,
+      "pos_y": -197.0,
+      "width": 400.0,
+      "height": 350.0,
+      "config": {
+        "inputs": {
+          "field_a": "complex_spectrum",
+          "field_b": "complex_spectrum",
+          "hologram_a": "image",
+          "hologram_b": "image",
+          "decode_angle": "signal"
+        },
+        "outputs": {
+          "phase_skeleton": "image",
+          "orthogonal_residual": "image",
+          "binding_map": "image",
+          "conflict_map": "image",
+          "cfc_map": "image",
+          "phase_gradient": "image",
+          "vortex_map": "image",
+          "decoded_0": "image",
+          "decoded_45": "image",
+          "decoded_90": "image",
+          "decoded_custom": "image",
+          "binding_strength": "signal",
+          "conflict_strength": "signal",
+          "vortex_count": "signal",
+          "phase_entropy": "signal",
+          "diagonal_entropy": "signal"
+        },
+        "node_title": "Phase Decoder",
+        "resolution": 128,
+        "decode_angle": 45.0,
+        "_history": [],
+        "_history_size": 10
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "JanusHoloNode",
+      "pos_x": 150.0,
+      "pos_y": 200.0,
+      "width": 300.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "reality_a": "image",
+          "reality_b": "image",
+          "phase_ctrl": "signal"
+        },
+        "outputs": {
+          "hologram_view": "image",
+          "complex_r": "image",
+          "complex_i": "image"
+        },
+        "node_title": "Janus Multiplexer",
+        "learning_rate": 0.1,
+        "pixel_count": 4096,
+        "initialized": true
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicCarrierSeparatorNode",
+      "pos_x": 550.0,
+      "pos_y": -150.0,
+      "width": 400.0,
+      "height": 300.0,
+      "config": {
+        "inputs": {
+          "hologram_field": "complex_spectrum",
+          "hologram_image": "image",
+          "spatial_k": "signal",
+          "phase_rot": "signal"
+        },
+        "outputs": {
+          "carrier_field": "complex_spectrum",
+          "signal_field": "complex_spectrum",
+          "carrier_image": "image",
+          "signal_image": "image",
+          "phase_deviation": "image",
+          "magnitude_ratio": "image",
+          "corner_strength": "image",
+          "carrier_power": "signal",
+          "signal_power": "signal",
+          "snr": "signal",
+          "corner_index": "signal"
+        },
+        "node_title": "Carrier Separator",
+        "resolution": 128,
+        "current_k": 15.0,
+        "current_rot": 0.0,
+        "separation_mode": 1,
+        "history_size": 10,
+        "field_history": [],
+        "_carrier_power": 0.0,
+        "_signal_power": 0.0,
+        "_snr": 0.0,
+        "_corner_index": 0.5
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "DisplayNode",
+      "pos_x": 650.0,
+      "pos_y": 200.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Binding Map"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "DisplayNode",
+      "pos_x": 870.0,
+      "pos_y": 200.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Null Space (45\u00c2\u00b0)"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 6,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -100.0,
+      "pos_y": 350.0,
+      "width": 150.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Janus Phase",
+        "value": 45.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 7,
+      "class_name": "DisplayNode",
+      "pos_x": 550.0,
+      "pos_y": -450.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Phase Skeleton"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 8,
+      "class_name": "DisplayNode",
+      "pos_x": 770.0,
+      "pos_y": -450.0,
+      "width": 200.0,
+      "height": 200.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "CFC Map"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 9,
+      "class_name": "ConstantSignalNode",
+      "pos_x": 1665.0,
+      "pos_y": 102.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Constant Signal",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 10,
+      "class_name": "RingAnalyzerNode",
+      "pos_x": 1887.0,
+      "pos_y": -305.0,
+      "width": 583.0,
+      "height": 557.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "fft_magnitude": "image",
+          "complex_spectrum": "complex_spectrum",
+          "do_fft": "signal"
+        },
+        "outputs": {
+          "radial_profile_image": "image",
+          "ring_overlay": "image",
+          "polar_view": "image",
+          "ring_1_radius": "signal",
+          "ring_2_radius": "signal",
+          "ring_3_radius": "signal",
+          "ring_ratio_1_2": "signal",
+          "ring_ratio_2_3": "signal",
+          "num_rings": "signal",
+          "ratio_type": "signal",
+          "ring_sharpness": "signal",
+          "isotropy": "signal",
+          "radial_profile": "signal",
+          "peak_radii": "signal"
+        },
+        "node_title": "Base Node",
+        "resolution": 128,
+        "do_fft": true,
+        "smoothing": 2.0,
+        "peak_prominence": 0.01,
+        "peak_distance": 5,
+        "search_corners": true,
+        "auto_shift": true,
+        "_ratio_name": "3.167"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 11,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 1118.0,
+      "pos_y": -296.0,
+      "width": 491.0,
+      "height": 494.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "delta_field",
+      "to_node_id": 1,
+      "to_port": "field_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma_field",
+      "to_node_id": 1,
+      "to_port": "field_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "delta_hologram",
+      "to_node_id": 2,
+      "to_port": "reality_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma_hologram",
+      "to_node_id": 2,
+      "to_port": "reality_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "phase_ctrl",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "hologram_view",
+      "to_node_id": 3,
+      "to_port": "hologram_image",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "binding_map",
+      "to_node_id": 4,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "orthogonal_residual",
+      "to_node_id": 5,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "phase_skeleton",
+      "to_node_id": 7,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "cfc_map",
+      "to_node_id": 8,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 9,
+      "from_port": "signal",
+      "to_node_id": 10,
+      "to_port": "do_fft",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "phase_skeleton",
+      "to_node_id": 11,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 11,
+      "from_port": "complex_spectrum",
+      "to_node_id": 10,
+      "to_port": "complex_spectrum",
+      "learned_weight": 1.0
+    }
+  ]
+}
