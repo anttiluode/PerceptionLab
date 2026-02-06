@@ -1,0 +1,254 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PhiHologramNode",
+      "pos_x": -473.0,
+      "pos_y": -167.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "phase_rot": "signal",
+          "spatial_k": "signal",
+          "speed": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "delta_hologram": "image",
+          "theta_hologram": "image",
+          "alpha_hologram": "image",
+          "beta_hologram": "image",
+          "gamma_hologram": "image",
+          "combined_hologram": "image",
+          "delta_field": "complex_spectrum",
+          "theta_field": "complex_spectrum",
+          "alpha_field": "complex_spectrum",
+          "beta_field": "complex_spectrum",
+          "gamma_field": "complex_spectrum",
+          "delta_power": "signal",
+          "theta_power": "signal",
+          "alpha_power": "signal",
+          "beta_power": "signal",
+          "gamma_power": "signal",
+          "time_seconds": "signal"
+        },
+        "input_data": {
+          "phase_rot": [],
+          "spatial_k": [],
+          "speed": [],
+          "reset": []
+        },
+        "node_title": "Base Node",
+        "edf_file_path": "e:\\docshouse\\450\\1.edf",
+        "resolution": 128,
+        "default_k": 15,
+        "default_rot": 0,
+        "display_band": "alpha",
+        "active_elecs": {
+          "Fp1": [
+            -0.3,
+            0.9
+          ],
+          "Fp2": [
+            0.3,
+            0.9
+          ],
+          "F7": [
+            -0.7,
+            0.6
+          ],
+          "F3": [
+            -0.35,
+            0.6
+          ],
+          "Fz": [
+            0,
+            0.6
+          ],
+          "F4": [
+            0.35,
+            0.6
+          ],
+          "F8": [
+            0.7,
+            0.6
+          ],
+          "T7": [
+            -0.9,
+            0.0
+          ],
+          "C3": [
+            -0.4,
+            0.0
+          ],
+          "Cz": [
+            0,
+            0.0
+          ],
+          "C4": [
+            0.4,
+            0.0
+          ],
+          "T8": [
+            0.9,
+            0.0
+          ],
+          "P7": [
+            -0.7,
+            -0.5
+          ],
+          "P3": [
+            -0.35,
+            -0.5
+          ],
+          "Pz": [
+            0,
+            -0.5
+          ],
+          "P4": [
+            0.35,
+            -0.5
+          ],
+          "P8": [
+            0.7,
+            -0.5
+          ],
+          "O1": [
+            -0.3,
+            -0.85
+          ],
+          "Oz": [
+            0,
+            -0.85
+          ],
+          "O2": [
+            0.3,
+            -0.85
+          ]
+        },
+        "sfreq": 160.0,
+        "current_idx": 1545,
+        "loaded_path": "e:\\docshouse\\450\\1.edf",
+        "status_msg": "Loaded: 20 channels",
+        "power_cache": {
+          "delta": 0.13147518038749695,
+          "theta": 0.13999152183532715,
+          "alpha": 0.10576016455888748,
+          "beta": 0.12708066403865814,
+          "gamma": 0.13063348829746246
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "PhiDwellMacroscopeNode",
+      "pos_x": -192.0,
+      "pos_y": -191.0,
+      "width": 613.0,
+      "height": 419.0,
+      "config": {
+        "inputs": {
+          "delta_field": "complex_spectrum",
+          "theta_field": "complex_spectrum",
+          "alpha_field": "complex_spectrum",
+          "beta_field": "complex_spectrum",
+          "gamma_field": "complex_spectrum"
+        },
+        "outputs": {
+          "portrait": "image",
+          "regime_map": "image",
+          "dominant_mode": "signal",
+          "dominant_band": "signal",
+          "dwell_time": "signal",
+          "regime_index": "signal",
+          "cv_running": "signal",
+          "metastability": "signal"
+        },
+        "node_title": "\u03a6-Dwell Macroscope",
+        "n_modes": 8,
+        "e_names": [
+          "C3",
+          "C4",
+          "Cz",
+          "F3",
+          "F4",
+          "F7",
+          "F8",
+          "Fp1",
+          "Fp2",
+          "Fz",
+          "O1",
+          "O2",
+          "Oz",
+          "P3",
+          "P4",
+          "P7",
+          "P8",
+          "Pz",
+          "T7",
+          "T8"
+        ],
+        "max_trail": 600,
+        "current_dwell": 1,
+        "dwell_threshold": 0.7853981633974483,
+        "portrait_size": 400,
+        "attractor_decay": 0.998,
+        "regime": "clocklike",
+        "regime_confidence": 0.9756582927721449,
+        "running_cv": 0.4073025121683565,
+        "metastability_score": 0.29828930440075097,
+        "dominant_mode_idx": 0,
+        "dominant_band_idx": 3,
+        "current_dwell_ms": 61,
+        "frame_count": 309,
+        "fps_estimate": 16.275688742208615,
+        "last_time": 1770394232.8813179,
+        "pca_scale": 2.3339688510537475
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "delta_field",
+      "to_node_id": 1,
+      "to_port": "delta_field",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_field",
+      "to_node_id": 1,
+      "to_port": "theta_field",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "alpha_field",
+      "to_node_id": 1,
+      "to_port": "alpha_field",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "beta_field",
+      "to_node_id": 1,
+      "to_port": "beta_field",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "gamma_field",
+      "to_node_id": 1,
+      "to_port": "gamma_field",
+      "learned_weight": 1.0
+    }
+  ]
+}
