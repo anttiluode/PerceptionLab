@@ -1,0 +1,41 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PhiEigenHologramNode",
+      "pos_x": -235.0,
+      "pos_y": -159.0,
+      "width": 947.0,
+      "height": 576.0,
+      "config": {
+        "inputs": {
+          "speed": "signal",
+          "lens_k": "signal"
+        },
+        "input_data": {
+          "speed": [],
+          "lens_k": []
+        },
+        "node_title": "Phi Eigen-Hologram",
+        "res": 128,
+        "lens_k": 9999.0,
+        "focus_z": 1.0,
+        "curvature": 0.5,
+        "eigen_update_rate": 5,
+        "frame_count": 571,
+        "n_ch": 64,
+        "current_idx": 1142,
+        "sampling_rate": 160.0,
+        "file_path": "E:\\docshouse\\450\\2.edf",
+        "is_synthetic": false,
+        "metastability_index": 485.0652582146898
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": []
+}
