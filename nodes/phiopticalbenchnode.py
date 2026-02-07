@@ -1,12 +1,22 @@
 """
-Phi Fractal Bench (Complete Implementation)
-===========================================
-"The Eye of the Beholder" - High-Performance Holographic Lens.
+Phi Fractal Bench (Standalone Source)
+=====================================
+"The Eye of the Beholder"
 
-FIXED:
-- Implemented Lazy Loading inside step() to sync with JSON restoration.
-- Explicitly defined all grid attributes in __init__ to prevent AttributeErrors.
-- Removed unstable Lifecycle Locks and QTimers.
+High-Performance Holographic Lens with DIRECT EDF LOADING.
+Allows you to sweep the Holographic Lens from the Macro (Universe) to the Micro (Pixel)
+using raw EEG data directly.
+
+CONTROLS:
+- Focus Z: Moves the observation plane through the depth of the brain.
+- Lens K (Zoom): Changes the spatial frequency.
+    - Low K (0.05) = Global Binding.
+    - High K (50+) = Fractal Texture / Cortical Columns.
+
+FEATURES:
+- FULL MNE LOADER: Parses .EDF files directly.
+- SYNTHETIC FALLBACK: Generates phantom data if load fails.
+- BATCHED MATH: Prevents system freeze.
 """
 
 import numpy as np
@@ -38,57 +48,52 @@ class PhiOpticalBenchNode(BaseNode):
         self.node_title = "Phi Fractal Bench"
         
         self.inputs = {
-            'speed': 'signal',
-            'focus_z': 'signal',
-            'lens_k': 'signal'
+            'speed': 'signal',      # Playback Speed
+            'focus_z': 'signal',    # Dynamic Depth
+            'lens_k': 'signal'      # Dynamic Scale / Zoom
         }
         
         self.outputs = {
             'render': 'image'
         }
 
-        # Parameters
-        self.focus_z = 0.0   
-        self.lens_k = 5.0    
+        # Optical Parameters
+        self.focus_z = 1.0   
+        self.lens_k = 10.0   
         self.curvature = 0.5 
-        self.res = 128 
+        self.res = 128 # Default resolution
         
         # State
+        self.n_ch = 0
+        self.emitters = None    # (N, 3)
+        self.display_image = None # Buffer
+        
+        # Data State
         self.data = None
+        self.times = None
         self.sampling_rate = 160.0
         self.current_idx = 0
-        self.n_ch = 0
         self.file_path = ""
-        self._last_loaded_path = None # TRACKER FOR LAZY LOAD
         self.is_synthetic = False
-        self.display_image = None
-        
-        # Geometry Initialization
-        self.emitters = None
-        self.pixel_x = None
-        self.pixel_y = None
-        self.grid_x = None
-        self.grid_y = None
-        
-        # Build grid immediately so attributes exist
-        self.rebuild_grid()
         
         # UI Elements
-        self.lbl_status = QtWidgets.QLabel("No Source")
+        self.lbl_status = QtWidgets.QLabel("No Source Loaded")
         self.lbl_status.setStyleSheet("color: #666; font-size: 10px; margin-top: 4px;")
         self.btn_load = QtWidgets.QPushButton("LOAD EEG SOURCE")
         self.btn_load.setStyleSheet("""
             QPushButton { 
-                background-color: #223344; color: #88ccff; 
-                border: 1px solid #446688; padding: 6px; font-weight: bold;
+                background-color: #443322; 
+                color: #ffcc88; 
+                border: 1px solid #886644;
+                padding: 6px;
+                font-weight: bold;
                 border-radius: 4px;
             }
-            QPushButton:hover { background-color: #334455; }
+            QPushButton:hover { background-color: #554433; }
         """)
         self.btn_load.clicked.connect(self.load_file_dialog)
-
-    def rebuild_grid(self):
-        """Pre-calculate the coordinate matrices for ray tracing."""
+        
+        # Grid Setup
         x = np.linspace(-1, 1, self.res)
         y = np.linspace(-1, 1, self.res)
         self.grid_x, self.grid_y = np.meshgrid(x, y)
@@ -105,139 +110,171 @@ class PhiOpticalBenchNode(BaseNode):
         return w
 
     def load_file_dialog(self):
-        fname, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self.btn_load, "Select EEG Source", "", "EDF Files (*.edf);;All Files (*)"
-        )
+        fname, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select EEG Source", "", "EDF Files (*.edf);;All Files (*)")
         if fname:
-            self.file_path = fname # Step() will detect the change and load
+            self.load_data(fname)
 
     def load_data(self, path):
-        """Handles heavy EDF ingestion and filtering."""
         if not MNE_AVAILABLE:
-            self.lbl_status.setText("MNE Missing")
+            self.lbl_status.setText("MNE Missing -> Synthetic")
             self.generate_synthetic_data()
             return
 
         try:
-            self.lbl_status.setText("Parsing...")
+            self.lbl_status.setText("Parsing Geometry...")
             QtWidgets.QApplication.processEvents()
             
+            # 1. Load Data
             raw = mne.io.read_raw_edf(path, preload=True, verbose=False)
             
+            # 2. Pick Channels
             if 'eeg' in raw:
-                raw.pick('eeg', exclude='bads')
+                raw.pick_types(eeg=True, exclude='bads')
             else:
                 raw.pick(range(min(60, len(raw.ch_names))))
 
-            raw.filter(8, 12, verbose=False) 
+            # 3. Filter
+            raw.filter(1, 60, verbose=False) 
             
             self.data = raw.get_data() * 1e6 
+            self.times = raw.times
             self.sampling_rate = raw.info['sfreq']
             self.n_ch = len(raw.ch_names)
+            self.file_path = path
             self.is_synthetic = False
-            self.current_idx = 0
             
             self.rebuild_optics(self.n_ch)
-            self.lbl_status.setText(f"READY: {os.path.basename(path)}")
+            self.lbl_status.setText(f"REAL: {os.path.basename(path)}")
             
         except Exception as e:
-            print(f"Load Error: {e}")
-            self.lbl_status.setText("Error -> Synthetic")
+            print(f"File Load Error: {e}")
+            self.lbl_status.setText("Load Error -> Synthetic")
             self.generate_synthetic_data()
 
     def generate_synthetic_data(self):
+        """Generates a phantom brain signal."""
+        print("Generating Synthetic Data...")
         self.is_synthetic = True
         self.n_ch = 64
         self.sampling_rate = 160.0
         duration = 10 
         t = np.linspace(0, duration, int(duration*self.sampling_rate))
+        
         self.data = np.zeros((self.n_ch, len(t)))
         for i in range(self.n_ch):
-            self.data[i] = np.sin(2*np.pi*10*t + i*0.1) * 20 
+            # Complex interference pattern
+            freq = 8 + (i % 4) * 2 # Varying frequencies
+            self.data[i] = np.sin(2 * np.pi * freq * t + i*0.5) * 20
+            
         self.rebuild_optics(self.n_ch)
         self.lbl_status.setText("MODE: SYNTHETIC")
 
     def rebuild_optics(self, n_ch):
-        if n_ch <= 0: return
+        if n_ch == 0: return
+
+        # 1. Build the Concave Lens (Scalp Geometry)
         theta = np.linspace(0, 2*np.pi, n_ch, endpoint=False)
         r = 0.8
         ex = r * np.cos(theta)
         ey = r * np.sin(theta)
-        ez = np.full_like(ex, -self.curvature)
-        self.emitters = np.stack((ex, ey, ez), axis=1)
+        ez = np.full_like(ex, -self.curvature) # Negative Z = Concave
+        
+        self.emitters = np.stack((ex, ey, ez), axis=1) # (N, 3)
+        print(f"[Optics] Geometry rebuilt for {n_ch} channels.")
 
     def step(self):
-        # LAZY LOAD TRIGGER: Handles both Fresh and JSON load
-        if self.file_path and self.file_path != self._last_loaded_path:
-            self._last_loaded_path = self.file_path
-            if os.path.exists(self.file_path):
-                self.load_data(self.file_path)
-
-        # Defensive Guard: Ensure data exists
-        if self.data is None:
-            self.render_placeholder()
+        # 1. Handle Missing Data
+        if self.data is None: 
+            canvas = np.zeros((256, 256, 3), dtype=np.uint8)
+            cv2.putText(canvas, "LOAD EEG", (70, 128), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (100,100,100), 2)
+            self.display_image = canvas 
+            self.outputs['render'] = canvas
             return
-        
-        if self.grid_x is None: self.rebuild_grid()
 
-        # Inputs
-        speed = self.get_blended_input('speed', 'max') or 1.0
+        # 2. Playback Control
+        speed = self.get_blended_input('speed', 'max')
+        if speed is None: speed = 1.0
         self.current_idx += int(speed * 2)
-        if self.current_idx >= self.data.shape[1] - 64: self.current_idx = 0
 
-        z_sig = self.get_blended_input('focus_z', 'max')
-        k_sig = self.get_blended_input('lens_k', 'max')
-        if z_sig is not None: self.focus_z = z_sig * 5.0
-        if k_sig is not None: self.lens_k = k_sig * 50.0
-
-        # Physics
-        window = 64 
+        if self.current_idx >= self.data.shape[1]: self.current_idx = 0
+        
+        # 3. Physics Window
+        window = 128
         start = self.current_idx
         end = start + window
+        if end > self.data.shape[1]: 
+            self.current_idx = 0
+            return
+        
         segment = self.data[:, start:end]
+        
+        # 4. Get Field (Alpha Band Focus)
         fft_res = np.fft.rfft(segment, axis=1)
         freqs = np.fft.rfftfreq(window, d=1/self.sampling_rate)
         
-        mask = (freqs >= 8) & (freqs <= 12)
+        # Focus on Alpha/Beta for structure (8-20Hz)
+        mask = (freqs >= 8) & (freqs <= 20)
         if not np.any(mask): mask[len(freqs)//10] = True
-        complex_field = np.sum(fft_res[:, mask], axis=1) 
+        
+        field = np.sum(fft_res[:, mask], axis=1) # Complex weights
 
-        # Ray Tracing Interference Field
+        # 5. Update Controls
+        z_sig = self.get_blended_input('focus_z', 'max')
+        k_sig = self.get_blended_input('lens_k', 'max')
+        
+        if z_sig is not None: self.focus_z = z_sig * 5.0
+        if k_sig is not None: self.lens_k = k_sig * 50.0
+
+        # 6. Batched Ray Tracing
         total_field = np.zeros((self.res, self.res), dtype=np.complex64)
-        if self.emitters is None or len(self.emitters) == 0: return
-
-        for i in range(self.n_ch):
-            ex, ey, ez = self.emitters[i]
+        batch_size = 16 
+        
+        for start_i in range(0, self.n_ch, batch_size):
+            end_i = min(start_i + batch_size, self.n_ch)
+            
+            # Slice Batch
+            batch_emitters = self.emitters[start_i:end_i] # (B, 3)
+            batch_field = field[start_i:end_i]            # (B,)
+            
+            # Geometry
+            ex = batch_emitters[:, 0][:, None, None]
+            ey = batch_emitters[:, 1][:, None, None]
+            ez = batch_emitters[:, 2][:, None, None]
+            
             dx = self.pixel_x - ex
             dy = self.pixel_y - ey
             dz = self.focus_z - ez
             dists = np.sqrt(dx**2 + dy**2 + dz**2)
             
-            waves = complex_field[i] * np.exp(-1j * self.lens_k * dists)
-            waves *= (1.0 / (dists + 0.1))
+            # Holographic Summation
+            complex_weights = batch_field[:, None, None]
+            waves = complex_weights * np.exp(-1j * self.lens_k * dists)
+            
+            # Attenuation
+            attenuation = 1.0 / (dists + 0.1)
+            waves *= attenuation
+            
             total_field += np.sum(waves, axis=0)
 
-        # Rendering
+        # 7. Render
         intensity = np.abs(total_field)
+        intensity = intensity ** 1.5 
         i_max = np.max(intensity) + 1e-9
         norm = (intensity / i_max * 255).astype(np.uint8)
+        
         heatmap = cv2.applyColorMap(norm, cv2.COLORMAP_INFERNO)
         
+        # HUD
         cv2.putText(heatmap, f"Z: {self.focus_z:.2f}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
         cv2.putText(heatmap, f"K: {self.lens_k:.2f}", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 255), 1)
-        
-        status_c = (0, 255, 0) if not self.is_synthetic else (0, 0, 255)
-        cv2.circle(heatmap, (10, 240), 4, status_c, -1)
 
+        # Output
         out_rgb = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
         self.outputs['render'] = out_rgb
         self.display_image = out_rgb
 
-    def render_placeholder(self):
-        canvas = np.zeros((256, 256, 3), dtype=np.uint8)
-        cv2.putText(canvas, "LOAD EEG", (85, 128), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100,100,100), 1)
-        self.display_image = canvas 
-        self.outputs['render'] = canvas
+    def get_output(self, port_name):
+        return self.outputs.get(port_name, None)
 
     def get_display_image(self):
         return self.display_image
@@ -246,14 +283,26 @@ class PhiOpticalBenchNode(BaseNode):
         return [
             ("Focal Depth", "focus_z", self.focus_z, "float"),
             ("Lens K", "lens_k", self.lens_k, "float"),
-            ("File Path", "file_path", self.file_path, "str")
+            ("Resolution", "res", self.res, "int"),
+            ("Scalp Curvature", "curvature", self.curvature, "float"),
+            ("Last File", "file_path", self.file_path, "str")
         ]
 
     def set_config_options(self, options):
         if 'focus_z' in options: self.focus_z = float(options['focus_z'])
         if 'lens_k' in options: self.lens_k = float(options['lens_k'])
+        if 'curvature' in options: self.curvature = float(options['curvature'])
         if 'file_path' in options: 
-            self.file_path = str(options['file_path'])
-
-    def close(self):
-        self.data = None
+            fp = str(options['file_path'])
+            if fp and os.path.exists(fp):
+                self.load_data(fp)
+        if 'res' in options: 
+            new_res = int(options['res'])
+            if new_res != self.res:
+                self.res = new_res
+                # Rebuild Grid
+                x = np.linspace(-1, 1, self.res)
+                y = np.linspace(-1, 1, self.res)
+                self.grid_x, self.grid_y = np.meshgrid(x, y)
+                self.pixel_x = self.grid_x.reshape(1, self.res, self.res)
+                self.pixel_y = self.grid_y.reshape(1, self.res, self.res)
