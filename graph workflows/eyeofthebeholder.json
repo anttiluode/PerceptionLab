@@ -7,10 +7,10 @@
     {
       "id": 0,
       "class_name": "PhiCarrierModulatorNode",
-      "pos_x": -117.0,
-      "pos_y": -59.0,
-      "width": 200.0,
-      "height": 180.0,
+      "pos_x": 281.0,
+      "pos_y": -298.0,
+      "width": 609.0,
+      "height": 513.0,
       "config": {
         "inputs": {
           "speed": "signal"
@@ -19,24 +19,24 @@
           "speed": []
         },
         "node_title": "Carrier / Modulator",
-        "k_carrier": 0.05,
-        "k_modulator": 5.0,
+        "k_carrier": 5.0,
+        "k_modulator": 50.0,
         "res": 256,
         "file_path": "e:\\docshouse\\450\\2.edf",
         "is_synthetic": false,
         "sampling_rate": 160.0,
         "n_ch": 64,
-        "current_idx": 28
+        "current_idx": 5712
       },
       "custom_state_file": null
     },
     {
       "id": 1,
       "class_name": "PhiOpticalBenchNode",
-      "pos_x": -474.0,
-      "pos_y": -295.0,
-      "width": 200.0,
-      "height": 180.0,
+      "pos_x": -737.0,
+      "pos_y": -283.0,
+      "width": 490.0,
+      "height": 466.0,
       "config": {
         "inputs": {
           "speed": "signal",
@@ -49,18 +49,73 @@
           "lens_k": []
         },
         "node_title": "Phi Fractal Bench",
-        "focus_z": 0.0,
-        "lens_k": 5.0,
+        "focus_z": 40.0,
+        "lens_k": 9999.0,
         "curvature": 0.5,
         "res": 128,
-        "sampling_rate": 160.0,
-        "current_idx": 18,
         "n_ch": 64,
+        "sampling_rate": 160.0,
+        "current_idx": 5702,
         "file_path": "e:\\docshouse\\450\\2.edf",
         "is_synthetic": false
       },
       "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "HolographicFFTNode",
+      "pos_x": -196.0,
+      "pos_y": -268.0,
+      "width": 415.0,
+      "height": 434.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HolographicFFTNode",
+      "pos_x": 962.0,
+      "pos_y": -306.0,
+      "width": 594.0,
+      "height": 608.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "complex_spectrum": "complex_spectrum",
+          "magnitude_view": "image",
+          "phase_view": "image"
+        },
+        "node_title": "Base Node"
+      },
+      "custom_state_file": null
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "render",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "render",
+      "to_node_id": 3,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
 }
