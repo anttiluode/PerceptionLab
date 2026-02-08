@@ -44,7 +44,7 @@
           "reset": []
         },
         "node_title": "Base Node",
-        "edf_file_path": "e:\\docshouse\\450\\1.edf",
+        "edf_file_path": "e:\\docshouse\\450\\3.edf",
         "resolution": 128,
         "default_k": 0.05,
         "default_rot": 0,
@@ -132,15 +132,15 @@
           ]
         },
         "sfreq": 160.0,
-        "current_idx": 6920,
-        "loaded_path": "e:\\docshouse\\450\\1.edf",
+        "current_idx": 3000,
+        "loaded_path": "e:\\docshouse\\450\\3.edf",
         "status_msg": "Loaded: 20 channels",
         "power_cache": {
-          "delta": 0.7383267879486084,
-          "theta": 0.7930585145950317,
-          "alpha": 0.7561318874359131,
-          "beta": 0.7396202683448792,
-          "gamma": 0.7358686923980713
+          "delta": 0.7402070760726929,
+          "theta": 0.6484601497650146,
+          "alpha": 0.5554246306419373,
+          "beta": 0.8092142939567566,
+          "gamma": 0.7275195717811584
         }
       },
       "custom_state_file": null
@@ -148,8 +148,8 @@
     {
       "id": 1,
       "class_name": "PhiDwellMacroscopeNode",
-      "pos_x": -237.0,
-      "pos_y": -408.0,
+      "pos_x": -220.0,
+      "pos_y": -405.0,
       "width": 798.0,
       "height": 628.0,
       "config": {
@@ -198,18 +198,19 @@
         "current_dwell": 1,
         "dwell_threshold": 0.7853981633974483,
         "portrait_size": 400,
-        "attractor_decay": 0.998,
+        "attractor_decay": 0.999,
         "regime": "clocklike",
         "regime_confidence": 1.0,
-        "running_cv": 0.07018276606798948,
-        "metastability_score": 0.08147267034249751,
-        "dominant_mode_idx": 7,
-        "dominant_band_idx": 4,
+        "running_cv": 0.18088288992916252,
+        "metastability_score": 0.14448089646191847,
+        "dominant_mode_idx": 0,
+        "dominant_band_idx": 3,
         "current_dwell_ms": 62,
-        "frame_count": 16024,
-        "fps_estimate": 15.910033083092943,
-        "last_time": 1770538566.3888564,
-        "pca_scale": 3.0195426792267686
+        "frame_count": 17796,
+        "fps_estimate": 16.054794721280974,
+        "last_time": 1770538691.4280002,
+        "pca_scale": 2.348265922074174,
+        "_dwell_deg": 45
       },
       "custom_state_file": null
     },
@@ -230,19 +231,35 @@
         "outputs": {},
         "input_data": {
           "meta": [
-            0.08147267034249751
+            0.14448089646191847
           ],
           "regime": [
             3.0
           ],
           "band": [
-            4.0
+            3.0
           ],
           "mode": [
-            8.0
+            1.0
           ]
         },
         "node_title": "\u03a6-Dwell Sonifier"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "DisplayNode",
+      "pos_x": 1110.0,
+      "pos_y": -378.0,
+      "width": 547.0,
+      "height": 534.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {},
+        "node_title": "Display"
       },
       "custom_state_file": null
     }
@@ -309,6 +326,13 @@
       "from_port": "dominant_mode",
       "to_node_id": 2,
       "to_port": "mode",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "regime_map",
+      "to_node_id": 3,
+      "to_port": "image_in",
       "learned_weight": 1.0
     }
   ]
