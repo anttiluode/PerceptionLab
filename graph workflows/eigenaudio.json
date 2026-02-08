@@ -1,6 +1,6 @@
 {
   "global_settings": {
-    "coupling": 70,
+    "coupling": 100,
     "speed": 100
   },
   "nodes": [
@@ -46,10 +46,9 @@
         "node_title": "Base Node",
         "edf_file_path": "e:\\docshouse\\450\\1.edf",
         "resolution": 128,
-        "default_k": 15,
+        "default_k": 0.05,
         "default_rot": 0,
         "display_band": "alpha",
-        "channel_data": {},
         "active_elecs": {
           "Fp1": [
             -0.3,
@@ -133,37 +132,15 @@
           ]
         },
         "sfreq": 160.0,
-        "current_idx": 7915,
+        "current_idx": 6920,
         "loaded_path": "e:\\docshouse\\450\\1.edf",
         "status_msg": "Loaded: 20 channels",
-        "dist_maps": {},
-        "band_phases": {
-          "delta": {},
-          "theta": {},
-          "alpha": {},
-          "beta": {},
-          "gamma": {}
-        },
-        "field_cache": {
-          "delta": null,
-          "theta": null,
-          "alpha": null,
-          "beta": null,
-          "gamma": null
-        },
-        "image_cache": {
-          "delta": null,
-          "theta": null,
-          "alpha": null,
-          "beta": null,
-          "gamma": null
-        },
         "power_cache": {
-          "delta": 0.13271604478359222,
-          "theta": 0.16943377256393433,
-          "alpha": 0.16003099083900452,
-          "beta": 0.19368888437747955,
-          "gamma": 0.14969685673713684
+          "delta": 0.7383267879486084,
+          "theta": 0.7930585145950317,
+          "alpha": 0.7561318874359131,
+          "beta": 0.7396202683448792,
+          "gamma": 0.7358686923980713
         }
       },
       "custom_state_file": null
@@ -193,7 +170,6 @@
           "cv_running": "signal",
           "metastability": "signal"
         },
-        "input_data": {},
         "node_title": "\u03a6-Dwell Macroscope",
         "n_modes": 8,
         "e_names": [
@@ -225,15 +201,15 @@
         "attractor_decay": 0.998,
         "regime": "clocklike",
         "regime_confidence": 1.0,
-        "running_cv": 0.28980216614755916,
-        "metastability_score": 0.2364206428823652,
-        "dominant_mode_idx": 0,
-        "dominant_band_idx": 2,
-        "current_dwell_ms": 68,
-        "frame_count": 14640,
-        "fps_estimate": 14.551609952969272,
-        "last_time": 1770454475.457883,
-        "pca_scale": 2.436321946119076
+        "running_cv": 0.07018276606798948,
+        "metastability_score": 0.08147267034249751,
+        "dominant_mode_idx": 7,
+        "dominant_band_idx": 4,
+        "current_dwell_ms": 62,
+        "frame_count": 16024,
+        "fps_estimate": 15.910033083092943,
+        "last_time": 1770538566.3888564,
+        "pca_scale": 3.0195426792267686
       },
       "custom_state_file": null
     },
@@ -252,7 +228,20 @@
           "mode": "signal"
         },
         "outputs": {},
-        "input_data": {},
+        "input_data": {
+          "meta": [
+            0.08147267034249751
+          ],
+          "regime": [
+            3.0
+          ],
+          "band": [
+            4.0
+          ],
+          "mode": [
+            8.0
+          ]
+        },
         "node_title": "\u03a6-Dwell Sonifier"
       },
       "custom_state_file": null
