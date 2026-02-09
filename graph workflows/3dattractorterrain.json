@@ -1,0 +1,195 @@
+{
+  "global_settings": {
+    "coupling": 70,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PhiHologramNodeOLD",
+      "pos_x": -660.0,
+      "pos_y": -160.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "phase_rot": "signal",
+          "spatial_k": "signal",
+          "speed": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "delta_hologram": "image",
+          "theta_hologram": "image",
+          "alpha_hologram": "image",
+          "beta_hologram": "image",
+          "gamma_hologram": "image",
+          "combined_hologram": "image",
+          "delta_field": "complex_spectrum",
+          "theta_field": "complex_spectrum",
+          "alpha_field": "complex_spectrum",
+          "beta_field": "complex_spectrum",
+          "gamma_field": "complex_spectrum",
+          "delta_power": "signal",
+          "theta_power": "signal",
+          "alpha_power": "signal",
+          "beta_power": "signal",
+          "gamma_power": "signal",
+          "time_seconds": "signal"
+        },
+        "input_data": {
+          "phase_rot": [],
+          "spatial_k": [],
+          "speed": [],
+          "reset": []
+        },
+        "node_title": "Base Node",
+        "edf_file_path": "E:\\docshouse\\450\\2.edf",
+        "resolution": 128,
+        "default_k": 15,
+        "default_rot": 0,
+        "display_band": "alpha",
+        "active_elecs": {
+          "Fp1": [
+            -0.3,
+            0.9
+          ],
+          "Fp2": [
+            0.3,
+            0.9
+          ],
+          "F7": [
+            -0.7,
+            0.6
+          ],
+          "F3": [
+            -0.35,
+            0.6
+          ],
+          "Fz": [
+            0,
+            0.6
+          ],
+          "F4": [
+            0.35,
+            0.6
+          ],
+          "F8": [
+            0.7,
+            0.6
+          ],
+          "T7": [
+            -0.9,
+            0.0
+          ],
+          "C3": [
+            -0.4,
+            0.0
+          ],
+          "Cz": [
+            0,
+            0.0
+          ],
+          "C4": [
+            0.4,
+            0.0
+          ],
+          "T8": [
+            0.9,
+            0.0
+          ],
+          "P7": [
+            -0.7,
+            -0.5
+          ],
+          "P3": [
+            -0.35,
+            -0.5
+          ],
+          "Pz": [
+            0,
+            -0.5
+          ],
+          "P4": [
+            0.35,
+            -0.5
+          ],
+          "P8": [
+            0.7,
+            -0.5
+          ],
+          "O1": [
+            -0.3,
+            -0.85
+          ],
+          "Oz": [
+            0,
+            -0.85
+          ],
+          "O2": [
+            0.3,
+            -0.85
+          ]
+        },
+        "sfreq": 160.0,
+        "current_idx": 2180,
+        "loaded_path": "E:\\docshouse\\450\\2.edf",
+        "status_msg": "Loaded: 20 channels",
+        "power_cache": {
+          "delta": 0.13763222098350525,
+          "theta": 0.15377750992774963,
+          "alpha": 0.13196825981140137,
+          "beta": 0.15343931317329407,
+          "gamma": 0.1430986523628235
+        }
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "PhiAttractorTerrainNode",
+      "pos_x": -163.0,
+      "pos_y": -232.0,
+      "width": 476.0,
+      "height": 467.0,
+      "config": {
+        "inputs": {
+          "delta_field": "complex_spectrum",
+          "theta_field": "complex_spectrum",
+          "alpha_field": "complex_spectrum",
+          "beta_field": "complex_spectrum",
+          "gamma_field": "complex_spectrum",
+          "reset": "signal"
+        },
+        "node_title": "Attractor Terrain",
+        "grid_size": 50,
+        "decay_rate": 0.995,
+        "dig_rate": 0.8,
+        "smoothing": 0.2,
+        "data_buffer": [],
+        "auto_scale": 728.5776232731405,
+        "ball_x": 49.0,
+        "ball_y": 12.134374643711386,
+        "ball_vx": 43.46481568188976,
+        "ball_vy": -3.7456395984176156
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "delta_field",
+      "to_node_id": 1,
+      "to_port": "delta_field",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "theta_field",
+      "to_node_id": 1,
+      "to_port": "theta_field",
+      "learned_weight": 1.0
+    }
+  ]
+}
