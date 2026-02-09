@@ -1,0 +1,97 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "EigenToImageNode",
+      "pos_x": -120.0,
+      "pos_y": -530.0,
+      "width": 810.0,
+      "height": 497.0,
+      "config": {
+        "inputs": {
+          "eigen_image": "image",
+          "eigenfrequencies": "spectrum",
+          "reference_image": "image"
+        },
+        "outputs": {
+          "reconstructed": "image",
+          "radial_profile": "spectrum",
+          "confidence_map": "image",
+          "residual": "image"
+        },
+        "node_title": "Eigen -> Image",
+        "output_size": 2048,
+        "vector_dim": 2048,
+        "use_phase_recovery": "False",
+        "iterations": 5,
+        "smoothing": 1,
+        "eigen_size": 128,
+        "max_radius": 64
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ImageToVectorNode",
+      "pos_x": -349.0,
+      "pos_y": -400.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "image_in": "image"
+        },
+        "outputs": {
+          "vector_out": "spectrum"
+        },
+        "node_title": "Image -> Vector",
+        "output_dim": 2048
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "MediaSourceNode",
+      "pos_x": -560.0,
+      "pos_y": -534.0,
+      "width": 160.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal",
+          "image": "image"
+        },
+        "input_data": {},
+        "node_title": "Source (Webcam)",
+        "device_id": 0,
+        "source_type": "Webcam",
+        "w": 160,
+        "h": 120,
+        "sample_rate": 44100,
+        "signal_output": 0.42984497549019607
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "vector_out",
+      "to_node_id": 0,
+      "to_port": "eigenfrequencies",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
