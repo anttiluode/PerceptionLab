@@ -1,11 +1,19 @@
 """
-Standalone Chronotopic Radar Node
-=================================
+Standalone Chronotopic Radar Node v8: Regional (Occipital) Selection
+=====================================================================
 Antti Luode (PerceptionLab) | 2026
 
 Self-standing Perception Lab node for the Deerskin Time-Folded Surface.
-Includes native EDF loading, Theta/Alpha phase extraction, and logarithmic
-amplification. No external input nodes required.
+Includes native EDF loading, Theta/Alpha phase extraction, extreme logarithmic
+amplification, and brain region selection (e.g., Occipital only).
+
+Features:
+- Native EDF file loading and MNE preprocessing
+- Lobe Selection (All, Occipital, Frontal, Temporal, Parietal, Central)
+- Logarithmic Amplification (up to 10,000,000x gain)
+- Temporal Blur / Phosphor Decay
+- Chronotopic Mode (RGB = Past/Recent/Present)
+- Moiré Mode (Theta/Alpha structural beats)
 """
 
 import os
@@ -46,6 +54,16 @@ ELEC_COORDS_2D = {
     'O1':  (-0.3, -0.7), 'O2':  (0.3, -0.7)
 }
 
+# --- Brain Region Channel Sets ---
+EEG_REGIONS = {
+    "All": ['FP1', 'FP2', 'F7', 'F3', 'FZ', 'F4', 'F8', 'T3', 'C3', 'CZ', 'C4', 'T4', 'T5', 'P3', 'PZ', 'P4', 'T6', 'O1', 'O2'],
+    "Frontal": ['FP1', 'FP2', 'F7', 'F3', 'FZ', 'F4', 'F8'],
+    "Temporal": ['F7', 'F8', 'T3', 'T4', 'T5', 'T6'],
+    "Central": ['C3', 'CZ', 'C4'],
+    "Parietal": ['P3', 'PZ', 'P4'],
+    "Occipital": ['T5', 'P3', 'PZ', 'P4', 'T6', 'O1', 'O2'] # Occipital + Parieto-occipital border
+}
+
 class StandaloneChronotopicRadarNode(BaseNode):
     NODE_CATEGORY = "Deerskin Architecture"
     NODE_TITLE = "Standalone Chronotopic Radar"
@@ -63,7 +81,11 @@ class StandaloneChronotopicRadarNode(BaseNode):
         
         # Configuration parameters
         self.edf_path = ""
-        self._last_path = ""  # Used to track UI changes continuously
+        self._last_path = ""  # Track UI changes
+        
+        self.selected_region = "All"
+        self._last_region = "All"
+        
         self.mode = 1         # 0 = Moiré, 1 = Chronotopic
         self.amp_slider = 0.0 # -10 to 70 (Logarithmic multiplier)
         self.blur = 0.85      # Temporal decay (0.0 to 0.99)
@@ -98,6 +120,8 @@ class StandaloneChronotopicRadarNode(BaseNode):
         self.mask = (self.grid_coords[:, 0]**2 + self.grid_coords[:, 1]**2) <= 1.0
 
         self.elec_weights = np.zeros((len(self.grid_coords), self.n_ch))
+        # The weights map exactly to the 19 channels in the ELEC_COORDS_2D order.
+        # We must maintain this order in our raw_data array even if we zero out channels.
         for i, (name, coord) in enumerate(ELEC_COORDS_2D.items()):
             dists = np.linalg.norm(self.grid_coords - np.array(coord), axis=1)
             self.elec_weights[:, i] = 1.0 / (dists**3 + 0.05)
@@ -106,8 +130,12 @@ class StandaloneChronotopicRadarNode(BaseNode):
         self.elec_weights[~self.mask] = 0.0
 
     def get_config_options(self):
+        # Using a list of tuples for the dropdown (displayed_name, variable_value)
+        region_options = [(r, r) for r in EEG_REGIONS.keys()]
+        
         return [
             ("EDF File Path", "edf_path", self.edf_path, 'string'),
+            ("Brain Region (Lobe)", "selected_region", self.selected_region, region_options),
             ("Mode (0=Moiré, 1=Chrono)", "mode", self.mode, 'int'),
             ("Log Amp (-10 to 70)", "amp_slider", self.amp_slider, 'float'),
             ("Temporal Blur (0-0.99)", "blur", self.blur, 'float'),
@@ -115,13 +143,17 @@ class StandaloneChronotopicRadarNode(BaseNode):
         
     def set_config_options(self, options):
         if isinstance(options, dict):
+            # Check if mode or region changed to clear accumulator
             if 'mode' in options and options['mode'] != self.mode:
                 self.accum_color.fill(0)
+            if 'selected_region' in options and options['selected_region'] != self.selected_region:
+                self.accum_color.fill(0)
+                
             for k, v in options.items():
                 if hasattr(self, k):
                     setattr(self, k, v)
 
-    def _load_edf(self, path):
+    def _load_edf(self, path, region="All"):
         if not MNE_AVAILABLE:
             self.status_msg = "Error: MNE/SciPy not installed."
             self.status_color = (0, 0, 255) # Red in BGR
@@ -134,8 +166,10 @@ class StandaloneChronotopicRadarNode(BaseNode):
             return
 
         try:
-            self.status_msg = "Loading EDF... (Wait)"
+            msg = f"Loading {os.path.basename(path)}: {region}"
+            self.status_msg = msg if len(msg) < 30 else msg[:27] + "..."
             self.status_color = (0, 255, 255) # Yellow
+            print(f"Loading EDF: {path}, Region: {region}")
             
             raw = mne.io.read_raw_edf(path, preload=True, verbose=False)
             raw.filter(1.0, 45.0, verbose=False)
@@ -144,32 +178,42 @@ class StandaloneChronotopicRadarNode(BaseNode):
                 
             ch_names_upper = [c.upper().replace(' ', '').replace('-', '').replace('.', '') for c in raw.ch_names]
             
-            mapped_indices = []
-            mapped_names = []
-            for target in ELEC_COORDS_2D.keys():
-                for i, name in enumerate(ch_names_upper):
-                    if target in name:
-                        mapped_indices.append(i)
-                        mapped_names.append(target)
-                        break
+            # === SURGICAL CHANNEL PICKING (Maintains 19-ch topology but zeros unselected) ===
+            full_raw_data = np.zeros((self.n_ch, raw.n_times))
+            
+            # The list of target channels for the selected region
+            region_targets = EEG_REGIONS.get(region, EEG_REGIONS["All"])
+            found_count = 0
+            
+            # We must iterate in the exact order of ELEC_COORDS_2D to match precomputed weights
+            for i, target_name in enumerate(ELEC_COORDS_2D.keys()):
+                
+                # Check 1: Is this electrode in the selected region?
+                if target_name in region_targets:
+                    
+                    # Check 2: Does this file contain this electrode?
+                    found_index = -1
+                    for file_ch_idx, file_ch_name in enumerate(ch_names_upper):
+                        if target_name == file_ch_name:
+                            found_index = file_ch_idx
+                            break
+                    
+                    if found_index != -1:
+                        # Success: Load the real data and put it in the correct slot
+                        full_raw_data[i, :] = raw.get_data()[found_index, :]
+                        found_count += 1
                         
-            if len(mapped_indices) == 0:
-                self.status_msg = "No 10-20 channels found!"
+                # else: electrode is not in selected region. Leave as zero (padded in _load_edf structure).
+            
+            if found_count == 0:
+                self.status_msg = f"Error: No channels for {region}!"
                 self.status_color = (0, 0, 255)
                 self.raw_data = None
                 return
 
-            # If some channels are missing, we still try to run with what we have
-            if len(mapped_indices) < self.n_ch:
-                print(f"Warning: Only found {len(mapped_indices)}/19 channels. Pad with zeros for missing.")
-                self.raw_data = np.zeros((self.n_ch, raw.n_times))
-                found_data = raw.get_data()[mapped_indices, :]
-                for i, idx in enumerate(mapped_indices):
-                    self.raw_data[i, :] = found_data[i, :]
-            else:
-                self.raw_data = raw.get_data()[mapped_indices, :]
+            self.raw_data = full_raw_data
             
-            # Precompute Theta and Alpha phases for the entire file (massive optimization)
+            # Precompute Theta and Alpha phases for the entire file (on the 19-ch structure)
             b_t, a_t = butter(4, [4/(self.sfreq/2), 8/(self.sfreq/2)], btype='band')
             theta_data = np.array([filtfilt(b_t, a_t, ch) for ch in self.raw_data])
             self.theta_phase = np.angle(hilbert(theta_data, axis=1))
@@ -182,7 +226,8 @@ class StandaloneChronotopicRadarNode(BaseNode):
             self.accum_color.fill(0)
             
             filename = os.path.basename(path)
-            self.status_msg = f"LIVE: {filename}"
+            self.status_msg = f"LIVE ({region}): {filename}"
+            if len(self.status_msg) > 30: self.status_msg = self.status_msg[:27] + "..."
             self.status_color = (0, 255, 0) # Green in BGR
             
         except Exception as e:
@@ -203,17 +248,23 @@ class StandaloneChronotopicRadarNode(BaseNode):
         return -np.sum(sv * np.log2(sv + 1e-10))
 
     def step(self):
-        # --- FIX: Track path changes continuously just like the old node ---
+        # --- TRACK CONFIG CHANGES ---
         current_path = str(self.edf_path).strip().strip('\"').strip('\'')
-        if current_path != self._last_path:
+        path_changed = current_path != self._last_path
+        region_changed = self.selected_region != self._last_region
+        
+        if path_changed or region_changed:
             self._last_path = current_path
+            self._last_region = self.selected_region
+            
             if current_path != "":
-                self._load_edf(current_path)
+                # Re-load or re-process the file with the new region
+                self._load_edf(current_path, self.selected_region)
             else:
                 self.raw_data = None
                 self.status_msg = "No EDF. Using Synthetic."
                 self.status_color = (0, 165, 255)
-        # -------------------------------------------------------------------
+        # -----------------------------
 
         win_samples = int(self.window_size_s * self.sfreq)
         
@@ -257,9 +308,11 @@ class StandaloneChronotopicRadarNode(BaseNode):
             comp_slow = np.zeros(self.n_ch)
             
             for i in range(self.n_ch):
-                comp_fast[i] = self._fast_takens(window_data[i], tau=2)  # Blue (Fast)
-                comp_med[i]  = self._fast_takens(window_data[i], tau=6)  # Green (Medium)
-                comp_slow[i] = self._fast_takens(window_data[i], tau=12) # Red (Slow)
+                # The data here might be zero if not in the selected region.
+                # Takens complexity on flat zeros will return 0, which is correct.
+                comp_fast[i] = self._fast_takens(window_data[i], tau=2)  
+                comp_med[i]  = self._fast_takens(window_data[i], tau=6)  
+                comp_slow[i] = self._fast_takens(window_data[i], tau=12) 
                 
             norm_fast = np.clip(((comp_fast - 1.0) / 1.5) * amp, 0, 1)
             norm_med  = np.clip(((comp_med - 1.0) / 1.5) * amp, 0, 1)
@@ -277,8 +330,10 @@ class StandaloneChronotopicRadarNode(BaseNode):
             for i in range(self.n_ch):
                 wire_metrics[i] = self._fast_takens(window_data[i], tau=5)
                 
+                # Cross-frequency structural beats
                 interference = np.sin(window_theta[i]) * np.sin(window_alpha[i])
                 if MNE_AVAILABLE:
+                    # Flat zeros will result in flat zeros, no crashes
                     envelope = filtfilt(self.b_low, self.a_low, np.abs(interference))
                     outer_metrics[i] = np.mean(envelope) + 0.4 * (np.max(envelope) - np.min(envelope))
                 else:
@@ -316,6 +371,9 @@ class StandaloneChronotopicRadarNode(BaseNode):
         
         # 4. Draw UI Overlays natively on the image
         cv2.circle(img_bgr, (self.res//2, self.res//2), int(self.res//2 * 0.95), (82, 61, 52), 2)
+        
+        # The region label shows the selection on the live image
+        cv2.putText(img_bgr, f"Region: {self.selected_region}", (10, self.res - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
         
         amp_text = f"Amp: {amp:.1f}x" if amp < 1000 else f"Amp: {amp/1000:.1f}kx"
         cv2.putText(img_bgr, amp_text, (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
