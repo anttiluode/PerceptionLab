@@ -1,0 +1,64 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "StandaloneChronotopicRadarNode",
+      "pos_x": -860.0,
+      "pos_y": -418.0,
+      "width": 530.0,
+      "height": 460.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "radar_view": "image"
+        },
+        "input_data": {},
+        "node_title": "Base Node",
+        "edf_path": "e:\\docshouse\\450\\2.edf",
+        "mode": 0,
+        "amp_slider": 0.0,
+        "blur": 0.85,
+        "res": 200,
+        "n_ch": 19,
+        "sfreq": 250,
+        "window_size_s": 1.0,
+        "current_frame": 25404,
+        "status_msg": "LIVE: 2.edf"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "TemporalBlurNode",
+      "pos_x": -240.0,
+      "pos_y": -403.0,
+      "width": 460.0,
+      "height": 435.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Temporal Blur (Ghosting)",
+        "feedback": 0.999
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "radar_view",
+      "to_node_id": 1,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
