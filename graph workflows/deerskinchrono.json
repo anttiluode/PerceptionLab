@@ -19,6 +19,7 @@
         "input_data": {},
         "node_title": "Base Node",
         "edf_path": "e:\\docshouse\\450\\2.edf",
+        "selected_region": "Occipital",
         "mode": 0,
         "amp_slider": 0.0,
         "blur": 0.85,
@@ -26,8 +27,8 @@
         "n_ch": 19,
         "sfreq": 250,
         "window_size_s": 1.0,
-        "current_frame": 25404,
-        "status_msg": "LIVE: 2.edf"
+        "current_frame": 1116,
+        "status_msg": "LIVE (Occipital): 2.edf"
       },
       "custom_state_file": null
     },
