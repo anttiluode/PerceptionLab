@@ -1,0 +1,145 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 48
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "StandaloneChronotopicRadarNode",
+      "pos_x": -1130.0,
+      "pos_y": -424.0,
+      "width": 530.0,
+      "height": 460.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "radar_view": "image"
+        },
+        "input_data": {},
+        "node_title": "Base Node",
+        "edf_path": "E:\\DocsHouse\\618\\repod_schizophrenia\\h10.edf",
+        "selected_region": "Occipital",
+        "mode": 1,
+        "amp_slider": 0.0,
+        "blur": 0.85,
+        "res": 200,
+        "n_ch": 19,
+        "sfreq": 250,
+        "window_size_s": 1.0,
+        "current_frame": 10644,
+        "status_msg": "LIVE (Occipital): h10.edf"
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "PredictiveDreamNode",
+      "pos_x": -746.0,
+      "pos_y": -654.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "visual_reality": "image"
+        },
+        "outputs": {
+          "dream_view": "image",
+          "surprise_map": "image",
+          "panic_signal": "signal"
+        },
+        "node_title": "Predictive Dream (Retro-V2)",
+        "history_loss": [
+          0.05958437919616699,
+          0.062385302037000656,
+          0.05825718864798546,
+          0.04690441116690636,
+          0.0450376495718956,
+          0.0376521535217762,
+          0.03704920783638954,
+          0.033776525408029556,
+          0.030781473964452744,
+          0.033499497920274734,
+          0.0684526190161705,
+          0.1280989646911621,
+          0.8180410861968994,
+          0.23266257345676422,
+          0.17197109758853912,
+          0.14093171060085297,
+          0.2393658608198166,
+          0.2111198604106903,
+          0.15654033422470093,
+          0.14249996840953827,
+          0.6822401285171509,
+          0.6657984256744385,
+          0.5720131397247314,
+          0.46513688564300537,
+          0.31191501021385193,
+          0.2664160430431366,
+          0.2095048725605011,
+          0.1730985790491104,
+          0.14192332327365875,
+          0.14465361833572388,
+          0.1410895735025406,
+          0.12121021002531052,
+          0.1052929013967514,
+          0.11185397207736969,
+          0.11957718431949615,
+          0.11609171330928802,
+          0.14357569813728333,
+          1.0580847263336182,
+          0.7602594494819641,
+          0.6060991287231445,
+          0.4172510802745819,
+          0.3194679617881775,
+          0.20896771550178528,
+          0.1431763768196106,
+          0.11144313961267471,
+          0.09377148002386093,
+          0.09594357013702393,
+          0.10432791709899902,
+          0.12082299590110779,
+          0.12909480929374695
+        ],
+        "initialized": true
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "TemporalBlurNode",
+      "pos_x": -427.0,
+      "pos_y": -603.0,
+      "width": 702.0,
+      "height": 640.0,
+      "config": {
+        "inputs": {
+          "image_in": "image",
+          "reset": "signal"
+        },
+        "outputs": {
+          "image_out": "image"
+        },
+        "node_title": "Temporal Blur (Ghosting)",
+        "feedback": 0.85
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "radar_view",
+      "to_node_id": 1,
+      "to_port": "visual_reality",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "surprise_map",
+      "to_node_id": 2,
+      "to_port": "image_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
