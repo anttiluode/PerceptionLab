@@ -1,0 +1,552 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "GeometricNeuronNode",
+      "pos_x": -947.0,
+      "pos_y": -128.0,
+      "width": 218.0,
+      "height": 199.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "ephaptic_in": "signal"
+        },
+        "outputs": {
+          "spike_out": "signal",
+          "spike_pos_out": "signal",
+          "resonance_out": "signal",
+          "ephaptic_out": "signal",
+          "manifold_img": "image"
+        },
+        "input_data": {
+          "signal_in": [
+            0.0
+          ],
+          "ephaptic_in": [
+            -0.014911641366779804
+          ]
+        },
+        "node_title": "Geometric Neuron",
+        "cable_length": 128,
+        "rc_alpha": 0.93,
+        "diffusion": 0.1,
+        "manifold_decay": 0.9998,
+        "scorch_rate": 0.001,
+        "grating_period": 3,
+        "n_samples": 43,
+        "n_templates": 8,
+        "threshold_min": 0.25,
+        "threshold_max": 0.7,
+        "membrane": 2.235192853950094e-283,
+        "membrane_leak": 0.88,
+        "charge_rate": 0.14,
+        "spike_threshold": 0.52,
+        "ephaptic_strength": 0.03,
+        "ephaptic_decay": 0.95,
+        "ephaptic_buffer": -0.011024887926678682,
+        "johnson_nyquist_sigma": 0.035,
+        "current_resonance": 0.0,
+        "current_spike": 0.0,
+        "current_spike_pos": -1,
+        "current_mismatch": 1.0,
+        "step_counter": 9286
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "GeometricNeuronNode",
+      "pos_x": -418.0,
+      "pos_y": -117.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "ephaptic_in": "signal"
+        },
+        "outputs": {
+          "spike_out": "signal",
+          "spike_pos_out": "signal",
+          "resonance_out": "signal",
+          "ephaptic_out": "signal",
+          "manifold_img": "image"
+        },
+        "input_data": {
+          "signal_in": [
+            0.0,
+            0.0
+          ],
+          "ephaptic_in": [
+            -0.14249278604984283
+          ]
+        },
+        "node_title": "Geometric Neuron",
+        "cable_length": 128,
+        "rc_alpha": 0.93,
+        "diffusion": 0.1,
+        "manifold_decay": 0.9998,
+        "scorch_rate": 0.001,
+        "grating_period": 3,
+        "n_samples": 43,
+        "n_templates": 8,
+        "threshold_min": 0.25,
+        "threshold_max": 0.7,
+        "membrane": 5.80265209496118e-282,
+        "membrane_leak": 0.88,
+        "charge_rate": 0.14,
+        "spike_threshold": 0.52,
+        "ephaptic_strength": 0.03,
+        "ephaptic_decay": 0.95,
+        "ephaptic_buffer": 0.0015107168107659239,
+        "johnson_nyquist_sigma": 0.035,
+        "current_resonance": 0.0,
+        "current_spike": 0.0,
+        "current_spike_pos": -1,
+        "current_mismatch": 1.0,
+        "step_counter": 9286
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "GeometricNeuronNode",
+      "pos_x": -177.0,
+      "pos_y": -110.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "ephaptic_in": "signal"
+        },
+        "outputs": {
+          "spike_out": "signal",
+          "spike_pos_out": "signal",
+          "resonance_out": "signal",
+          "ephaptic_out": "signal",
+          "manifold_img": "image"
+        },
+        "input_data": {
+          "signal_in": [
+            0.0
+          ],
+          "ephaptic_in": [
+            -0.13001275062561035
+          ]
+        },
+        "node_title": "Geometric Neuron",
+        "cable_length": 128,
+        "rc_alpha": 0.93,
+        "diffusion": 0.1,
+        "manifold_decay": 0.9998,
+        "scorch_rate": 0.001,
+        "grating_period": 3,
+        "n_samples": 43,
+        "n_templates": 8,
+        "threshold_min": 0.25,
+        "threshold_max": 0.7,
+        "membrane": 9.702180399238054e-284,
+        "membrane_leak": 0.88,
+        "charge_rate": 0.14,
+        "spike_threshold": 0.52,
+        "ephaptic_strength": 0.03,
+        "ephaptic_decay": 0.95,
+        "ephaptic_buffer": 0.004570093608455925,
+        "johnson_nyquist_sigma": 0.035,
+        "current_resonance": 0.0,
+        "current_spike": 0.0,
+        "current_spike_pos": -1,
+        "current_mismatch": 1.0,
+        "step_counter": 9286
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "GeometricNeuronNode",
+      "pos_x": -689.0,
+      "pos_y": -123.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "ephaptic_in": "signal"
+        },
+        "outputs": {
+          "spike_out": "signal",
+          "spike_pos_out": "signal",
+          "resonance_out": "signal",
+          "ephaptic_out": "signal",
+          "manifold_img": "image"
+        },
+        "input_data": {
+          "signal_in": [
+            0.0
+          ],
+          "ephaptic_in": [
+            0.07197172194719315
+          ]
+        },
+        "node_title": "Geometric Neuron",
+        "cable_length": 128,
+        "rc_alpha": 0.93,
+        "diffusion": 0.1,
+        "manifold_decay": 0.9998,
+        "scorch_rate": 0.001,
+        "grating_period": 3,
+        "n_samples": 43,
+        "n_templates": 8,
+        "threshold_min": 0.25,
+        "threshold_max": 0.7,
+        "membrane": 6.550877014352714e-283,
+        "membrane_leak": 0.88,
+        "charge_rate": 0.14,
+        "spike_threshold": 0.52,
+        "ephaptic_strength": 0.03,
+        "ephaptic_decay": 0.95,
+        "ephaptic_buffer": 0.021537744511365867,
+        "johnson_nyquist_sigma": 0.035,
+        "current_resonance": 0.0,
+        "current_spike": 0.0,
+        "current_spike_pos": -1,
+        "current_mismatch": 1.0,
+        "step_counter": 9286
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "GeometricNeuronNode",
+      "pos_x": 59.0,
+      "pos_y": -112.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "ephaptic_in": "signal"
+        },
+        "outputs": {
+          "spike_out": "signal",
+          "spike_pos_out": "signal",
+          "resonance_out": "signal",
+          "ephaptic_out": "signal",
+          "manifold_img": "image"
+        },
+        "input_data": {
+          "signal_in": [
+            0.0
+          ],
+          "ephaptic_in": [
+            0.12747366726398468
+          ]
+        },
+        "node_title": "Geometric Neuron",
+        "cable_length": 128,
+        "rc_alpha": 0.93,
+        "diffusion": 0.1,
+        "manifold_decay": 0.9998,
+        "scorch_rate": 0.001,
+        "grating_period": 3,
+        "n_samples": 43,
+        "n_templates": 8,
+        "threshold_min": 0.25,
+        "threshold_max": 0.7,
+        "membrane": 3.1821173929822685e-283,
+        "membrane_leak": 0.88,
+        "charge_rate": 0.14,
+        "spike_threshold": 0.52,
+        "ephaptic_strength": 0.03,
+        "ephaptic_decay": 0.95,
+        "ephaptic_buffer": -0.010908330808068476,
+        "johnson_nyquist_sigma": 0.035,
+        "current_resonance": 0.0,
+        "current_spike": 0.0,
+        "current_spike_pos": -1,
+        "current_mismatch": 1.0,
+        "step_counter": 9286
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "EphapticFieldNode",
+      "pos_x": -713.0,
+      "pos_y": 115.0,
+      "width": 837.0,
+      "height": 367.0,
+      "config": {
+        "inputs": {
+          "neuron_0_ephaptic": "signal",
+          "neuron_0_spike_pos": "signal",
+          "neuron_0_resonance": "signal",
+          "neuron_1_ephaptic": "signal",
+          "neuron_1_spike_pos": "signal",
+          "neuron_1_resonance": "signal",
+          "neuron_2_ephaptic": "signal",
+          "neuron_2_spike_pos": "signal",
+          "neuron_2_resonance": "signal",
+          "neuron_3_ephaptic": "signal",
+          "neuron_3_spike_pos": "signal",
+          "neuron_3_resonance": "signal",
+          "neuron_4_ephaptic": "signal",
+          "neuron_4_spike_pos": "signal",
+          "neuron_4_resonance": "signal"
+        },
+        "outputs": {
+          "field_to_0": "signal",
+          "field_to_1": "signal",
+          "field_to_2": "signal",
+          "field_to_3": "signal",
+          "field_to_4": "signal",
+          "field_spectrum": "spectrum",
+          "field_image": "image"
+        },
+        "input_data": {
+          "neuron_0_ephaptic": [
+            -0.024403395562475127
+          ],
+          "neuron_0_spike_pos": [
+            0.0
+          ],
+          "neuron_0_resonance": [
+            0.0
+          ],
+          "neuron_1_ephaptic": [
+            -0.032354843984178545
+          ],
+          "neuron_1_spike_pos": [
+            0.0
+          ],
+          "neuron_1_resonance": [
+            0.0
+          ],
+          "neuron_2_ephaptic": [
+            0.015239414937047032
+          ],
+          "neuron_2_spike_pos": [
+            0.0
+          ],
+          "neuron_2_resonance": [
+            0.0
+          ],
+          "neuron_3_ephaptic": [
+            -0.011240137983904745
+          ],
+          "neuron_3_spike_pos": [
+            0.0
+          ],
+          "neuron_3_resonance": [
+            0.0
+          ],
+          "neuron_4_ephaptic": [
+            -0.015229080568662321
+          ],
+          "neuron_4_spike_pos": [
+            0.0
+          ],
+          "neuron_4_resonance": [
+            0.0
+          ]
+        },
+        "node_title": "Ephaptic Field (5 neurons)",
+        "n_neurons": 5,
+        "spatial_decay": 0.3,
+        "field_decay": 0.95,
+        "johnson_nyquist_sigma": 0.03
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "ephaptic_out",
+      "to_node_id": 5,
+      "to_port": "neuron_0_ephaptic",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "spike_pos_out",
+      "to_node_id": 5,
+      "to_port": "neuron_0_spike_pos",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "resonance_out",
+      "to_node_id": 5,
+      "to_port": "neuron_0_resonance",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "ephaptic_out",
+      "to_node_id": 5,
+      "to_port": "neuron_1_ephaptic",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "spike_pos_out",
+      "to_node_id": 5,
+      "to_port": "neuron_1_spike_pos",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "resonance_out",
+      "to_node_id": 5,
+      "to_port": "neuron_1_resonance",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "ephaptic_out",
+      "to_node_id": 5,
+      "to_port": "neuron_2_ephaptic",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "spike_pos_out",
+      "to_node_id": 5,
+      "to_port": "neuron_2_spike_pos",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "resonance_out",
+      "to_node_id": 5,
+      "to_port": "neuron_2_resonance",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "ephaptic_out",
+      "to_node_id": 5,
+      "to_port": "neuron_3_ephaptic",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "spike_pos_out",
+      "to_node_id": 5,
+      "to_port": "neuron_3_spike_pos",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "resonance_out",
+      "to_node_id": 5,
+      "to_port": "neuron_3_resonance",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "ephaptic_out",
+      "to_node_id": 5,
+      "to_port": "neuron_4_ephaptic",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "spike_pos_out",
+      "to_node_id": 5,
+      "to_port": "neuron_4_spike_pos",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "resonance_out",
+      "to_node_id": 5,
+      "to_port": "neuron_4_resonance",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "field_to_0",
+      "to_node_id": 0,
+      "to_port": "ephaptic_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "field_to_1",
+      "to_node_id": 1,
+      "to_port": "ephaptic_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "field_to_2",
+      "to_node_id": 2,
+      "to_port": "ephaptic_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "field_to_3",
+      "to_node_id": 3,
+      "to_port": "ephaptic_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "field_to_4",
+      "to_node_id": 4,
+      "to_port": "ephaptic_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "spike_out",
+      "to_node_id": 1,
+      "to_port": "signal_in",
+      "learned_weight": 0.3
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "spike_out",
+      "to_node_id": 3,
+      "to_port": "signal_in",
+      "learned_weight": 0.3
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "spike_out",
+      "to_node_id": 2,
+      "to_port": "signal_in",
+      "learned_weight": 0.3
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "spike_out",
+      "to_node_id": 0,
+      "to_port": "signal_in",
+      "learned_weight": 0.3
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "spike_out",
+      "to_node_id": 4,
+      "to_port": "signal_in",
+      "learned_weight": 0.3
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "spike_out",
+      "to_node_id": 1,
+      "to_port": "signal_in",
+      "learned_weight": 0.3
+    }
+  ]
+}
