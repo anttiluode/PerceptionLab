@@ -1,0 +1,84 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 60
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PatternMemoryBankNode",
+      "pos_x": -900.0,
+      "pos_y": -400.0,
+      "width": 200.0,
+      "height": 180.0
+    },
+    {
+      "id": 1,
+      "class_name": "AssociativeCortexNode",
+      "pos_x": -500.0,
+      "pos_y": -400.0,
+      "width": 200.0,
+      "height": 180.0
+    },
+    {
+      "id": 2,
+      "class_name": "ATPMetabolismNode",
+      "pos_x": -500.0,
+      "pos_y": -150.0,
+      "width": 200.0,
+      "height": 150.0
+    },
+    {
+      "id": 3,
+      "class_name": "CognitiveDashboardNode",
+      "pos_x": -150.0,
+      "pos_y": -400.0,
+      "width": 260.0,
+      "height": 180.0
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "query_vec",
+      "to_node_id": 1,
+      "to_port": "query_vec"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "clean_vec",
+      "to_node_id": 1,
+      "to_port": "teach_vec"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "demand",
+      "to_node_id": 2,
+      "to_port": "demand"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "atp_level",
+      "to_node_id": 1,
+      "to_port": "atp_level"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "query_img",
+      "to_node_id": 3,
+      "to_port": "query_img"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "recall_img",
+      "to_node_id": 3,
+      "to_port": "recall_img"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "atp_level",
+      "to_node_id": 3,
+      "to_port": "atp_level"
+    }
+  ]
+}
