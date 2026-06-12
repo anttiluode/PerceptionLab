@@ -1,0 +1,233 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 60
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "MediaSourceNode",
+      "pos_x": -1100.0,
+      "pos_y": -550.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "source_type": "Webcam",
+        "node_title": "The Optic Nerve (Webcam)"
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "ImageToVectorNode",
+      "pos_x": -800.0,
+      "pos_y": -550.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "output_dim": 16,
+        "node_title": "Spectral Compressor"
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "AssociativeCortexNode",
+      "pos_x": -500.0,
+      "pos_y": -550.0,
+      "width": 200.0,
+      "height": 180.0
+    },
+    {
+      "id": 3,
+      "class_name": "CognitiveDashboardNode",
+      "pos_x": -200.0,
+      "pos_y": -550.0,
+      "width": 260.0,
+      "height": 180.0
+    },
+    {
+      "id": 4,
+      "class_name": "SkewOperatorNode",
+      "pos_x": -800.0,
+      "pos_y": -300.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "tau": 5,
+        "dim": 16,
+        "node_title": "Entropy Engine (A)"
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "ATPMetabolismNode",
+      "pos_x": -200.0,
+      "pos_y": -300.0,
+      "width": 200.0,
+      "height": 150.0,
+      "config": {
+        "burn_rate": 0.08,
+        "recovery_rate": 0.03
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "PhaseFieldNodeV2",
+      "pos_x": 100.0,
+      "pos_y": -550.0,
+      "width": 200.0,
+      "height": 180.0
+    },
+    {
+      "id": 7,
+      "class_name": "IslandArchivalNodeV2",
+      "pos_x": 100.0,
+      "pos_y": -300.0,
+      "width": 250.0,
+      "height": 200.0,
+      "config": {
+        "dim": 16,
+        "freeze_threshold": 0.07
+      }
+    },
+    {
+      "id": 8,
+      "class_name": "TopologicalDreamerNode",
+      "pos_x": 400.0,
+      "pos_y": -300.0,
+      "width": 200.0,
+      "height": 180.0
+    },
+    {
+      "id": 9,
+      "class_name": "ResonantColumnNode",
+      "pos_x": -200.0,
+      "pos_y": -50.0,
+      "width": 260.0,
+      "height": 180.0,
+      "config": {
+        "num_columns": 4
+      }
+    },
+    {
+      "id": 10,
+      "class_name": "EigenmodeLoRANode",
+      "pos_x": -500.0,
+      "pos_y": -300.0,
+      "width": 260.0,
+      "height": 200.0,
+      "config": {
+        "manual_strength": 0.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 1,
+      "to_port": "image_in"
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "image",
+      "to_node_id": 3,
+      "to_port": "query_img"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "vector_out",
+      "to_node_id": 2,
+      "to_port": "query_vec"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "vector_out",
+      "to_node_id": 2,
+      "to_port": "teach_vec"
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "vector_out",
+      "to_node_id": 4,
+      "to_port": "vector_in"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "demand",
+      "to_node_id": 5,
+      "to_port": "demand"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "skew_flux",
+      "to_node_id": 5,
+      "to_port": "demand"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "atp_level",
+      "to_node_id": 2,
+      "to_port": "atp_level"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "atp_level",
+      "to_node_id": 3,
+      "to_port": "atp_level"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "recall_img",
+      "to_node_id": 3,
+      "to_port": "recall_img"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "skew_flux",
+      "to_node_id": 6,
+      "to_port": "skew_flux"
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "confidence",
+      "to_node_id": 6,
+      "to_port": "scale"
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "state_vector",
+      "to_node_id": 7,
+      "to_port": "vector_in"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "skew_flux",
+      "to_node_id": 7,
+      "to_port": "skew_flux"
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "atp_level",
+      "to_node_id": 7,
+      "to_port": "atp_level"
+    },
+    {
+      "from_node_id": 7,
+      "from_port": "memory_readout",
+      "to_node_id": 8,
+      "to_port": "memory_vector"
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "skew_matrix",
+      "to_node_id": 10,
+      "to_port": "live_matrix"
+    },
+    {
+      "from_node_id": 10,
+      "from_port": "biased_matrix",
+      "to_node_id": 9,
+      "to_port": "skew_matrix"
+    }
+  ]
+}
