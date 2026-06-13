@@ -1,0 +1,22 @@
+{
+  "global_settings": { "coupling": 100, "speed": 60,
+    "_comment": "LISTENER (machine 2). Its ONLY input is peer tokens. It grows nodes and recalls what the teacher taught - learned from tokens, no shared weights. Set Token Relay host to the relay machine's IP." },
+  "nodes": [
+    { "id": 0, "class_name": "TokenRelayNode", "pos_x": -900.0, "pos_y": -300.0, "width": 256.0, "height": 96.0,
+      "config": { "node_title": "Token Relay (IN)", "host": "127.0.0.1", "port": 8765, "src_id": 2, "broadcast_every": 3, "conf_gate": 0.3 } },
+    { "id": 1, "class_name": "MycelialCortexNode", "pos_x": -540.0, "pos_y": -340.0, "width": 256.0, "height": 200.0,
+      "config": { "node_title": "Mycelial Cortex (learns from the wire)", "beta": 18.0, "leak": 0.25, "familiar": 0.30, "novel": 0.20, "alpha": 0.20, "budget": 48 } },
+    { "id": 2, "class_name": "CognitiveDashboardNode", "pos_x": -180.0, "pos_y": -340.0, "width": 260.0, "height": 180.0,
+      "config": { "node_title": "Dashboard (what B came to know)" } },
+    { "id": 3, "class_name": "SignalDisplayNode", "pos_x": 140.0, "pos_y": -340.0, "width": 160.0, "height": 120.0,
+      "config": { "node_title": "Nodes Grown" } },
+    { "id": 4, "class_name": "SignalDisplayNode", "pos_x": 140.0, "pos_y": -190.0, "width": 160.0, "height": 120.0,
+      "config": { "node_title": "Tokens Received" } }
+  ],
+  "edges": [
+    { "from_node_id": 0, "from_port": "token_out",  "to_node_id": 1, "to_port": "query_vec" },
+    { "from_node_id": 1, "from_port": "recall_img", "to_node_id": 2, "to_port": "recall_img" },
+    { "from_node_id": 1, "from_port": "n_nodes",    "to_node_id": 3, "to_port": "signal" },
+    { "from_node_id": 0, "from_port": "rx",         "to_node_id": 4, "to_port": "signal" }
+  ]
+}
