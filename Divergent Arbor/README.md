@@ -1,5 +1,7 @@
 # Divergent Arbors
 
+![pic](pic.png)
+
 ### The same stream carves a different organization in every mesh — and the knowledge crosses anyway
 
 **PerceptionLab / Antti Luode, with Claude (Opus 4.8). Helsinki, June 2026.**
