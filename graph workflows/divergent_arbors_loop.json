@@ -1,0 +1,32 @@
+{
+  "global_settings": { "coupling": 100, "speed": 60,
+    "_comment": "divergent_arbors_loop - two Morphogenetic Cortex meshes (Arbor A seed 11, Arbor B seed 29) read the SAME Engram stream. Watch their viz galleries: both grow a set of footprint SHAPES, both recall the shapes (high conf), but their NODE COUNT, partition, and footprint sizes drift apart - the same stream carved into different organizations. The per-node shapes still track the stimulus (see shape_divergence_proof.py: shape cos 0.98, but counts 7 vs 9). Divergence here comes from each mesh's spawn_jitter (internal noise); the federation setup (different prior + reordered stream over the token relay) is the other route, with verified numbers in the proof. Needs in nodes/: morphogeneticcortexnode.py, patternmemorybanknode.py, cognitivedashboardnode.py." },
+  "nodes": [
+    { "id": 0, "class_name": "PatternMemoryBankNode", "pos_x": -960.0, "pos_y": -200.0, "width": 200.0, "height": 180.0,
+      "config": { "node_title": "Engram Library (one stream)", "num_patterns": 6, "side": 20, "corruption": 0.45, "dwell": 60 } },
+    { "id": 1, "class_name": "MorphogeneticCortexNode", "pos_x": -620.0, "pos_y": -400.0, "width": 256.0, "height": 200.0,
+      "config": { "node_title": "Arbor A", "beta": 22.0, "leak": 0.22, "familiar": 0.62, "novel": 0.42, "alpha": 0.22, "morph": 0.2, "inhib": 0.05, "spawn_jitter": 0.05, "seed": 11, "budget": 40 } },
+    { "id": 2, "class_name": "MorphogeneticCortexNode", "pos_x": -620.0, "pos_y": -150.0, "width": 256.0, "height": 200.0,
+      "config": { "node_title": "Arbor B", "beta": 22.0, "leak": 0.22, "familiar": 0.62, "novel": 0.42, "alpha": 0.22, "morph": 0.2, "inhib": 0.05, "spawn_jitter": 0.05, "seed": 29, "budget": 40 } },
+    { "id": 3, "class_name": "CognitiveDashboardNode", "pos_x": -260.0, "pos_y": -400.0, "width": 260.0, "height": 180.0,
+      "config": { "node_title": "Dashboard (Arbor A: noisy in / recall out)" } },
+    { "id": 4, "class_name": "SignalDisplayNode", "pos_x": 80.0, "pos_y": -400.0, "width": 170.0, "height": 120.0,
+      "config": { "node_title": "Arbor A: nodes" } },
+    { "id": 5, "class_name": "SignalDisplayNode", "pos_x": 80.0, "pos_y": -260.0, "width": 170.0, "height": 120.0,
+      "config": { "node_title": "Arbor B: nodes" } },
+    { "id": 6, "class_name": "SignalDisplayNode", "pos_x": 80.0, "pos_y": -120.0, "width": 170.0, "height": 120.0,
+      "config": { "node_title": "Arbor A: mean footprint size" } },
+    { "id": 7, "class_name": "SignalDisplayNode", "pos_x": 80.0, "pos_y": 20.0, "width": 170.0, "height": 120.0,
+      "config": { "node_title": "Arbor B: mean footprint size" } }
+  ],
+  "edges": [
+    { "from_node_id": 0, "from_port": "query_vec", "to_node_id": 1, "to_port": "query_vec" },
+    { "from_node_id": 0, "from_port": "query_vec", "to_node_id": 2, "to_port": "query_vec" },
+    { "from_node_id": 0, "from_port": "query_img", "to_node_id": 3, "to_port": "query_img" },
+    { "from_node_id": 1, "from_port": "recall_img","to_node_id": 3, "to_port": "recall_img" },
+    { "from_node_id": 1, "from_port": "n_nodes",   "to_node_id": 4, "to_port": "signal" },
+    { "from_node_id": 2, "from_port": "n_nodes",   "to_node_id": 5, "to_port": "signal" },
+    { "from_node_id": 1, "from_port": "mean_size", "to_node_id": 6, "to_port": "signal" },
+    { "from_node_id": 2, "from_port": "mean_size", "to_node_id": 7, "to_port": "signal" }
+  ]
+}
