@@ -35,13 +35,16 @@ class ResonatorAxonNode(BaseNode):
     NODE_CATEGORY = "Resonator"
     NODE_COLOR = QtGui.QColor(210, 110, 90)  # axon orange-red
 
-    def __init__(self, n_cells=40, kick=12.0, gradient=1.0):
+    def __init__(self, n_cells=20, kick=12.0, gradient=1.0):
         super().__init__()
         self.node_title = "Resonator Axon"
 
         self.inputs = {
             'fire_in':  'signal',   # from a ResonatorSomaNode 'fire'
-            'reset':    'signal',   # >0.5 resets the line to rest (new compute)
+            'trigger':  'signal',   # paced origination (e.g. Septum 'peak') -
+                                    # originates ONE spike per rising edge,
+                                    # then lets it conduct undisturbed
+            'reset':    'signal',   # >0.5 hard-clears the line to rest
         }
         self.outputs = {
             'spike_out': 'signal',   # transient field value at the output end
@@ -51,7 +54,7 @@ class ResonatorAxonNode(BaseNode):
 
         # FitzHugh-Nagumo params (same as the repo's propagating_spike.py)
         self.n = int(n_cells)
-        self.D, self.eps, self.a, self.b, self.dt = 0.5, 0.08, 0.7, 0.8, 0.1
+        self.D, self.eps, self.a, self.b, self.dt = 0.5, 0.08, 0.7, 0.8, 0.3
         self.kick = float(kick)
         self.gradient = float(gradient)   # 1.0 = AIS gradient on; 0.0 = uniform
         self.ais_cell = 3
@@ -61,6 +64,8 @@ class ResonatorAxonNode(BaseNode):
         self.w = np.full(self.n, -0.6)
         self._kick_left = 0
         self._fired_latch = False
+        self._prev_trig = 0.0
+        self._armed = True
         self.plot_img = np.zeros((90, 220, 3), np.uint8)
 
     def _a_profile(self):
@@ -78,21 +83,45 @@ class ResonatorAxonNode(BaseNode):
         return lap
 
     def step(self):
+        # 'reset' HARD-clears the line to rest. Use sparingly: a theta peak
+        # should NOT drive this directly, because if theta is faster than the
+        # spike's traversal time it will wipe the spike before it arrives
+        # (the v16 lesson: the clock period must exceed the conduction
+        # latency). Leave 'reset' for an explicit "start a new computation".
         reset = self.get_blended_input('reset', 'sum')
         if reset is not None and float(reset) > 0.5:
             self.v[:] = -1.2
             self.w[:] = -0.6
             self._fired_latch = False
             self._kick_left = 0
+            self._armed = True            # ready to originate again
 
         fire = self.get_blended_input('fire_in', 'sum')
         fire = 0.0 if fire is None else float(fire)
-        # originate a spike when fire crosses, once per quiescent period
-        if fire > 0.5 and not self._fired_latch:
-            self._kick_left = 6
-            self._fired_latch = True
-        if fire < 0.5:
-            self._fired_latch = False   # rearm when input drops
+
+        # 'trigger' ORIGINATES one spike (rising edge), without wiping the
+        # line. This is the correct pacing input: a theta peak triggers a
+        # fresh spike, which then conducts UNDISTURBED to the output. The
+        # neuron fires only if its soma says fire (fire_in > 0.5) AND it is
+        # armed (hasn't already fired this cycle).
+        trig_raw = self.get_blended_input('trigger', 'sum')
+        trig = 0.0 if trig_raw is None else float(trig_raw)
+        trig_edge = (trig > 0.5 and self._prev_trig <= 0.5)
+        self._prev_trig = trig
+
+        if trig_edge and fire > 0.5 and self._armed:
+            self._kick_left = 6           # paced origination: one spike per trigger
+            self._armed = False
+        elif trig < 0.5:
+            self._armed = True            # re-arm between triggers
+
+        # free-running mode: if no trigger wired, originate on a fire edge
+        if trig_raw is None:
+            if fire > 0.5 and not self._fired_latch:
+                self._kick_left = 6
+                self._fired_latch = True
+            if fire < 0.5:
+                self._fired_latch = False
 
         I = np.zeros(self.n)
         if self._kick_left > 0:
@@ -103,7 +132,7 @@ class ResonatorAxonNode(BaseNode):
         lap = self._laplacian()
         dv = self.v - self.v**3 / 3 - self.w + self.D * lap + I
         dw = self.eps * (self.v + a_prof - self.b * self.w)
-        self.v = self.v + self.dt * dv
+        self.v = np.clip(self.v + self.dt * dv, -3.0, 3.0)
         self.w = self.w + self.dt * dw
         self._render()
 
