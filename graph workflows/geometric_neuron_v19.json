@@ -1,0 +1,231 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "SeptumPacemakerNode",
+      "pos_x": -600.0,
+      "pos_y": -200.0,
+      "width": 260.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "reset_in": "signal",
+          "f0_mod": "signal"
+        },
+        "outputs": {
+          "theta": "signal",
+          "peak": "signal",
+          "phase": "signal",
+          "coherence": "signal",
+          "plot": "image"
+        },
+        "input_data": {
+          "reset_in": [
+            0.0
+          ],
+          "f0_mod": []
+        },
+        "node_title": "Septum (Theta Pacemaker)",
+        "n": 50,
+        "f0": 7.0,
+        "k": 6.0,
+        "g_reset": 25.0,
+        "sigma": 0.5,
+        "dt": 0.001,
+        "g_theta": 1.0,
+        "A": 0.5347863238135198,
+        "phi": 1.5299464392701219,
+        "I_theta": 0.0,
+        "peak": 0.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -547.0,
+      "pos_y": -488.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Bit A",
+        "value": 1.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "ConstantSignalNode",
+      "pos_x": -289.0,
+      "pos_y": -150.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {},
+        "outputs": {
+          "signal": "signal"
+        },
+        "input_data": {},
+        "node_title": "Bit B",
+        "value": 0.0
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "ResonatorSomaNode",
+      "pos_x": -261.0,
+      "pos_y": -468.0,
+      "width": 200.0,
+      "height": 180.0,
+      "config": {
+        "inputs": {
+          "in_a": "signal",
+          "in_b": "signal",
+          "in_c": "signal"
+        },
+        "outputs": {
+          "fire": "signal",
+          "amplitude": "signal"
+        },
+        "input_data": {
+          "in_a": [
+            1.0
+          ],
+          "in_b": [
+            0.0
+          ],
+          "in_c": []
+        },
+        "node_title": "Resonator Soma (XOR)",
+        "gate": "XOR",
+        "fire": 1.0,
+        "amplitude": 1.2246467991473532e-16
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "ResonatorAxonNode",
+      "pos_x": -2.0,
+      "pos_y": -468.0,
+      "width": 240.0,
+      "height": 140.0,
+      "config": {
+        "inputs": {
+          "fire_in": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "spike_out": "signal",
+          "arrived": "signal",
+          "field": "spectrum"
+        },
+        "input_data": {
+          "fire_in": [
+            1.0
+          ],
+          "reset": []
+        },
+        "node_title": "Resonator Axon",
+        "n": 40,
+        "D": 0.5,
+        "eps": 0.08,
+        "a": 0.7,
+        "b": 0.8,
+        "dt": 0.3,
+        "kick": 12.0,
+        "gradient": 1.0,
+        "ais_cell": 3,
+        "out_cell": 37,
+        "_kick_left": 0,
+        "_fired_latch": true,
+        "_armed": true
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 5,
+      "class_name": "SynapseLatchNode",
+      "pos_x": 33.0,
+      "pos_y": -251.0,
+      "width": 180.0,
+      "height": 120.0,
+      "config": {
+        "inputs": {
+          "spike_in": "signal",
+          "reset": "signal"
+        },
+        "outputs": {
+          "bit": "signal",
+          "psp": "signal"
+        },
+        "input_data": {
+          "spike_in": [
+            -1.1993508626532408
+          ],
+          "reset": []
+        },
+        "node_title": "Synapse (OUTPUT BIT)",
+        "threshold": 0.5,
+        "decay": 0.98,
+        "_latched": true,
+        "psp": 0.027990805570896914
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "in_a",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "in_b",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "fire",
+      "to_node_id": 4,
+      "to_port": "fire_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "spike_out",
+      "to_node_id": 5,
+      "to_port": "spike_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "peak",
+      "to_node_id": 4,
+      "to_port": "trigger",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "arrived",
+      "to_node_id": 0,
+      "to_port": "reset_in",
+      "learned_weight": 1.0
+    }
+  ]
+}
