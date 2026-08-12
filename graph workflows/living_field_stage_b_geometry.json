@@ -1,0 +1,350 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "LivingCheckerboardNode",
+      "pos_x": -120.0,
+      "pos_y": -140.0,
+      "width": 300.0,
+      "height": 340.0,
+      "config": {
+        "inputs": {
+          "square_size": "signal",
+          "global_drive": "signal",
+          "write_0": "signal",
+          "write_1": "signal",
+          "write_2": "signal",
+          "write_3": "signal",
+          "write_4": "signal",
+          "write_5": "signal",
+          "write_6": "signal",
+          "write_7": "signal"
+        },
+        "outputs": {
+          "image": "image",
+          "field_vector": "spectrum",
+          "read_vector": "spectrum",
+          "read_0": "signal",
+          "read_1": "signal",
+          "read_2": "signal",
+          "read_3": "signal",
+          "read_4": "signal",
+          "read_5": "signal",
+          "read_6": "signal",
+          "read_7": "signal"
+        },
+        "input_data": {},
+        "node_title": "Living Checkerboard v3",
+        "size": 256,
+        "template_pull": 0.004,
+        "diffusion": 0.16,
+        "diffusion_steps": 4,
+        "leak": 0.0005,
+        "write_gain": 0.06,
+        "write_center": 0.5,
+        "write_sharpness": 1.5,
+        "global_gain": 0.03,
+        "geometry_slew": 0.08,
+        "read_aperture": 0.15,
+        "aperture_seed": 1234
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 1,
+      "class_name": "HomeostaticCouplerNode",
+      "pos_x": -760.0,
+      "pos_y": -420.0,
+      "width": 459.0,
+      "height": 190.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "image_in": "image",
+          "setpoint_mod": "signal",
+          "gain_mod": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal",
+          "image_out": "image",
+          "error": "signal",
+          "regime": "signal",
+          "history_plot": "image"
+        },
+        "input_data": {},
+        "node_title": "Home 0",
+        "setpoint": 0.5,
+        "gain": 1.0,
+        "sharpness": 3.0,
+        "dead_zone": 0.1,
+        "mode": "edge_of_chaos",
+        "integral_gain": 0.01,
+        "integral_state": 0.0,
+        "integral_limit": 0.5,
+        "target_variance": 0.02,
+        "variance_window": 50
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 2,
+      "class_name": "HomeostaticCouplerNode",
+      "pos_x": -760.0,
+      "pos_y": -210.0,
+      "width": 459.0,
+      "height": 190.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "image_in": "image",
+          "setpoint_mod": "signal",
+          "gain_mod": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal",
+          "image_out": "image",
+          "error": "signal",
+          "regime": "signal",
+          "history_plot": "image"
+        },
+        "input_data": {},
+        "node_title": "Home 1",
+        "setpoint": 0.5,
+        "gain": 1.0,
+        "sharpness": 3.0,
+        "dead_zone": 0.1,
+        "mode": "edge_of_chaos",
+        "integral_gain": 0.01,
+        "integral_state": 0.0,
+        "integral_limit": 0.5,
+        "target_variance": 0.02,
+        "variance_window": 50
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 3,
+      "class_name": "HomeostaticCouplerNode",
+      "pos_x": -760.0,
+      "pos_y": 0.0,
+      "width": 459.0,
+      "height": 190.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "image_in": "image",
+          "setpoint_mod": "signal",
+          "gain_mod": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal",
+          "image_out": "image",
+          "error": "signal",
+          "regime": "signal",
+          "history_plot": "image"
+        },
+        "input_data": {},
+        "node_title": "Home 2",
+        "setpoint": 0.5,
+        "gain": 1.0,
+        "sharpness": 3.0,
+        "dead_zone": 0.1,
+        "mode": "edge_of_chaos",
+        "integral_gain": 0.01,
+        "integral_state": 0.0,
+        "integral_limit": 0.5,
+        "target_variance": 0.02,
+        "variance_window": 50
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 4,
+      "class_name": "HomeostaticCouplerNode",
+      "pos_x": -760.0,
+      "pos_y": 210.0,
+      "width": 459.0,
+      "height": 190.0,
+      "config": {
+        "inputs": {
+          "signal_in": "signal",
+          "image_in": "image",
+          "setpoint_mod": "signal",
+          "gain_mod": "signal"
+        },
+        "outputs": {
+          "signal_out": "signal",
+          "image_out": "image",
+          "error": "signal",
+          "regime": "signal",
+          "history_plot": "image"
+        },
+        "input_data": {},
+        "node_title": "Home 3",
+        "setpoint": 0.5,
+        "gain": 1.0,
+        "sharpness": 3.0,
+        "dead_zone": 0.1,
+        "mode": "edge_of_chaos",
+        "integral_gain": 0.01,
+        "integral_state": 0.0,
+        "integral_limit": 0.5,
+        "target_variance": 0.02,
+        "variance_window": 50
+      },
+      "custom_state_file": null
+    },
+    {
+      "id": 9,
+      "class_name": "TemporalMultiScopeNode",
+      "pos_x": 320.0,
+      "pos_y": 220.0,
+      "width": 460.0,
+      "height": 280.0,
+      "config": {
+        "inputs": {
+          "vector_in": "spectrum",
+          "sig_0": "signal",
+          "sig_1": "signal",
+          "sig_2": "signal",
+          "sig_3": "signal"
+        },
+        "outputs": {
+          "plot": "image",
+          "spread": "signal",
+          "coherence": "signal",
+          "activity": "signal",
+          "saturation": "signal",
+          "lag_coherence": "signal",
+          "mean_abs_lag": "signal"
+        },
+        "input_data": {},
+        "node_title": "Temporal Multi Scope",
+        "history_len": 600,
+        "max_lag": 60,
+        "live_threshold": 1e-05,
+        "rail_epsilon": 0.02,
+        "autoscale": 1.0
+      },
+      "custom_state_file": null
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "read_0",
+      "to_node_id": 1,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal_out",
+      "to_node_id": 0,
+      "to_port": "write_0",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_0",
+      "to_node_id": 9,
+      "to_port": "sig_0",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_1",
+      "to_node_id": 2,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal_out",
+      "to_node_id": 0,
+      "to_port": "write_1",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_1",
+      "to_node_id": 9,
+      "to_port": "sig_1",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_2",
+      "to_node_id": 3,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal_out",
+      "to_node_id": 0,
+      "to_port": "write_2",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_2",
+      "to_node_id": 9,
+      "to_port": "sig_2",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_3",
+      "to_node_id": 4,
+      "to_port": "signal_in",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal_out",
+      "to_node_id": 0,
+      "to_port": "write_3",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_3",
+      "to_node_id": 9,
+      "to_port": "sig_3",
+      "learned_weight": 1.0
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal_out",
+      "to_node_id": 0,
+      "to_port": "square_size",
+      "learned_weight": 0.05
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "signal_out",
+      "to_node_id": 0,
+      "to_port": "square_size",
+      "learned_weight": 0.05
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "signal_out",
+      "to_node_id": 0,
+      "to_port": "square_size",
+      "learned_weight": 0.05
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "signal_out",
+      "to_node_id": 0,
+      "to_port": "square_size",
+      "learned_weight": 0.05
+    }
+  ]
+}
