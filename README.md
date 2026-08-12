@@ -20,6 +20,31 @@ file and load them later.Configurable: Right-click nodes to configure their inte
 
 ![midi](./midi.png)
 
+# Temporal propagation calibration demo
+
+A small August 2026 experiment now gives the lab a known-answer temporal calibration.
+
+`nodes/wavefieldnode.py` sends a pulse through a finite-speed second-order field and
+`nodes/temporalmultiscopenode.py` measures the lag between spatially separated probes.
+Use `graph workflows/wave_field_probe.json` for the clean probe and
+`graph workflows/wave_field_one_home.json` for the delayed feedback-loop version.
+
+With the checked settings the Wave Field predicts about `13.2` frames per adjacent probe
+gap. The scope averages over all pairs of four equally spaced probes, whose mean
+separation is `10/6` gaps, so the expected reported mean lag is `22.0` frames. Manual
+runs gave about `21.3-22.2` frames.
+
+The point is not that a wave equation has propagation delay -- that is built into the
+model. The useful result is a calibrated instrument plus a matched pair:
+
+```text
+persistent relaxational field -> common mode / near-zero causal-age separation
+persistent propagating field   -> distinguishable causal ages in one current state
+```
+
+See [`docs/TEMPORAL_THICKNESS_CALIBRATION.md`](docs/TEMPORAL_THICKNESS_CALIBRATION.md)
+for the derivation, limits and interpretation.
+
 # Installation
 
 # Core Application Requirements
