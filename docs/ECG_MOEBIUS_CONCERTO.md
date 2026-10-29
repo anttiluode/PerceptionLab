@@ -10,30 +10,30 @@ controller, which modulates checkerboard square size. These are **not eigenmodes
 
 ## Run on Windows (same Python environment as Perception Lab)
 
-\`\`\`powershell
+```powershell
 git pull
 python3.13 perceptionlab12.py
-\`\`\`
+```
 
 Load via the Perception Lab graph-open command:
 
 - [ecg_moebius_observer.json](../graph%20workflows/ecg_moebius_observer.json)
   leaves the original feedback edges intact and adds a **passive** memory observer.
 - [ecg_moebius_feedback.json](../graph%20workflows/ecg_moebius_feedback.json)
-  additionally connects a bounded memory scalar to coupler \`gain_mod\`
+  additionally connects a bounded memory scalar to coupler `gain_mod`
   (edge weight 0.5). The maximum new gain modulation is ±5% with current code.
 
-The new node is \`nodes/moebiusloopmemorynode.py\`. It imports
-\`nodes/loopmemory.py\`, copied from [MoebiusLoopMemory](https://github.com/anttiluode/MoebiusLoopMemory).
+The new node is `nodes/moebiusloopmemorynode.py`. It imports
+`nodes/loopmemory.py`, copied from [MoebiusLoopMemory](https://github.com/anttiluode/MoebiusLoopMemory).
 The recurrence is exactly the same form as in the tested webcam demo:
-\`s_next=tanh(leak*R@s + B@u + gate*(B@u)*tanh(A@R@s))\`.
+`s_next=tanh(leak*R@s + B@u + gate*(B@u)*tanh(A@R@s))`.
 
-The node accepts the 256-value \`ImageToVector.vector_out\` spectrum,
+The node accepts the 256-value `ImageToVector.vector_out` spectrum,
 projects this lossily to 16D, and displays a state-history image.
-Outputs: \`memory_vector\` (16D), \`memory_signal\` (bounded scalar),
-\`input_novelty\` (input-induced state increment), and \`gate_drive\`.
-\`change\` mode by default has zero drive for an identical image;
-\`appearance\` mode continuously feeds a static image.
+Outputs: `memory_vector` (16D), `memory_signal` (bounded scalar),
+`input_novelty` (input-induced state increment), and `gate_drive`.
+`change` mode by default has zero drive for an identical image;
+`appearance` mode continuously feeds a static image.
 
 ### What must be established
 
@@ -47,7 +47,7 @@ Outputs: \`memory_vector\` (16D), \`memory_signal\` (bounded scalar),
    the ECG controller's own 50-step variance signal.
 4. Separate externally written memory from controller-generated oscillations:
    with zero external input, the controller must not be credited for invented
-   sensory information. The \`edge_of_chaos\` label alone does not establish
+   sensory information. The `edge_of_chaos` label alone does not establish
    mathematical chaos.
 
 At the pictured 5.6 processed frames/s, a 0.92 linear leak gives an approximate
