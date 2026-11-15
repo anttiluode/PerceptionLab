@@ -1,0 +1,160 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "WaveFieldNode",
+      "pos_x": -220,
+      "pos_y": -175,
+      "width": 290,
+      "height": 340,
+      "config": {
+        "node_title": "Wave Field",
+        "size": 256,
+        "speed": 0.5,
+        "damping": 0.006,
+        "substeps": 4,
+        "drive_gain": 0.6,
+        "source_radius": 4,
+        "edge_absorb": 0.06,
+        "read_aperture": 6,
+        "line_y": 0.5,
+        "first_x": 0.2,
+        "last_x": 0.92,
+        "source_x": 0.08
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "PulseSourceNode",
+      "pos_x": -510,
+      "pos_y": -160,
+      "width": 210,
+      "height": 145,
+      "config": {
+        "node_title": "Pulse Source",
+        "period": 300,
+        "width": 3,
+        "amplitude": 1,
+        "warmup": 60
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "TemporalMultiScopeNode",
+      "pos_x": 130,
+      "pos_y": -130,
+      "width": 395,
+      "height": 230,
+      "config": {
+        "node_title": "Temporal Multi Scope",
+        "history_len": 600,
+        "max_lag": 60,
+        "live_threshold": 0.00001,
+        "rail_epsilon": 0.02,
+        "autoscale": 1
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "TemporalTransitPredictorNode",
+      "pos_x": 130,
+      "pos_y": 125,
+      "width": 250,
+      "height": 190,
+      "config": {
+        "node_title": "Temporal Transit Predictor",
+        "delay": 13,
+        "window": 200,
+        "min_samples": 50
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "SignalPlotterNode",
+      "pos_x": 455,
+      "pos_y": 125,
+      "width": 310,
+      "height": 250,
+      "config": {
+        "node_title": "Transit: red dB advantage, green innovation, blue lag",
+        "history_size": 500
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 0,
+      "to_port": "impulse",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_0",
+      "to_node_id": 2,
+      "to_port": "sig_0",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_1",
+      "to_node_id": 2,
+      "to_port": "sig_1",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_2",
+      "to_node_id": 2,
+      "to_port": "sig_2",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_3",
+      "to_node_id": 2,
+      "to_port": "sig_3",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_0",
+      "to_node_id": 3,
+      "to_port": "near",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 0,
+      "from_port": "read_1",
+      "to_node_id": 3,
+      "to_port": "far",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "advantage_db",
+      "to_node_id": 4,
+      "to_port": "signal_A (Red)",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "innovation",
+      "to_node_id": 4,
+      "to_port": "signal_B (Green)",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "mean_abs_lag",
+      "to_node_id": 4,
+      "to_port": "signal_C (Blue)",
+      "learned_weight": 1
+    }
+  ]
+}
