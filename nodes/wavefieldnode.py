@@ -268,6 +268,7 @@ class WaveFieldNode(BaseNode):
 
     def get_config_options(self):
         return [
+            ("Grid size (resets waves)", "size", self.size, None),
             ("Speed", "speed", self.speed, "float"),
             ("Damping", "damping", self.damping, "float"),
             ("Substeps", "substeps", self.substeps, None),
@@ -283,6 +284,26 @@ class WaveFieldNode(BaseNode):
 
     def set_config_options(self, options):
         rebuild = False
+
+        # The host always constructs nodes with no args, then applies the
+        # saved config. Without this branch, a saved size=96 was applied
+        # later as a plain scalar attribute while the *actual* arrays and
+        # aperture coordinates remained at the default size=256. That
+        # silently changes wave transit and breaks calibrated graph loops.
+        if "size" in options:
+            size = max(32, min(1024, int(float(options["size"]))))
+            if size != self.size:
+                self.size = size
+                self.field = np.zeros((size, size), dtype=np.float32)
+                self.vel = np.zeros((size, size), dtype=np.float32)
+                self.read_values = np.zeros(self.N_APERTURES,
+                                            dtype=np.float32)
+                self.field_vector[:] = 0.0
+                self.energy_value = 0.0
+                self.display_image = np.zeros((size, size, 3),
+                                              dtype=np.uint8)
+                rebuild = True
+
         for name in ("speed", "damping", "drive_gain"):
             if name in options:
                 setattr(self, name, float(options[name]))
