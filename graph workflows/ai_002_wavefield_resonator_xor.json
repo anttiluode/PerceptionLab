@@ -1,0 +1,197 @@
+{
+  "global_settings": {
+    "coupling": 100,
+    "speed": 100
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "class_name": "PulseSourceNode",
+      "pos_x": -740,
+      "pos_y": -285,
+      "width": 190,
+      "height": 135,
+      "config": {
+        "node_title": "Pulse A",
+        "period": 0,
+        "width": 3,
+        "amplitude": 1,
+        "warmup": 60
+      }
+    },
+    {
+      "id": 1,
+      "class_name": "PulseSourceNode",
+      "pos_x": -740,
+      "pos_y": 175,
+      "width": 190,
+      "height": 135,
+      "config": {
+        "node_title": "Pulse B (earlier)",
+        "period": 0,
+        "width": 3,
+        "amplitude": 1,
+        "warmup": 55
+      }
+    },
+    {
+      "id": 2,
+      "class_name": "WaveFieldNode",
+      "pos_x": -475,
+      "pos_y": -310,
+      "width": 245,
+      "height": 260,
+      "config": {
+        "node_title": "Lane A near aperture",
+        "size": 96,
+        "speed": 0.5,
+        "damping": 0.006,
+        "substeps": 4,
+        "drive_gain": 0.6,
+        "source_radius": 4,
+        "edge_absorb": 0.06,
+        "read_aperture": 6,
+        "line_y": 0.5,
+        "first_x": 0.2,
+        "last_x": 0.92,
+        "source_x": 0.08
+      }
+    },
+    {
+      "id": 3,
+      "class_name": "WaveFieldNode",
+      "pos_x": -475,
+      "pos_y": 165,
+      "width": 245,
+      "height": 260,
+      "config": {
+        "node_title": "Lane B farther aperture",
+        "size": 96,
+        "speed": 0.5,
+        "damping": 0.006,
+        "substeps": 4,
+        "drive_gain": 0.6,
+        "source_radius": 4,
+        "edge_absorb": 0.06,
+        "read_aperture": 6,
+        "line_y": 0.5,
+        "first_x": 0.2,
+        "last_x": 0.92,
+        "source_x": 0.08
+      }
+    },
+    {
+      "id": 4,
+      "class_name": "WaveArrivalGateNode",
+      "pos_x": -145,
+      "pos_y": -225,
+      "width": 190,
+      "height": 130,
+      "config": {
+        "node_title": "Arrival A",
+        "threshold": 0.919588565826416
+      }
+    },
+    {
+      "id": 5,
+      "class_name": "WaveArrivalGateNode",
+      "pos_x": -145,
+      "pos_y": 185,
+      "width": 190,
+      "height": 130,
+      "config": {
+        "node_title": "Arrival B",
+        "threshold": 0.6591460704803467
+      }
+    },
+    {
+      "id": 6,
+      "class_name": "ResonatorSomaNode",
+      "pos_x": 190,
+      "pos_y": -40,
+      "width": 220,
+      "height": 160,
+      "config": {
+        "node_title": "Resonator Soma: XOR",
+        "gate": "XOR"
+      }
+    },
+    {
+      "id": 7,
+      "class_name": "SignalPlotterNode",
+      "pos_x": 515,
+      "pos_y": -35,
+      "width": 330,
+      "height": 260,
+      "config": {
+        "node_title": "Red XOR / Green A / Blue B",
+        "history_size": 400
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node_id": 0,
+      "from_port": "signal",
+      "to_node_id": 2,
+      "to_port": "impulse",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 1,
+      "from_port": "signal",
+      "to_node_id": 3,
+      "to_port": "impulse",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 2,
+      "from_port": "read_0",
+      "to_node_id": 4,
+      "to_port": "signal_in",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 3,
+      "from_port": "read_1",
+      "to_node_id": 5,
+      "to_port": "signal_in",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "gate",
+      "to_node_id": 6,
+      "to_port": "in_a",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "gate",
+      "to_node_id": 6,
+      "to_port": "in_b",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 6,
+      "from_port": "fire",
+      "to_node_id": 7,
+      "to_port": "signal_A (Red)",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 4,
+      "from_port": "gate",
+      "to_node_id": 7,
+      "to_port": "signal_B (Green)",
+      "learned_weight": 1
+    },
+    {
+      "from_node_id": 5,
+      "from_port": "gate",
+      "to_node_id": 7,
+      "to_port": "signal_C (Blue)",
+      "learned_weight": 1
+    }
+  ]
+}
