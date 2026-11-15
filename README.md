@@ -1,3 +1,13 @@
+# PerceptionLab — composable perception research
+
+**Two repositories, one research cycle:** [PerceptionLabAI — experiment workshop](https://github.com/anttiluode/PerceptionLabAI) → [PerceptionLab — reusable node library](https://github.com/anttiluode/PerceptionLab).
+
+We develop ideas as **small, testable node graphs**. Human and AI contributors build and connect nodes in PerceptionLabAI, record hypotheses, measure against controls, and keep failures. Working, reusable nodes and saved workflows are submitted to PerceptionLab by reviewed pull request. The main laboratory stays stable while the workshop stays adventurous.
+
+**Start here:** [How collaboration works](docs/AI_COLLABORATION.md) · [Workshop repository](https://github.com/anttiluode/PerceptionLabAI) · [Node and workflow genealogy](https://anttiluode.github.io/PerceptionLabNodes/) · [First accepted experiment: temporal transit](docs/AI_001_TEMPORAL_TRANSIT_PREDICTOR.md) · [Website page source](index.html)
+
+---
+
 # Antti's Perception Laboratory (modular with node folder sepearate)
 
 EDIT: NEW PORTABLE 3 clicks to perception lab zip file at huggingface:
